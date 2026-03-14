@@ -44,8 +44,8 @@ docker-compose up -d api
 预期输出:
 
 ```text
-Creating network "tradermate_default" with the default driver
-Creating tradermate-api-1 ... done
+Creating network "quantmate_default" with the default driver
+Creating quantmate-api-1 ... done
 ```
 
 ### 2. 步骤二标题

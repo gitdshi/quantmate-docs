@@ -2,9 +2,9 @@
 
 ## Overview
 
-TraderMate uses a single MySQL instance with multiple logical databases:
+QuantMate uses a single MySQL instance with multiple logical databases:
 
-1. **tradermate** - core business data (users, strategies, backtests, jobs, sync status)
+1. **quantmate** - core business data (users, strategies, backtests, jobs, sync status)
 2. **tushare** - raw market data from Tushare
 3. **akshare** - index and trade calendar data from AkShare
 4. **vnpy** - VNpy-compatible bar tables (optional sync target)
@@ -13,7 +13,7 @@ All connections share the same MySQL host/port/user/password from `.env`.
 
 ## Key Tables (Non-Exhaustive)
 
-### tradermate
+### quantmate
 - `users`
 - `strategies`
 - `backtest_history`
@@ -47,7 +47,7 @@ MYSQL_HOST=127.0.0.1
 MYSQL_PORT=3306
 MYSQL_USER=root
 MYSQL_PASSWORD=...
-TRADERMATE_DB=tradermate   # optional override
+QUANTMATE_DB=quantmate   # optional override
 TUSHARE_DB=tushare         # optional override
 ```
 
@@ -55,10 +55,10 @@ TUSHARE_DB=tushare         # optional override
 
 ## Initialization
 
-Schemas live under `tradermate/mysql/init/` and are applied by:
+Schemas live under `quantmate/mysql/init/` and are applied by:
 
 ```bash
-cd tradermate
+cd quantmate
 ./scripts/datasync_service.sh init
 ```
 

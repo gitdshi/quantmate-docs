@@ -1,4 +1,4 @@
-# Getting Started ¡ª TraderMate
+# Getting Started ¡ª QuantMate
 
 Quick setup for local development.
 
@@ -13,7 +13,7 @@ Quick setup for local development.
 1) Copy env template
 
 ```bash
-cd tradermate
+cd QuantMate
 cp .env.example .env
 # Set at least MYSQL_PASSWORD, SECRET_KEY, and TUSHARE_TOKEN
 ```
@@ -48,7 +48,7 @@ python -m uvicorn app.api.main:app --reload
 ## Frontend (Portal)
 
 ```bash
-cd ../tradermate-portal
+cd ../QuantMate-portal
 npm install
 npm run dev -- --host 0.0.0.0 --port 5173
 ```
@@ -63,3 +63,4 @@ First login uses the admin account and requires a password change.
 - Backend tests: `testing/TESTING.md`
 - Frontend test summary: `development/frontend/TEST_SUMMARY.md`
 - E2E tests: `development/frontend/E2E_README.md`
+

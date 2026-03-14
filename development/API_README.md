@@ -1,6 +1,6 @@
-# TraderMate API
+# QuantMate API
 
-FastAPI-based REST API for the TraderMate platform.
+FastAPI-based REST API for the QuantMate platform.
 
 ## Features
 
@@ -16,7 +16,7 @@ FastAPI-based REST API for the TraderMate platform.
 1) Install deps
 
 ```bash
-cd tradermate
+cd quantmate
 pip install -r requirements.txt
 ```
 
@@ -68,7 +68,7 @@ MYSQL_HOST=127.0.0.1
 MYSQL_PORT=3306
 MYSQL_USER=root
 MYSQL_PASSWORD=<password>
-TRADERMATE_DB=tradermate
+QUANTMATE_DB=quantmate
 TUSHARE_DB=tushare
 
 # Redis

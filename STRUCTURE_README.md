@@ -5,7 +5,7 @@ This repository is the documentation root (there is no `docs/` subfolder).
 ## Current Layout
 
 ```
-tradermate-docs/
+quantmate-docs/
   README.md
   STRUCTURE_README.md
   SECURITY.md

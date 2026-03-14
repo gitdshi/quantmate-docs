@@ -1,6 +1,6 @@
-# TraderMate Frontend
+# QuantMate Frontend
 
-React 18 + Vite + TypeScript frontend for TraderMate trading platform.
+React 18 + Vite + TypeScript frontend for QuantMate trading platform.
 
 ## Tech Stack
 

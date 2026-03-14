@@ -146,13 +146,13 @@ curl -I http://localhost:8000/docs | grep -i access-control
 ---
 
 ### 🗄�?数据库问�?
-#### 问题: `OperationalError: (1049, "Unknown database 'tradermate'")`
+#### 问题: `OperationalError: (1049, "Unknown database 'QuantMate'")`
 
 **原因**: 数据库未初始�?
 **修复**:
 ```bash
 # Docker方式
-docker compose exec mysql mysql -u root -p${MYSQL_PASSWORD} < mysql/init/tradermate.sql
+docker compose exec mysql mysql -u root -p${MYSQL_PASSWORD} < mysql/init/QuantMate.sql
 docker compose exec mysql mysql -u root -p${MYSQL_PASSWORD} < mysql/init/vnpy.sql
 docker compose exec mysql mysql -u root -p${MYSQL_PASSWORD} < mysql/init/tushare.sql
 
@@ -167,10 +167,10 @@ docker compose exec mysql mysql -u root -p${MYSQL_PASSWORD} -e "SHOW DATABASES;"
 
 **修复**:
 ```bash
-# 查看表结�?docker compose exec mysql mysql -u root -p${MYSQL_PASSWORD} -e "DESCRIBE tradermate.strategies;"
+# 查看表结�?docker compose exec mysql mysql -u root -p${MYSQL_PASSWORD} -e "DESCRIBE QuantMate.strategies;"
 
 # 如果数据可丢失，清空表后重试
-docker compose exec mysql mysql -u root -p${MYSQL_PASSWORD} -e "TRUNCATE TABLE tradermate.strategies;"
+docker compose exec mysql mysql -u root -p${MYSQL_PASSWORD} -e "TRUNCATE TABLE QuantMate.strategies;"
 
 # 或创建全新数据库 (推荐开发环境重�?
 docker compose down -v  # ⚠️ 删除所有数�?docker compose up -d
@@ -207,7 +207,7 @@ docker compose down -v  # ⚠️ 删除所有数�?docker compose up -d
 **修复**:
 ```bash
 # 方案1: 修改文件权限 (推荐)
-sudo chown -R 1000:1000 tradermate/app  # 1000是容器内appuser UID
+sudo chown -R 1000:1000 QuantMate/app  # 1000是容器内appuser UID
 
 # 方案2: 临时用root启动 (仅开发调�?
 # �?docker-compose.dev.yml 中添�? user: "root:root"
@@ -302,7 +302,7 @@ docker stats
 ```bash
 # 1. 确保测试数据库独�?# 检�?conftest.py 中是否使用独立测试数据库
 
-# 2. 清理数据库状�?docker compose exec mysql mysql -u root -p${MYSQL_PASSWORD} -e "DROP DATABASE IF EXISTS tradermate_test; CREATE DATABASE tradermate_test;"
+# 2. 清理数据库状�?docker compose exec mysql mysql -u root -p${MYSQL_PASSWORD} -e "DROP DATABASE IF EXISTS QuantMate_test; CREATE DATABASE QuantMate_test;"
 
 # 3. 运行单个测试查看详细输出
 pytest tests/unit/test_auth.py::test_login -vv
@@ -345,3 +345,4 @@ docker-compose logs --since 10m > troubleshooting-logs.txt
 
 **最后更�?*: 2026-03-03  
 **待补�?*: WebSocket连接问题、异步任务失败、Redis内存不足�
+

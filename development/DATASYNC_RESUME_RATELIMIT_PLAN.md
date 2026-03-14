@@ -1,6 +1,6 @@
 # DataSync Init/Resume and Rate Limit Behavior
 
-This document describes the current behavior implemented in `tradermate/scripts/init_market_data.py` and `app/datasync/service/data_sync_daemon.py`. It is not a proposal; it reflects the live code.
+This document describes the current behavior implemented in `QuantMate/scripts/init_market_data.py` and `app/datasync/service/data_sync_daemon.py`. It is not a proposal; it reflects the live code.
 
 ## Scope
 
@@ -12,8 +12,8 @@ This document describes the current behavior implemented in `tradermate/scripts/
 
 ### Tables
 
-- `tradermate.init_progress` tracks init steps and cursor positions.
-- `tradermate.data_sync_status` tracks per-step sync status for normal daemon runs.
+- `QuantMate.init_progress` tracks init steps and cursor positions.
+- `QuantMate.data_sync_status` tracks per-step sync status for normal daemon runs.
 
 ### Behavior
 
@@ -24,12 +24,12 @@ This document describes the current behavior implemented in `tradermate/scripts/
 ### Entry Point
 
 ```bash
-cd tradermate
+cd QuantMate
 ./scripts/datasync_service.sh init
 ```
 
 This script:
-- Ensures schema initialization for `tradermate`, `tushare`, `akshare`, and `vnpy`.
+- Ensures schema initialization for `QuantMate`, `tushare`, `akshare`, and `vnpy`.
 - Runs init for the most recent year of data by default.
 - Resumes automatically if previous runs were interrupted.
 
@@ -58,7 +58,8 @@ Rate limiting is implemented in `app/datasync/service/tushare_ingest.py` via `ca
 
 ## Related Files
 
-- `tradermate/scripts/init_market_data.py`
-- `tradermate/app/datasync/service/data_sync_daemon.py`
-- `tradermate/app/datasync/service/tushare_ingest.py`
-- `tradermate/app/domains/extdata/dao/data_sync_status_dao.py`
+- `QuantMate/scripts/init_market_data.py`
+- `QuantMate/app/datasync/service/data_sync_daemon.py`
+- `QuantMate/app/datasync/service/tushare_ingest.py`
+- `QuantMate/app/domains/extdata/dao/data_sync_status_dao.py`
+

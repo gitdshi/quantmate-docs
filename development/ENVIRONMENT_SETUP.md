@@ -14,7 +14,7 @@ This guide matches the current codebase: Docker is used only for MySQL/Redis, wh
 1) Configure environment
 
 ```bash
-cd tradermate
+cd quantmate
 cp .env.example .env
 ```
 
@@ -33,7 +33,7 @@ docker compose -f docker-compose.dev.yml up -d mysql redis
 docker compose -f docker-compose.dev.yml ps
 ```
 
-Data is mounted under `tradermate/.data/`.
+Data is mounted under `quantmate/.data/`.
 
 3) Install deps + start API
 
@@ -48,7 +48,7 @@ pip install -r requirements.txt
 ./scripts/api_service.sh start
 ```
 
-Logs: `tradermate/logs/api.out`
+Logs: `quantmate/logs/api.out`
 
 4) Initialize data (idempotent/resumable)
 
@@ -56,12 +56,21 @@ Logs: `tradermate/logs/api.out`
 ./scripts/datasync_service.sh init
 ```
 
-Logs: `tradermate/logs/data_sync.out`
+Logs: `quantmate/logs/data_sync.out`
+
+## Data Migration (Optional)
+
+If you have existing data under a previous database name, you can copy it into the new `quantmate` database without deleting the source:
+
+```bash
+cd quantmate
+./scripts/migrate_db_name.sh <source_db>
+```
 
 ## Frontend (Portal)
 
 ```bash
-cd tradermate-portal
+cd quantmate-portal
 npm install
 npm run dev -- --host 0.0.0.0 --port 5173
 ```
@@ -89,5 +98,5 @@ docker compose -f docker-compose.dev.yml down
 To remove DB data:
 
 ```bash
-rm -rf tradermate/.data
+rm -rf quantmate/.data
 ```

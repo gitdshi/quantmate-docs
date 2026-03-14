@@ -1,5 +1,5 @@
 /* ============================================================
-   TraderMate Prototype — Shared JavaScript
+   QuantMate Prototype — Shared JavaScript
    Sidebar, Tabs, Modals, Dark Mode, Mock Data
    ============================================================ */
 
@@ -49,7 +49,7 @@ function buildSidebar() {
     <div class="sidebar-header">
       <div class="sidebar-logo">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
-        TraderMate
+        QuantMate
       </div>
       <button class="btn btn-ghost btn-icon" onclick="toggleSidebar()" title="收起侧边栏">
         ${icon('panel-left-close')}
@@ -71,7 +71,7 @@ function buildSidebar() {
     <div class="sidebar-footer">
       <div class="sidebar-user">
         <div class="sidebar-user-name">demo_user</div>
-        <div class="sidebar-user-email">demo@tradermate.io</div>
+        <div class="sidebar-user-email">demo@quantmate.io</div>
       </div>
       <button class="btn btn-ghost btn-icon" onclick="toggleDark()" title="切换主题">${icon('moon')}</button>
       <a href="login.html" class="btn btn-ghost btn-icon" title="退出登录">${icon('log-out')}</a>

@@ -4,8 +4,8 @@ version: '3.8'
 
 services:
   api:
-    image: ${API_IMAGE:-tradermate-api:latest}
-    container_name: tradermate_api
+    image: ${API_IMAGE:-quantmate-api:latest}
+    container_name: quantmate_api
     restart: unless-stopped
     environment:
       # core
@@ -18,9 +18,9 @@ services:
       # mysql
       MYSQL_HOST: ${MYSQL_HOST:-mysql}
       MYSQL_PORT: ${MYSQL_PORT:-3306}
-      MYSQL_USER: ${MYSQL_USER:-tradermate}
+      MYSQL_USER: ${MYSQL_USER:-quantmate}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      TRADERMATE_DB: ${TRADERMATE_DB:-tradermate}
+      QUANTMATE_DB: ${QUANTMATE_DB:-quantmate}
       TUSHARE_DB: ${TUSHARE_DB:-tushare}
 
       # redis
@@ -31,7 +31,7 @@ services:
       TUSHARE_TOKEN: ${TUSHARE_TOKEN:-}
 
       # cors (JSON array string)
-      CORS_ORIGINS: ${CORS_ORIGINS:-"[\"https://www.tradermate.com\"]"}
+      CORS_ORIGINS: ${CORS_ORIGINS:-"[\"https://www.quantmate.com\"]"}
     depends_on:
       - mysql
       - redis
@@ -44,8 +44,8 @@ services:
     #   - "8000:8000"  # expose only if not using an external reverse proxy
 
   worker:
-    image: ${API_IMAGE:-tradermate-api:latest}
-    container_name: tradermate_worker
+    image: ${API_IMAGE:-quantmate-api:latest}
+    container_name: quantmate_worker
     restart: unless-stopped
     depends_on:
       - mysql
@@ -53,7 +53,7 @@ services:
     environment:
       MYSQL_HOST: ${MYSQL_HOST:-mysql}
       MYSQL_PORT: ${MYSQL_PORT:-3306}
-      MYSQL_USER: ${MYSQL_USER:-tradermate}
+      MYSQL_USER: ${MYSQL_USER:-quantmate}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       REDIS_HOST: ${REDIS_HOST:-redis}
       REDIS_PORT: ${REDIS_PORT:-6379}
@@ -61,24 +61,24 @@ services:
 
   mysql:
     image: mysql:8.0
-    container_name: tradermate_mysql
+    container_name: quantmate_mysql
     restart: unless-stopped
     command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_USER: ${MYSQL_USER:-tradermate}
+      MYSQL_USER: ${MYSQL_USER:-quantmate}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_DATABASE: ${TRADERMATE_DB:-tradermate}
+      MYSQL_DATABASE: ${QUANTMATE_DB:-quantmate}
     volumes:
       - mysql_data:/var/lib/mysql
-      # mount init scripts from the `tradermate/mysql/init/` folder
+      # mount init scripts from the `quantmate/mysql/init/` folder
       # - ./mysql/init:/docker-entrypoint-initdb.d:ro
     expose:
       - "3306"
 
   redis:
     image: redis:7-alpine
-    container_name: tradermate_redis
+    container_name: quantmate_redis
     restart: unless-stopped
     command: redis-server --appendonly yes --save 60 1 --loglevel warning --requirepass ${REDIS_PASSWORD:-}
     environment:
@@ -89,11 +89,11 @@ services:
       - "6379"
 
   portal:
-    image: ${PORTAL_IMAGE:-tradermate-portal:latest}
-    container_name: tradermate_portal
+    image: ${PORTAL_IMAGE:-quantmate-portal:latest}
+    container_name: quantmate_portal
     restart: unless-stopped
     environment:
-      VITE_API_URL: ${API_URL:-https://api.tradermate.com}
+      VITE_API_URL: ${API_URL:-https://api.quantmate.com}
     # ports:
     #   - "5173:80"  # expose only if not using an external reverse proxy
 

@@ -6,7 +6,7 @@
 
 检查日志：
 ```bash
-tail -n 100 tradermate/logs/api.out
+tail -n 100 quantmate/logs/api.out
 ```
 
 常见原因：
@@ -24,7 +24,7 @@ ss -lntp | grep 8000
 检查 Vite 进程和日志：
 ```bash
 pgrep -af vite
-tail -n 100 /tmp/tradermate-portal.out
+tail -n 100 /tmp/quantmate-portal.out
 ```
 
 确认访问：
@@ -38,7 +38,7 @@ curl -I http://localhost:5173
 
 检查后端日志：
 ```bash
-tail -n 200 tradermate/logs/api.out
+tail -n 200 quantmate/logs/api.out
 ```
 
 清理本地 token（浏览器控制台）：
@@ -60,7 +60,7 @@ sessionStorage.clear()
 
 查看日志：
 ```bash
-tail -n 200 tradermate/logs/data_sync.out
+tail -n 200 quantmate/logs/data_sync.out
 ```
 
 常见原因：
@@ -105,6 +105,6 @@ docker compose -f docker-compose.dev.yml logs --tail=100 redis
 如果数据损坏或权限异常：
 ```bash
 docker compose -f docker-compose.dev.yml down
-rm -rf tradermate/.data
+rm -rf quantmate/.data
 docker compose -f docker-compose.dev.yml up -d
 ```

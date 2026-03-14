@@ -1,6 +1,6 @@
 # Development Docs
 
-This folder contains developer-facing documentation for the TraderMate codebase.
+This folder contains developer-facing documentation for the QuantMate codebase.
 
 ## Start Here
 

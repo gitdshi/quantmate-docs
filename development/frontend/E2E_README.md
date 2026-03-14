@@ -11,7 +11,7 @@
 ## Running E2E Tests
 
 ```bash
-cd tradermate-portal
+cd quantmate-portal
 npm install -D @playwright/test
 npx playwright install
 
@@ -21,7 +21,7 @@ npm run test:e2e
 ## Backend Prerequisite
 
 ```bash
-cd ../tradermate
+cd ../quantmate
 ./scripts/api_service.sh start
 ```
 

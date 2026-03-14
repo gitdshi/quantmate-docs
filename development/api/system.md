@@ -8,4 +8,4 @@ Auth: Bearer token required.
 
 - `GET /api/system/sync-status`
   - Returns aggregated sync status for required data-sync steps.
-  - Backed by `tradermate.data_sync_status`.
+  - Backed by `quantmate.data_sync_status`.

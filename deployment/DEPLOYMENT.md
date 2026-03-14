@@ -22,21 +22,21 @@ REFRESH_TOKEN_EXPIRE_DAYS=7
 
 # mysql
 MYSQL_ROOT_PASSWORD=<root>
-MYSQL_USER=tradermate
+MYSQL_USER=quantmate
 MYSQL_PASSWORD=<app>
 
 # data
 TUSHARE_TOKEN=<optional>
 
 # routing
-API_HOST=api.tradermate.com
-FRONTEND_HOST=www.tradermate.com
+API_HOST=api.quantmate.com
+FRONTEND_HOST=www.quantmate.com
 ```
 
 2) Build or pull images
 
-- API image: built from `tradermate` repo (FastAPI)
-- Portal image: built from `tradermate-portal` repo (React)
+- API image: built from `quantmate` repo (FastAPI)
+- Portal image: built from `quantmate-portal` repo (React)
 
 3) Deploy with the template compose
 
@@ -47,5 +47,5 @@ docker compose -f deployment/docker-compose.prod.yml --env-file .env.prod up -d
 ## Notes
 
 - `deployment/docker-compose.prod.yml` is an example; adjust build contexts, volumes, and network labels to match your infra.
-- MySQL schema init scripts live in `tradermate/mysql/init/` and should be applied on first boot.
+- MySQL schema init scripts live in `quantmate/mysql/init/` and should be applied on first boot.
 - Health checks should target `/health` on the API.

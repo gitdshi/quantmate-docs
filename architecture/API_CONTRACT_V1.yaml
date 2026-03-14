@@ -2,21 +2,21 @@
 # Use FastAPI /docs for the current API surface.
 openapi: 3.0.3
 info:
-  title: TraderMate API - Phase 7 V1
+  title: QuantMate API - Phase 7 V1
   version: "1.0.0"
   description: |
-    OpenAPI specification for TraderMate Phase 7 V1 endpoints.
+    OpenAPI specification for QuantMate Phase 7 V1 endpoints.
     Scope: Portfolio (read-only), Analytics (dashboard), Optimization (submit+status).
   contact:
-    name: TraderMate Team
-    email: dev@tradermate.example.com
+    name: QuantMate Team
+    email: dev@quantmate.example.com
   license:
     name: Proprietary
 
 servers:
   - url: http://localhost:8000/api
     description: Development server
-  - url: https://api.tradermate.example.com/api
+  - url: https://api.quantmate.example.com/api
     description: Production server
 
 security:

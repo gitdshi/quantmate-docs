@@ -1,9 +1,9 @@
-# TraderMate 产品需求规格文档 (PRD)
+# QuantMate 产品需求规格文档 (PRD)
 
 > **版本**: V1.0  
 > **创建日期**: 2026-03-14  
 > **文档状态**: 初稿  
-> **维护者**: TraderMate Team
+> **维护者**: QuantMate Team
 
 ---
 
@@ -36,7 +36,7 @@
 
 ### 1.1 目的与范围
 
-本文档是 TraderMate 个人量化交易工具平台的产品需求规格文档（PRD），旨在：
+本文档是 QuantMate 个人量化交易工具平台的产品需求规格文档（PRD），旨在：
 
 - **全面梳理** 平台所有功能模块的需求，覆盖从数据接入到交易执行的完整链路
 - **标注实现状态** 区分已实现、部分实现和待开发的功能，便于开发优先级判断
@@ -44,7 +44,7 @@
 - **描述业务与交互流程** 为 UI/UX 设计和前后端开发提供行为参考
 - **作为后续设计与开发的权威依据** 指导技术架构设计、接口设计、数据模型设计
 
-**范围**：覆盖 TraderMate 平台全部 10 大功能模块（账户与权限、数据与行情、策略研究、回测与评估、组合与风险、交易执行、监控与告警、报告与复盘、系统设置、协作与分享），以及非功能需求、AI 集成、数据模型、API 清单、业务流程和里程碑规划。
+**范围**：覆盖 QuantMate 平台全部 10 大功能模块（账户与权限、数据与行情、策略研究、回测与评估、组合与风险、交易执行、监控与告警、报告与复盘、系统设置、协作与分享），以及非功能需求、AI 集成、数据模型、API 清单、业务流程和里程碑规划。
 
 ### 1.2 读者对象
 
@@ -64,7 +64,7 @@
 | 标的 (Symbol) | 可交易的金融工具，如股票、ETF、指数 |
 | K 线 (Candlestick/Bar) | OHLCV（开高低收量）数据的图表表示 |
 | 回测 (Backtest) | 使用历史数据模拟策略执行以评估绩效 |
-| VNPy | 开源量化交易框架，TraderMate 后端使用其 CTA 引擎 |
+| VNPy | 开源量化交易框架，QuantMate 后端使用其 CTA 引擎 |
 | CTA | Commodity Trading Advisor，趋势跟踪策略框架 |
 | RQ (Redis Queue) | 基于 Redis 的 Python 任务队列 |
 | JWT | JSON Web Token，无状态认证令牌 |
@@ -89,7 +89,7 @@
 
 ### 1.5 市场阶段标记说明
 
-TraderMate 采用分阶段市场扩展策略：
+QuantMate 采用分阶段市场扩展策略：
 
 | 标记 | 市场 | 数据源 | 说明 |
 |------|------|--------|------|
@@ -102,12 +102,12 @@ TraderMate 采用分阶段市场扩展策略：
 
 | 文档 | 路径 | 说明 |
 |------|------|------|
-| 系统架构 | `tradermate-docs/architecture/SYSTEM_ARCHITECTURE.md` | 当前系统架构设计 |
-| 数据库架构 | `tradermate-docs/architecture/DATABASE_ARCHITECTURE.md` | 数据库 Schema 设计 |
-| 数据同步方案 | `tradermate-docs/architecture/DATA_SYNC_PLAN.md` | 数据同步详细方案 |
-| API 文档 | `tradermate-docs/development/API_README.md` | 当前 API 端点文档 |
-| 环境变量 | `tradermate-docs/development/ENV_VARIABLES_REFERENCE.md` | 配置项参考 |
-| 开发指南 | `tradermate-docs/development/GETTING_STARTED.md` | 本地开发环境搭建 |
+| 系统架构 | `quantmate-docs/architecture/SYSTEM_ARCHITECTURE.md` | 当前系统架构设计 |
+| 数据库架构 | `quantmate-docs/architecture/DATABASE_ARCHITECTURE.md` | 数据库 Schema 设计 |
+| 数据同步方案 | `quantmate-docs/architecture/DATA_SYNC_PLAN.md` | 数据同步详细方案 |
+| API 文档 | `quantmate-docs/development/API_README.md` | 当前 API 端点文档 |
+| 环境变量 | `quantmate-docs/development/ENV_VARIABLES_REFERENCE.md` | 配置项参考 |
+| 开发指南 | `quantmate-docs/development/GETTING_STARTED.md` | 本地开发环境搭建 |
 
 ---
 
@@ -115,7 +115,7 @@ TraderMate 采用分阶段市场扩展策略：
 
 ### 2.1 产品愿景与定位
 
-**TraderMate** 是一款面向个人量化交易者的全链路工具平台，核心理念：
+**QuantMate** 是一款面向个人量化交易者的全链路工具平台，核心理念：
 
 - **AI-First**：深度集成 AI 和大语言模型，从策略生成、智能选股到自动化报告，贯穿全流程
 - **全链路覆盖**：从数据接入 → 策略研究 → 回测评估 → 风险管理 → 交易执行 → 监控复盘的完整闭环
@@ -135,17 +135,17 @@ TraderMate 采用分阶段市场扩展策略：
 
 ### 2.3 系统架构概览
 
-TraderMate 采用三层服务架构：
+QuantMate 采用三层服务架构：
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│                     前端层 (tradermate-portal)                │
+│                     前端层 (quantmate-portal)                │
 │          React 19 + TypeScript + Vite + Zustand              │
 │     9 个页面 / 25 个组件 / Recharts 图表 / Monaco 编辑器      │
 └────────────────────────┬─────────────────────────────────────┘
                          │ REST API (HTTP/JSON)
 ┌────────────────────────┴─────────────────────────────────────┐
-│                    后端 API 层 (tradermate)                    │
+│                    后端 API 层 (quantmate)                    │
 │              FastAPI + VNPy CTA Engine + RQ Worker             │
 │   28 个 API 端点 / 6 个领域模块 / JWT 认证 / 异步任务队列       │
 ├──────────────┬───────────────┬────────────────────────────────┤
@@ -156,7 +156,7 @@ TraderMate 采用三层服务架构：
 ┌──────┴───────────────┴──────────────────┴────────────────────┐
 │                       数据层                                   │
 │  MySQL 8.0 (4 库 / 68 表)          Redis 7 (任务队列 + 缓存)   │
-│  tradermate / tushare / akshare / vnpy                        │
+│  quantmate / tushare / akshare / vnpy                        │
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -432,7 +432,7 @@ Phase 1 [当前]           Phase 2              Phase 3            Phase 4
 #### 3.1.6 API Key 管理 ❌
 
 **功能描述**：  
-允许用户创建和管理 API Key，用于第三方程序或自动化脚本通过 REST API 访问 TraderMate 功能，无需交互式登录。
+允许用户创建和管理 API Key，用于第三方程序或自动化脚本通过 REST API 访问 QuantMate 功能，无需交互式登录。
 
 **业务规则**：
 - 每个用户最多创建 5 个 API Key
@@ -507,7 +507,7 @@ Phase 1 [当前]           Phase 2              Phase 3            Phase 4
 #### 3.2.1 数据源接入与管理 ✅
 
 **功能描述**：  
-TraderMate 通过数据源适配层接入外部行情数据。当前已实现 Tushare（A 股主数据源）和 AkShare（指数/交易日历）两个数据源，架构支持后续扩展更多数据源。
+QuantMate 通过数据源适配层接入外部行情数据。当前已实现 Tushare（A 股主数据源）和 AkShare（指数/交易日历）两个数据源，架构支持后续扩展更多数据源。
 
 **业务规则**：
 - 数据源通过环境变量配置（如 `TUSHARE_TOKEN`）
@@ -3378,12 +3378,12 @@ Strategies 页面 → 选择策略 → "分享" 按钮
 
 | 数据库 | 用途 | 当前表数 | 状态 |
 |--------|------|----------|------|
-| `tradermate` | 核心业务数据（用户/策略/回测/组合） | 10 活跃 + 31 planned | 主库 |
+| `quantmate` | 核心业务数据（用户/策略/回测/组合） | 10 活跃 + 31 planned | 主库 |
 | `tushare` | Tushare 数据源同步数据 | 4 活跃 + 14 planned | P1 A 股 |
 | `akshare` | AkShare 数据源同步数据 | 2 活跃 + 5 planned | 辅助 |
 | `vnpy` | VNPy 引擎内部数据 | 0 活跃 + 2 planned | 交易引擎 |
 
-### 6.2 核心业务数据库 tradermate
+### 6.2 核心业务数据库 quantmate
 
 #### 6.2.1 已实现表（10 表）
 
@@ -3771,7 +3771,7 @@ tool_trade_date_hist   -- 交易日历（AkShare来源）
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                     TraderMate 用户旅程                          │
+│                     QuantMate 用户旅程                          │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
 │  注册/登录 ─→ 配置数据源 ─→ 浏览行情 ─→ 编写策略 ─→ 回测验证  │

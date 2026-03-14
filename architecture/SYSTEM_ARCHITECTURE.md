@@ -5,10 +5,10 @@ Last Updated: 2026-03-13
 
 ## Overview
 
-TraderMate consists of three core components:
+QuantMate consists of three core components:
 
-- **Frontend (tradermate-portal)**: React + Vite
-- **Backend API (tradermate)**: FastAPI monolith
+- **Frontend (quantmate-portal)**: React + Vite
+- **Backend API (quantmate)**: FastAPI monolith
 - **DataSync**: Separate process for Tushare/AkShare ingestion and VNpy sync
 
 ## High-Level Diagram
@@ -25,7 +25,7 @@ flowchart LR
     DS --> AKSHARE[AkShare API]
     DS --> MYSQL
 
-    MYSQL --> TM[tradermate DB]
+    MYSQL --> TM[quantmate DB]
     MYSQL --> TS[tushare DB]
     MYSQL --> AK[akshare DB]
     MYSQL --> VN[vnpy DB]

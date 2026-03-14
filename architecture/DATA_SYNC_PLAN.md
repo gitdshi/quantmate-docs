@@ -24,7 +24,7 @@
 
 ## Status Tracking
 
-- Table: `tradermate.data_sync_status`
+- Table: `quantmate.data_sync_status`
 - Dimensions: `sync_date` + `step_name`
 - Step names:
   - `akshare_index`
@@ -53,7 +53,7 @@ TUSHARE_CALLS_PER_MIN=50
 ## Init + Resume
 
 ```bash
-cd tradermate
+cd quantmate
 ./scripts/datasync_service.sh init
 ```
 

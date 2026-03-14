@@ -32,7 +32,7 @@
 **具体细节**:
 - 技术选型: Docker Compose v2
 - 工具�? VS Code + Dev Containers
-- 网络架构: �?bridge 网络 `tradermate_network`
+- 网络架构: �?bridge 网络 `QuantMate_network`
 - 数据持久�? named volumes
 
 ---
@@ -109,7 +109,7 @@
 ## 参考文�?
 - [Docker Compose 文档](https://docs.docker.com/compose/)
 - [Dev Containers](https://containers.dev/)
-- [TraderMate 环境配置](../development/ENVIRONMENT_SETUP.md)
+- [QuantMate 环境配置](../development/ENVIRONMENT_SETUP.md)
 
 ---
 
@@ -121,3 +121,4 @@
 | 2026-03-10 | v1.1 | 增加团队培训反馈 |
 
 **状�?*: `Accepted` (2026-03-03) - 已实施，预期3个月后复�
+

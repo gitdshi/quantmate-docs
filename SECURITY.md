@@ -7,7 +7,7 @@ Do NOT commit:
 - Internal IP addresses, hostnames, SSH commands, firewall details
 - Private run logs, incident logs, staging logs
 
-Put internal-only materials in your local workspace under `TraderMate/docs/project-management/` (not committed).
+Put internal-only materials in your local workspace under `QuantMate/docs/project-management/` (not committed).
 
 If sensitive info is accidentally committed:
 1. Remove it in a new commit.

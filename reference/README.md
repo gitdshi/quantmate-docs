@@ -1,6 +1,6 @@
 # Reference
 
-This folder contains external data/API references used by TraderMate.
+This folder contains external data/API references used by QuantMate.
 
 ## Contents
 

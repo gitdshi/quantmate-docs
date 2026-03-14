@@ -1,6 +1,6 @@
 # Documentation Standards
 
-This repository is the documentation root for TraderMate. Keep docs concise, accurate, and aligned with the current codebase.
+This repository is the documentation root for QuantMate. Keep docs concise, accurate, and aligned with the current codebase.
 
 ## Principles
 

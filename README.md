@@ -1,6 +1,6 @@
-# TraderMate Docs
+# QuantMate Docs
 
-Single source of truth for TraderMate documentation.
+Single source of truth for QuantMate documentation.
 
 ## Entry Points
 - Development: `development/README.md`
@@ -9,13 +9,13 @@ Single source of truth for TraderMate documentation.
 - Standards: `standards/DOCUMENTATION_STANDARDS.md`
 
 ## Repositories
-- `tradermate/` (API + DataSync + DB init scripts)
-- `tradermate-portal/` (React frontend)
-- `tradermate-docs/` (this repo)
+- `quantmate/` (API + DataSync + DB init scripts)
+- `quantmate-portal/` (React frontend)
+- `quantmate-docs/` (this repo)
 
 ## Policy
 - This repository is **public**. Do not commit secrets (tokens, passwords, internal IPs, admin creds).
-- Internal-only notes and task tracking remain local under `TraderMate/docs/project-management/` and are **not** included here.
+- Internal-only notes and task tracking remain local under `QuantMate/docs/project-management/` and are **not** included here.
 
 ## Security
 

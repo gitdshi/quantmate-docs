@@ -13,16 +13,16 @@ Scope: local development with Docker used only for MySQL + Redis. The Python API
 
 Expected layout (sibling repos):
 
-- `TraderMate/tradermate`
-- `TraderMate/tradermate-portal`
-- `TraderMate/tradermate-docs`
+- `QuantMate/quantmate`
+- `QuantMate/quantmate-portal`
+- `QuantMate/quantmate-docs`
 
 ## Quick Start (Local)
 
 1) Configure environment
 
 ```bash
-cd tradermate
+cd quantmate
 cp .env.example .env
 ```
 
@@ -31,16 +31,16 @@ Edit `.env` with your MySQL password, JWT secret, and Tushare token (optional). 
 2) Start MySQL + Redis via dev compose
 
 ```bash
-cd tradermate
+cd quantmate
 docker compose -f docker-compose.dev.yml up -d mysql redis
 ```
 
-Data volumes are mounted to `tradermate/.data` for easy reset.
+Data volumes are mounted to `quantmate/.data` for easy reset.
 
 3) Create Python venv + install deps
 
 ```bash
-cd tradermate
+cd quantmate
 python -m venv .venv
 # Windows PowerShell:
 . .venv/Scripts/activate
@@ -52,12 +52,12 @@ pip install -r requirements.txt
 4) Initialize database + recent data (idempotent)
 
 ```bash
-cd tradermate
+cd quantmate
 ./scripts/datasync_service.sh init
 ```
 
 Notes:
-- Initializes MySQL schemas for `tradermate`, `tushare`, `akshare`, and `vnpy`.
+- Initializes MySQL schemas for `quantmate`, `tushare`, `akshare`, and `vnpy`.
 - Loads the most recent year of data by default.
 - If initialization already completed, it skips.
 - If it was interrupted, it resumes from the last checkpoint automatically.
@@ -65,14 +65,14 @@ Notes:
 5) Start API
 
 ```bash
-cd tradermate
+cd quantmate
 ./scripts/api_service.sh start
 ```
 
 6) Start portal (React)
 
 ```bash
-cd tradermate-portal
+cd quantmate-portal
 npm install
 npm run dev -- --host 0.0.0.0 --port 5173
 ```
@@ -91,8 +91,8 @@ curl -s http://localhost:5173 | head -20
 
 ## Logs
 
-- API logs: `tradermate/logs/`
-- Data sync logs: `tradermate/logs/data_sync.out`
+- API logs: `quantmate/logs/`
+- Data sync logs: `quantmate/logs/data_sync.out`
 
 ## Related Docs
 

@@ -1,17 +1,17 @@
 # Testing
 
-## Backend (tradermate)
+## Backend (quantmate)
 
 ```bash
-cd tradermate
+cd quantmate
 pip install -r requirements.txt
 pytest -q
 ```
 
-## Frontend (tradermate-portal)
+## Frontend (quantmate-portal)
 
 ```bash
-cd tradermate-portal
+cd quantmate-portal
 npm install
 npm run test:run
 ```

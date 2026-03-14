@@ -2,16 +2,16 @@
 
 This guide covers backend (API + DataSync) and frontend (portal) environment variables.
 
-Backend variables are loaded from `tradermate/.env` via `app.infrastructure.config.config.Settings`.
+Backend variables are loaded from `quantmate/.env` via `app.infrastructure.config.config.Settings`.
 Frontend variables are injected by Vite and must use the `VITE_` prefix.
 
-## Backend (tradermate)
+## Backend (quantmate)
 
 ### Core
 
 | Variable | Required | Default | Notes |
 |---|---|---|---|
-| `APP_NAME` | No | `TraderMate API` | API title (optional) |
+| `APP_NAME` | No | `QuantMate API` | API title (optional) |
 | `APP_VERSION` | No | `1.0.0` | API version (optional) |
 | `DEBUG` | No | `false` | Enable debug mode |
 
@@ -23,7 +23,7 @@ Frontend variables are injected by Vite and must use the `VITE_` prefix.
 | `MYSQL_PORT` | No | `3306` |  |
 | `MYSQL_USER` | No | `root` |  |
 | `MYSQL_PASSWORD` | Yes | - |  |
-| `TRADERMATE_DB` | No | `tradermate` | Optional override |
+| `QUANTMATE_DB` | No | `quantmate` | Optional override |
 | `TUSHARE_DB` | No | `tushare` | Optional override |
 | `TUSHARE_TOKEN` | Optional | - | Required for Tushare ingest |
 
@@ -51,7 +51,7 @@ Used on API startup (see `app/api/main.py`).
 | Variable | Required (prod) | Default | Notes |
 |---|---|---|---|
 | `ADMIN_USERNAME` | No | `admin` |  |
-| `ADMIN_EMAIL` | No | `admin@tradermate.local` |  |
+| `ADMIN_EMAIL` | No | `admin@quantmate.local` |  |
 | `ADMIN_PASSWORD` | Yes in prod | - | If missing in dev, a random password is generated |
 
 ### CORS
@@ -102,7 +102,7 @@ CORS_ORIGINS='["http://localhost:5173","http://localhost:3000"]'
 | `INIT_SKIP_VNPY` | `0` | Skip vnpy sync |
 | `INIT_RESET_PROGRESS` | `0` | Reset checkpoint |
 
-## Frontend (tradermate-portal)
+## Frontend (quantmate-portal)
 
 | Variable | Default | Notes |
 |---|---|---|
