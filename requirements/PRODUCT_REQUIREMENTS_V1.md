@@ -178,7 +178,7 @@ QuantMate 采用三层服务架构：
 - VNPy（CTA 回测引擎）
 - RQ（Redis Queue，异步任务）
 - SQLAlchemy（数据库连接，raw SQL）
-- bcrypt（密码哈希）+ PyJWT（令牌签发）
+- Argon2（密码哈希，向后兼容 bcrypt）+ PyJWT（令牌签发）
 
 **前端**：
 - React 19 + TypeScript 5.9
@@ -286,7 +286,7 @@ Phase 1 [当前]           Phase 2              Phase 3            Phase 4
 **业务规则**：
 - Access Token 有效期默认 1440 分钟（24 小时），通过 `ACCESS_TOKEN_EXPIRE_MINUTES` 配置
 - Refresh Token 有效期默认 7 天，通过 `REFRESH_TOKEN_EXPIRE_DAYS` 配置
-- 密码使用 bcrypt 哈希验证
+- 密码使用 Argon2 哈希验证（向后兼容 bcrypt）
 - 首次登录管理员账户时 `must_change_password=true`，强制跳转改密页面
 - 令牌存储于 localStorage（键: `access_token`, `refresh_token`）
 - Access Token 过期后自动使用 Refresh Token 刷新，刷新失败则登出
@@ -329,7 +329,7 @@ Phase 1 [当前]           Phase 2              Phase 3            Phase 4
 #### 3.1.3 密码管理 ✅
 
 **功能描述**：  
-支持用户修改密码，以及管理员首次登录时的强制改密流程。密码使用 bcrypt 加密存储。
+支持用户修改密码，以及管理员首次登录时的强制改密流程。密码使用 Argon2 加密存储（向后兼容 bcrypt）。
 
 **业务规则**：
 - 修改密码需提供当前密码进行验证

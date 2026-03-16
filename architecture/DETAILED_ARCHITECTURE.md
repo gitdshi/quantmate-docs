@@ -219,7 +219,7 @@ graph TB
             D_Strat["strategies/<br/>StrategiesService"]
             D_Market["market/<br/>MarketService"]
             D_Jobs["jobs/<br/>JobsService"]
-            D_Ext["extdata/<br/>ExtDataService"]
+            D_Ext["extdata/<br/>SyncStatusService"]
         end
         
         subgraph "DAOs 数据访问层"
@@ -463,7 +463,7 @@ app/
 │   │   ├── service.py             # JobsService
 │   │   └── dao/jobs_dao.py
 │   └── extdata/                   # 外部数据领域
-│       ├── service.py             # ExtDataService
+│       ├── service.py             # SyncStatusService
 │       └── dao/
 │           ├── data_sync_status_dao.py
 │           ├── tushare_dao.py
@@ -525,14 +525,14 @@ app/
 4. **路由注册** — 挂载 7 个路由模块到 `/api` 前缀
 
 ```python
-# 路由注册结构
-app.include_router(auth_router,      prefix="/api/auth",       tags=["认证"])
-app.include_router(strategies_router, prefix="/api/strategies", tags=["策略"])
-app.include_router(backtest_router,   prefix="/api/backtest",   tags=["回测"])
-app.include_router(data_router,       prefix="/api/data",       tags=["数据"])
-app.include_router(queue_router,      prefix="/api/queue",      tags=["队列"])
-app.include_router(system_router,     prefix="/api/system",     tags=["系统"])
-app.include_router(code_router,       prefix="/api/strategies", tags=["代码校验"])
+# 路由注册结构（各子路由自带前缀，main.py 统一挂载到 /api）
+app.include_router(auth_router,      prefix="/api")  # → /api/auth/*
+app.include_router(strategies_router, prefix="/api")  # → /api/strategies/*
+app.include_router(backtest_router,   prefix="/api")  # → /api/backtest/*
+app.include_router(data_router,       prefix="/api")  # → /api/data/*
+app.include_router(queue_router,      prefix="/api")  # → /api/queue/*
+app.include_router(system_router,     prefix="/api")  # → /api/system/*
+app.include_router(code_router,       prefix="/api")  # → /api/strategy-code/*
 ```
 
 #### 2.2.2 路由模块
@@ -547,7 +547,7 @@ app.include_router(code_router,       prefix="/api/strategies", tags=["代码校
 | `data.py` | `/api/data` | 4 | 标的搜索/K线/指标/概览 |
 | `queue.py` | `/api/queue` | 6 | 队列统计/任务列表/取消/删除 |
 | `system.py` | `/api/system` | 1+ | 同步状态/健康检查 |
-| `strategy_code.py` | `/api/strategies` | 2 | 代码 Lint/解析 |
+| `strategy_code.py` | `/api/strategy-code` | 2 | 代码 Lint/解析 |
 
 #### 2.2.3 API Service 层
 
@@ -555,10 +555,10 @@ API Service 层位于 routes 和 domains 之间，主要处理**跨领域编排*
 
 | 服务 | 文件 | 关键方法 | 职责 |
 |------|------|---------|------|
-| `AuthTokenService` | `auth_service.py` | `create_access_token()`, `create_refresh_token()`, `decode_token()` | JWT 签发/验证，密码哈希 |
+| _(函数模块)_ | `auth_service.py` | `create_access_token()`, `create_refresh_token()`, `decode_token()`, `verify_password()`, `get_password_hash()` | JWT 签发/验证，密码哈希 |
 | `BacktestServiceV2` | `backtest_service.py` | `submit_backtest()`, `submit_batch()` | 回测任务入队 RQ |
-| `StrategyCompiler` | `strategy_service.py` | `validate()`, `compile()` | Python AST 校验 + 编译 |
-| `DataQueryService` | `data_service.py` | `get_symbols()`, `get_history()` | 行情数据查询编排 |
+| _(函数模块)_ | `strategy_service.py` | `validate_strategy_code()`, `parse_strategy_file()` | Python AST 校验 + 解析 |
+| `DataService` | `data_service.py` | `get_symbols()`, `get_history()`, `get_indicators()` | 行情数据查询编排 |
 | `JobStorageService` | `job_storage_service.py` | `store_meta()`, `get_meta()` | Redis 任务元数据管理 |
 
 ### 2.3 Domain 层
@@ -572,7 +572,7 @@ Domain 层是**业务逻辑的核心**，每个领域（Domain）封装独立的
 | **strategies** | `StrategiesService` | `list_strategies()`, `create_strategy()`, `get_strategy()`, `update_strategy()`, `delete_strategy()` | `StrategyDao`, `StrategyHistoryDao` |
 | **market** | `MarketService` | `resolve_symbol_name()`, `market_overview()` | `MarketDao` |
 | **jobs** | `JobsService` | `list_jobs()`, `delete_job_and_results()` | `JobsDao` |
-| **extdata** | `ExtDataService` | _同步状态查询_ | `DataSyncStatusDao`, `TushareDao`, `SyncLogDao` |
+| **extdata** | `SyncStatusService` | `get_sync_status()` | `SyncLogDao` |
 
 ### 2.4 DAO 层
 
@@ -712,6 +712,8 @@ class Settings:
     └── /portfolio        → Portfolio      [组合管理]
 ```
 
+> **注**：以上为 React SPA 已实现的路由。HTML 原型（`prototype/`）中规划了更多导航项（因子研究、交易执行、监控告警、报告复盘、AI 助手、模板市场、团队空间、系统设置等），将在后续阶段逐步实现。
+
 **路由守卫机制**（`PrivateRoute` 组件）：
 
 ```mermaid
@@ -808,14 +810,20 @@ graph TD
 ```typescript
 // 按领域组织
 authAPI        → POST /auth/login, /register, /refresh, /change-password; GET /auth/me
-strategiesAPI  → GET/POST/PUT/DELETE /strategies/*
-backtestAPI    → POST /backtest, /backtest/batch; GET /backtest/{id}
+strategiesAPI  → GET/POST/PUT/DELETE /strategies/*; GET /strategies/builtin
+backtestAPI    → POST /backtest, /backtest/batch; GET /backtest/{id}, /backtest/history
 queueAPI       → GET /queue/stats, /queue/jobs/*; POST /queue/jobs/cancel; DELETE
-marketDataAPI  → GET /data/symbols, /data/history/*, /data/indicators/*, /data/overview
-analyticsAPI   → GET /analytics/dashboard, /analytics/risk-metrics
-portfolioAPI   → GET /portfolio/positions; POST /portfolio/close
+marketDataAPI  → GET /data/symbols, /data/history, /data/indicators, /data/overview
+analyticsAPI   → GET /analytics/dashboard, /analytics/risk-metrics  ⚠️ 后端未实现
+portfolioAPI   → GET /portfolio/positions; POST /portfolio/close     ⚠️ 后端未实现
 systemAPI      → GET /system/sync-status
 ```
+
+> **⚠️ 前后端路径差异**：
+> - 前端 `strategiesAPI.listBuiltin()` 调用 `/strategies/builtin`，后端实际路由为 `/strategies/builtin/list`
+> - 前端 `backtestAPI.getHistory()` 调用 `/backtest/history`，后端实际路由为 `/backtest/history/list`
+> - 前端 `marketDataAPI.history()` 使用 query 参数，后端使用路径参数 `/data/history/{vt_symbol}`
+> - `analyticsAPI` 和 `portfolioAPI` 后端路由模块尚未实现
 
 ### 3.5 组件层次
 
@@ -1850,7 +1858,7 @@ graph LR
 | 端点 | 方法 | 认证 | 请求体 | 响应 | 说明 |
 |------|------|------|--------|------|------|
 | `/backtest` | POST | 是 | `BacktestRequest` | `BacktestSubmitResponse` | 提交单次回测 |
-| `/backtest/batch` | POST | 是 | `BatchBacktestRequest` | `BatchBacktestJob` | 提交批量回测 |
+| `/backtest/batch` | POST | 是 | `BatchBacktestRequest` | `BacktestSubmitResponse` | 提交批量回测 |
 | `/backtest/{job_id}` | GET | 是 | — | `BacktestJob` | 查询任务状态 |
 | `/backtest/batch/{job_id}` | GET | 是 | — | `BatchBacktestJob` | 查询批量任务状态 |
 | `/backtest/history/list` | GET | 是 | — | `List[BacktestHistory]` | 历史记录列表 |
@@ -1866,6 +1874,8 @@ graph LR
 | `/data/symbols` | GET | 可选 | `exchange`, `keyword`, `limit`, `offset` | `List[SymbolInfo]` | 搜索标的 |
 | `/data/history/{vt_symbol}` | GET | 可选 | `start_date`, `end_date`, `interval` | `List[OHLCBar]` | K 线数据 |
 | `/data/indicators/{vt_symbol}` | GET | 可选 | `start_date`, `end_date` | `IndicatorData` | 技术指标（MA/MACD/KDJ/RSI/BOLL） |
+
+> **⚠️ 前后端不一致**：后端使用路径参数 `/data/history/{vt_symbol}`，但前端 `api.ts` 使用 query 参数 `/data/history?symbol=xxx`。需要统一（建议后端保持路径参数，前端修正调用方式）。
 | `/data/overview` | GET | 可选 | — | `MarketOverview` | 市场概览 |
 | `/data/sectors` | GET | 可选 | — | `List[Sector]` | 板块信息 |
 | `/data/exchanges` | GET | 可选 | — | `List[Exchange]` | 交易所信息 |
