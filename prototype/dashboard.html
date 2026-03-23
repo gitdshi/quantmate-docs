@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>QuantMate — Dashboard</title>
@@ -15,11 +15,11 @@
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
         <div>
           <h1 class="page-title">Dashboard</h1>
-          <p class="page-subtitle">实时概览 · 最后更新 14:35:02</p>
+          <p class="page-subtitle">Real-time Overview · Last Updated 14:35:02</p>
         </div>
         <div style="display:flex;gap:8px">
-          <button class="btn btn-ghost" onclick="toggleDark()">${icon('moon')} 切换主题</button>
-          <button class="btn btn-secondary" onclick="showToast('数据已刷新','success');drawNavChart();drawPieChart()">${icon('refresh-cw')} 刷新</button>
+          <button class="btn btn-ghost" onclick="toggleDark()">${icon('moon')} Toggle Theme</button>
+          <button class="btn btn-secondary" onclick="showToast('Data has been refreshed','success');drawNavChart();drawPieChart()">${icon('refresh-cw')} Refresh</button>
         </div>
       </div>
     </div>
@@ -29,26 +29,26 @@
       <div class="stat-card">
         <div class="stat-icon">${icon('wallet')}</div>
         <div class="stat-value">¥ 1,256,800</div>
-        <div class="stat-label">总资产</div>
-        <div class="stat-trend up">+2.35% 今日</div>
+        <div class="stat-label">Total Assets</div>
+        <div class="stat-trend up">2.35% Today</div>
       </div>
       <div class="stat-card">
         <div class="stat-icon">${icon('trending-up')}</div>
         <div class="stat-value text-success">+¥ 28,960</div>
-        <div class="stat-label">今日盈亏</div>
+        <div class="stat-label">Today's Profit and Loss</div>
         <div class="stat-trend up">+2.35%</div>
       </div>
       <div class="stat-card">
         <div class="stat-icon">${icon('activity')}</div>
         <div class="stat-value">6</div>
-        <div class="stat-label">活跃策略</div>
-        <div class="stat-trend neutral">4 运行中</div>
+        <div class="stat-label">Active strategy</div>
+        <div class="stat-trend neutral">4 Running</div>
       </div>
       <div class="stat-card">
         <div class="stat-icon">${icon('bell')}</div>
         <div class="stat-value text-warning">3</div>
-        <div class="stat-label">未处理告警</div>
-        <div class="stat-trend down">1 严重</div>
+        <div class="stat-label">Unprocessed Alarm</div>
+        <div class="stat-trend down">1 Severe</div>
       </div>
     </div>
 
@@ -56,12 +56,12 @@
     <div class="grid-2">
       <div class="card">
         <div class="card-header">
-          <h3 class="card-title">组合净值曲线</h3>
+          <h3 class="card-title">Portfolio Net Value Curve</h3>
           <div class="tabs" data-group="curve">
-            <button class="tab-btn active" data-tab="1w">1周</button>
-            <button class="tab-btn" data-tab="1m">1月</button>
-            <button class="tab-btn" data-tab="3m">3月</button>
-            <button class="tab-btn" data-tab="ytd">今年</button>
+            <button class="tab-btn active" data-tab="1w">1 week</button>
+            <button class="tab-btn" data-tab="1m">January</button>
+            <button class="tab-btn" data-tab="3m">March</button>
+            <button class="tab-btn" data-tab="ytd">This year</button>
           </div>
         </div>
         <div class="chart-placeholder" style="height:220px" id="navChart">
@@ -70,7 +70,7 @@
       </div>
       <div class="card">
         <div class="card-header">
-          <h3 class="card-title">持仓分布</h3>
+          <h3 class="card-title">Position Distribution</h3>
         </div>
         <div class="chart-placeholder" style="height:220px" id="pieChart">
           <canvas id="pieCanvas"></canvas>
@@ -81,13 +81,13 @@
     <!-- Positions -->
     <div class="card">
       <div class="card-header">
-        <h3 class="card-title">当前持仓</h3>
-        <a href="portfolio.html" class="btn btn-ghost btn-sm">查看全部 →</a>
+        <h3 class="card-title">Current Positions</h3>
+        <a href="portfolio.html" class="btn btn-ghost btn-sm">View All →</a>
       </div>
       <div class="table-wrap">
         <table>
           <thead>
-            <tr><th>代码</th><th>名称</th><th>策略</th><th>方向</th><th>数量</th><th>成本</th><th>现价</th><th>盈亏</th><th>盈亏%</th></tr>
+            <tr><th>Code</th><th>Name</th><th>Strategy</th><th>Direction</th><th>Quantity</th><th>Cost</th><th>Current price</th><th>Profit and loss</th><th>Profit and Loss %</th></tr>
           </thead>
           <tbody id="posTable"></tbody>
         </table>
@@ -98,24 +98,24 @@
     <div class="grid-2">
       <div class="card">
         <div class="card-header">
-          <h3 class="card-title">最近委托</h3>
-          <a href="trading.html" class="btn btn-ghost btn-sm">全部 →</a>
+          <h3 class="card-title">Recently commissioned</h3>
+          <a href="trading.html" class="btn btn-ghost btn-sm">All →</a>
         </div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>时间</th><th>代码</th><th>方向</th><th>价格</th><th>数量</th><th>状态</th></tr></thead>
+            <thead><tr><th>Time</th><th>Code</th><th>Direction</th><th>Price</th><th>Quantity</th><th>State</th></tr></thead>
             <tbody id="orderTable"></tbody>
           </table>
         </div>
       </div>
       <div class="card">
         <div class="card-header">
-          <h3 class="card-title">最新告警</h3>
-          <a href="alerts.html" class="btn btn-ghost btn-sm">全部 →</a>
+          <h3 class="card-title">Latest Alert</h3>
+          <a href="alerts.html" class="btn btn-ghost btn-sm">All →</a>
         </div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>时间</th><th>类型</th><th>级别</th><th>消息</th><th>状态</th></tr></thead>
+            <thead><tr><th>Time</th><th>Type</th><th>Level</th><th>Message</th><th>State</th></tr></thead>
             <tbody id="alertTable"></tbody>
           </table>
         </div>
@@ -125,33 +125,33 @@
     <!-- Strategy Status List -->
     <div class="card">
       <div class="card-header">
-        <h3 class="card-title">策略运行状态</h3>
-        <a href="strategies.html" class="btn btn-ghost btn-sm">管理 →</a>
+        <h3 class="card-title">Strategy operating status</h3>
+        <a href="strategies.html" class="btn btn-ghost btn-sm">Management →</a>
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;padding-top:4px">
         <div class="card" style="border-left:3px solid var(--success)">
           <div style="display:flex;justify-content:space-between;align-items:center">
-            <b>DualMA_Cross</b><span class="badge badge-success">运行中</span>
+            <b>DualMA_Cross</b><span class="badge badge-success">Running</span>
           </div>
-          <div class="text-muted" style="font-size:13px;margin-top:4px">今日收益 +¥3,600 · Sharpe 1.42</div>
+          <div class="text-muted" style="font-size:13px;margin-top:4px">Today's earnings ¥3,600 · Sharpe 1.42</div>
         </div>
         <div class="card" style="border-left:3px solid var(--success)">
           <div style="display:flex;justify-content:space-between;align-items:center">
-            <b>RSI_Reversal</b><span class="badge badge-success">运行中</span>
+            <b>RSI_Reversal</b><span class="badge badge-success">Running</span>
           </div>
-          <div class="text-muted" style="font-size:13px;margin-top:4px">今日收益 +¥3,900 · Sharpe 1.18</div>
+          <div class="text-muted" style="font-size:13px;margin-top:4px">Today's earnings ¥3,900 · Sharpe 1.18</div>
         </div>
         <div class="card" style="border-left:3px solid var(--primary)">
           <div style="display:flex;justify-content:space-between;align-items:center">
-            <b>MyAlpha01</b><span class="badge badge-primary">回测中</span>
+            <b>MyAlpha01</b><span class="badge badge-primary">In backtesting</span>
           </div>
-          <div class="text-muted" style="font-size:13px;margin-top:4px">进度 67% · 预计剩余 3 分钟</div>
+          <div class="text-muted" style="font-size:13px;margin-top:4px">Progress 67% · Estimated 3 minutes remaining</div>
         </div>
         <div class="card" style="border-left:3px solid var(--muted-foreground)">
           <div style="display:flex;justify-content:space-between;align-items:center">
-            <b>MeanRevert_v2</b><span class="badge badge-muted">草稿</span>
+            <b>MeanRevert_v2</b><span class="badge badge-muted">Draft</span>
           </div>
-          <div class="text-muted" style="font-size:13px;margin-top:4px">v2 · 待验证</div>
+          <div class="text-muted" style="font-size:13px;margin-top:4px">v2 · Pending verification</div>
         </div>
       </div>
     </div>
@@ -182,7 +182,7 @@ const orderBody = document.getElementById('orderTable');
 MOCK.orders.slice(0, 4).forEach(o => {
   orderBody.innerHTML += `<tr>
     <td>${o.time}</td><td class="font-mono">${o.symbol}</td>
-    <td><span class="badge ${o.dir === '买入' ? 'badge-success' : 'badge-destructive'}">${o.dir}</span></td>
+    <td><span class="badge ${o.dir === 'Buy' ? 'badge-success' : 'badge-destructive'}">${o.dir}</span></td>
     <td>¥${o.price.toFixed(2)}</td><td>${o.qty}</td><td>${statusBadge(o.status)}</td>
   </tr>`;
 });
@@ -226,10 +226,10 @@ function drawPieChart() {
   const W = c.parentElement.clientWidth; const H = c.parentElement.clientHeight;
   c.width = W; c.height = H;
   const data = [
-    { label: '贵州茅台', value: 185600, color: '#3b82f6' },
-    { label: '五粮液', value: 78150, color: '#10b981' },
-    { label: '隆基绿能', value: 22180, color: '#ef4444' },
-    { label: '现金', value: 970870, color: '#6b7280' },
+    { label: 'Guizhou Moutai', value: 185600, color: '#3b82f6' },
+    { label: 'Wuliangye', value: 78150, color: '#10b981' },
+    { label: 'LONGi Green Energy', value: 22180, color: '#ef4444' },
+    { label: 'Cash', value: 970870, color: '#6b7280' },
   ];
   const total = data.reduce((s, d) => s + d.value, 0);
   let angle = -Math.PI / 2;

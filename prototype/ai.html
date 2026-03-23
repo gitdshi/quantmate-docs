@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>QuantMate — AI 助手</title>
+  <title>QuantMate - AI Assistant</title>
   <link rel="stylesheet" href="shared.css">
   <script src="https://cdn.tailwindcss.com?v=3.4"></script>
 </head>
@@ -14,21 +14,21 @@
     <div class="page-header">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
         <div>
-          <h1 class="page-title">AI 助手</h1>
-          <p class="page-subtitle">智能问答 · 策略生成 · 市场解读 · 代码辅助</p>
+          <h1 class="page-title">AI Assistant</h1>
+          <p class="page-subtitle">Intelligent Q&amp;A | Strategy generation | Market analysis | Code assistance</p>
         </div>
         <div style="display:flex;gap:8px">
-          <button class="btn btn-ghost btn-sm" onclick="showConfirm('确认清空对话历史？',()=>showToast('对话已清空','success'))">清空对话</button>
-          <select class="form-select" style="max-width:160px" onchange="showToast('已切换到 '+this.value,'success')"><option>GPT-4o</option><option>Claude 3.5</option><option>Qwen 2.5</option></select>
+          <button class="btn btn-ghost btn-sm" onclick="showConfirm('Confirm clearing the conversation history?', ()=>showToast('Conversation cleared','success'))">Clear conversation</button>
+          <select class="form-select" style="max-width:160px" onchange="showToast('Switched to ' + this.value, 'success')"><option>GPT-4o</option><option>Claude 3.5</option><option>Qwen 2.5</option></select>
         </div>
       </div>
     </div>
 
     <div class="tabs" data-group="ai">
-      <button class="tab-btn active" data-tab="chat">AI 对话</button>
-      <button class="tab-btn" data-tab="codegen">代码生成</button>
-      <button class="tab-btn" data-tab="insight">市场洞察</button>
-      <button class="tab-btn" data-tab="suggest">策略建议</button>
+      <button class="tab-btn active" data-tab="chat">AI Chat</button>
+      <button class="tab-btn" data-tab="codegen">Code Generation</button>
+      <button class="tab-btn" data-tab="insight">Market Insights</button>
+      <button class="tab-btn" data-tab="suggest">Strategy Recommendations</button>
     </div>
 
     <!-- Tab: Chat -->
@@ -37,49 +37,49 @@
         <div class="chat-messages" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:16px">
           <!-- System -->
           <div class="chat-msg system">
-            <div class="chat-bubble system">你好！我是 QuantMate AI 助手，可以帮你分析市场、生成策略代码、解读回测结果。有什么需要帮助的吗？</div>
+            <div class="chat-bubble system">Hello! I am the QuantMate AI assistant, and I can help you analyze the market, generate strategy code, and interpret backtest results. How can I assist you?</div>
           </div>
           <!-- User -->
           <div class="chat-msg user">
-            <div class="chat-bubble user">帮我分析一下贵州茅台近期的走势，给出技术面和基本面的综合建议。</div>
+            <div class="chat-bubble user">Help me analyze the recent trend of Kweichow Moutai, and provide a comprehensive recommendation based on both technical and fundamental aspects.</div>
           </div>
           <!-- AI Response -->
           <div class="chat-msg system">
             <div class="chat-bubble system">
-              <h4 style="font-weight:600;margin-bottom:8px">📊 贵州茅台 (600519.SH) 综合分析</h4>
+              <h4 style="font-weight:600;margin-bottom:8px">Market Analysis: Kweichow Moutai (600519.SH)</h4>
               
-              <p style="font-weight:600;margin:12px 0 4px">技术面：</p>
+              <p style="font-weight:600;margin:12px 0 4px">Technical aspect:</p>
               <ul style="margin:0;padding-left:16px;font-size:13px">
-                <li>当前价 ¥1,856，位于 MA5/MA10/MA20 上方，均线多头排列</li>
-                <li>RSI(14) = 62.5，处于中性偏多区域</li>
-                <li>MACD 金叉确认，DIF > DEA，红柱放大</li>
-                <li>布林带中轨上方运行，趋势偏强</li>
-                <li>支撑位: ¥1,840 / ¥1,820 · 压力位: ¥1,875 / ¥1,895</li>
+                <li>Current price CNY 1,856, above MA5/MA10/MA20, with moving averages in a bullish alignment</li>
+                <li>RSI(14) = 62.5, in the neutral-to-bullish zone</li>
+                <li>MACD bullish crossover confirmed, DIF &gt; DEA, and the histogram is expanding</li>
+                <li>Trading above the middle band of the Bollinger Bands, the trend is relatively strong</li>
+                <li>Support levels: CNY 1,840 / CNY 1,820 | Resistance levels: CNY 1,875 / CNY 1,895</li>
               </ul>
 
-              <p style="font-weight:600;margin:12px 0 4px">基本面：</p>
+              <p style="font-weight:600;margin:12px 0 4px">Fundamentals:</p>
               <ul style="margin:0;padding-left:16px;font-size:13px">
-                <li>PE(TTM) 28.5，略高于行业中位 18.5</li>
-                <li>ROE 32.8%，保持高质量盈利</li>
-                <li>2025Q4 营收 382.5 亿，同比 +18.2%</li>
-                <li>现金流充沛，分红率稳定</li>
+                <li>PE (TTM) 28.5, slightly higher than the industry median of 18.5</li>
+                <li>ROE 32.8%, maintaining high-quality profitability</li>
+                <li>Revenue for Q4 2025 is 38.25 billion, up 18.2% year-on-year</li>
+                <li>Abundant cash flow, stable dividend ratio</li>
               </ul>
 
-              <p style="font-weight:600;margin:12px 0 4px">综合建议：</p>
+              <p style="font-weight:600;margin:12px 0 4px">Overall Recommendation:</p>
               <div style="background:var(--muted);padding:12px;border-radius:6px;font-size:13px">
-                <span class="badge badge-success" style="margin-bottom:6px">看多</span>
-                <p>技术面多头格局明确，基本面业绩增长稳健。建议在 ¥1,840 支撑位附近加仓，止损设在 ¥1,795 (MA60)。目标位 ¥1,895-1,920。</p>
+                <span class="badge badge-success" style="margin-bottom:6px">Bullish</span>
+                <p>The technical setup remains bullish, and the fundamentals show steady earnings growth. Consider adding near the CNY 1,840 support level, with a stop-loss around CNY 1,795 (MA60). The target range is CNY 1,895-1,920.</p>
               </div>
             </div>
           </div>
           <!-- User -->
           <div class="chat-msg user">
-            <div class="chat-bubble user">帮我写一个基于 MACD 的交易策略。</div>
+            <div class="chat-bubble user">Help me write a trading strategy based on MACD.</div>
           </div>
           <!-- AI Code Response -->
           <div class="chat-msg system">
             <div class="chat-bubble system">
-              <p>这是一个基于 MACD 金叉/死叉的交易策略：</p>
+              <p>This is a trading strategy based on MACD golden cross/death cross:</p>
               <pre class="code-block" style="margin:8px 0;font-size:12px"><code>class MACDStrategy:
     def __init__(self, fast=12, slow=26, signal=9):
         self.fast = fast
@@ -94,19 +94,19 @@
         df['histogram'] = df['macd'] - df['signal_line']
         
         df['signal'] = 0
-        # 金叉买入
+        # Buy on bullish crossover
         df.loc[(df['macd'] > df['signal_line']) & 
                (df['macd'].shift(1) <= df['signal_line'].shift(1)), 
                'signal'] = 1
-        # 死叉卖出
+        # Sell on bearish crossover
         df.loc[(df['macd'] < df['signal_line']) & 
                (df['macd'].shift(1) >= df['signal_line'].shift(1)), 
                'signal'] = -1
         return df</code></pre>
               <div style="display:flex;gap:8px;margin-top:8px">
-                <button class="btn btn-primary btn-sm" onclick="showToast('代码已复制到剪贴板','success')">复制代码</button>
-                <button class="btn btn-secondary btn-sm" onclick="showToast('已导入到策略编辑器','success')">导入到策略编辑器</button>
-                <button class="btn btn-ghost btn-sm" onclick="showToast('正在跳转到回测页面…','info')">立即回测</button>
+                <button class="btn btn-primary btn-sm" onclick="showToast('Code has been copied to the clipboard', 'success')">Copy code</button>
+                <button class="btn btn-secondary btn-sm" onclick="showToast('Imported into the strategy editor','success')">Import to Strategy Editor</button>
+                <button class="btn btn-ghost btn-sm" onclick="showToast('Redirecting to the backtesting page...','info')">Backtest immediately</button>
               </div>
             </div>
           </div>
@@ -115,11 +115,11 @@
         <!-- Input Area -->
         <div style="border-top:1px solid var(--border);padding:12px;display:flex;gap:8px;align-items:flex-end">
           <div style="display:flex;gap:4px">
-            <button class="btn btn-ghost btn-icon btn-sm" title="上传文件" onclick="showToast('请选择要上传的文件','info')">📎</button>
-            <button class="btn btn-ghost btn-icon btn-sm" title="插入数据" onclick="showToast('请选择要插入的数据集','info')">📊</button>
+            <button class="btn btn-ghost btn-icon btn-sm" title="Upload File" onclick="showToast('Please select the file to upload','info')">📎</button>
+            <button class="btn btn-ghost btn-icon btn-sm" title="Insert data" onclick="showToast('Please select the dataset to insert', 'info')">📊</button>
           </div>
-          <textarea class="form-textarea" rows="1" style="flex:1;resize:none" placeholder="输入问题...支持策略分析、市场解读、代码生成等"></textarea>
-          <button class="btn btn-primary btn-icon" onclick="showToast('AI 正在思考中…','info')">➤</button>
+          <textarea class="form-textarea" rows="1" style="flex:1;resize:none" placeholder="Enter a question... supports strategy analysis, market interpretation, code generation, and more"></textarea>
+          <button class="btn btn-primary btn-icon" onclick="showToast('AI is thinking...','info')">➤</button>
         </div>
       </div>
     </div>
@@ -128,30 +128,30 @@
     <div class="tab-panel" data-group="ai" data-panel="codegen">
       <div class="grid-2">
         <div class="card">
-          <div class="card-header"><h3 class="card-title">需求描述</h3></div>
-          <textarea class="form-textarea" rows="8" placeholder="用自然语言描述你的策略逻辑...
-例如: 当RSI低于30且MACD柱状图由负转正时买入，当RSI高于70时卖出，每次交易100股"></textarea>
+          <div class="card-header"><h3 class="card-title">Requirement Description</h3></div>
+          <textarea class="form-textarea" rows="8" placeholder="Describe your strategy logic in natural language...
+Example: Buy when RSI drops below 30 and the MACD histogram turns positive. Sell when RSI rises above 70. Trade 100 shares each time."></textarea>
           <div style="margin-top:12px;display:flex;gap:8px">
-            <button class="btn btn-primary" onclick="showToast('代码生成中，请稍候…','info')">生成代码</button>
+            <button class="btn btn-primary" onclick="showToast('Generating code, please wait...','info')">Generate code</button>
             <select class="form-select" style="max-width:140px"><option>Python</option><option>Pine Script</option></select>
           </div>
         </div>
         <div class="card">
-          <div class="card-header"><h3 class="card-title">生成结果</h3><div style="display:flex;gap:8px"><button class="btn btn-ghost btn-sm" onclick="showToast('代码已复制','success')">复制</button><button class="btn btn-ghost btn-sm" onclick="showToast('已导入到策略编辑器','success')">导入策略</button></div></div>
-          <pre class="code-block" style="min-height:240px;font-size:12px"><code># AI 生成的策略代码将显示在这里
-# 点击"生成代码"开始...</code></pre>
+          <div class="card-header"><h3 class="card-title">Generated Result</h3><div style="display:flex;gap:8px"><button class="btn btn-ghost btn-sm" onclick="showToast('Code copied','success')">Copy</button><button class="btn btn-ghost btn-sm" onclick="showToast('Imported into the strategy editor','success')">Import Strategy</button></div></div>
+          <pre class="code-block" style="min-height:240px;font-size:12px"><code># AI generated strategy code will appear here
+# Click "Generate code" to start.</code></pre>
         </div>
       </div>
 
       <div class="card">
-        <div class="card-header"><h3 class="card-title">常用模板</h3></div>
+        <div class="card-header"><h3 class="card-title">Common Templates</h3></div>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px">
-          <button class="btn btn-secondary btn-sm" style="text-align:left" onclick="showToast('已加载趋势跟踪模板','success')">📈 趋势跟踪策略</button>
-          <button class="btn btn-secondary btn-sm" style="text-align:left" onclick="showToast('已加载均值回归模板','success')">🔄 均值回归策略</button>
-          <button class="btn btn-secondary btn-sm" style="text-align:left" onclick="showToast('已加载多因子模板','success')">📊 多因子选股</button>
-          <button class="btn btn-secondary btn-sm" style="text-align:left" onclick="showToast('已加载动量突破模板','success')">⚡ 动量突破策略</button>
-          <button class="btn btn-secondary btn-sm" style="text-align:left" onclick="showToast('已加载风险平价模板','success')">🛡️ 风险平价组合</button>
-          <button class="btn btn-secondary btn-sm" style="text-align:left" onclick="showToast('已加载配对交易模板','success')">🔀 配对交易策略</button>
+          <button class="btn btn-secondary btn-sm" style="text-align:left" onclick="showToast('Trend tracking template loaded','success')">📈 Trend Following Strategy</button>
+          <button class="btn btn-secondary btn-sm" style="text-align:left" onclick="showToast('Mean Reversion Template Loaded','success')">🔄 Mean Reversion Strategy</button>
+          <button class="btn btn-secondary btn-sm" style="text-align:left" onclick="showToast('Multi-factor template loaded','success')">📊 Multi-Factor Stock Selection</button>
+          <button class="btn btn-secondary btn-sm" style="text-align:left" onclick="showToast('Momentum Breakthrough Template Loaded','success')">⚡ Momentum Breakout Strategy</button>
+          <button class="btn btn-secondary btn-sm" style="text-align:left" onclick="showToast('Risk parity template loaded','success')">🛡️ Risk Parity Portfolio</button>
+          <button class="btn btn-secondary btn-sm" style="text-align:left" onclick="showToast('Pair trading template loaded','success')">🔀 Pair Trading Strategy</button>
         </div>
       </div>
     </div>
@@ -159,24 +159,24 @@
     <!-- Tab: Market Insight -->
     <div class="tab-panel" data-group="ai" data-panel="insight">
       <div class="card">
-        <div class="card-header"><h3 class="card-title">AI 市场洞察 — 2026-03-14</h3><span class="badge badge-primary">自动更新</span></div>
+        <div class="card-header"><h3 class="card-title">AI Market Insights - 2026-03-14</h3><span class="badge badge-primary">Automatic update</span></div>
         
         <div style="display:flex;flex-direction:column;gap:16px">
           <div class="card" style="border-left:3px solid var(--success)">
-            <h4 style="font-weight:600">🔥 今日热点</h4>
-            <p class="text-muted" style="font-size:13px;margin-top:4px">白酒板块集体走强，茅台五粮液领涨。AI概念股持续活跃，半导体产业链获资金关注。</p>
+            <h4 style="font-weight:600">🔥 Today's Hot Topics</h4>
+            <p class="text-muted" style="font-size:13px;margin-top:4px">The liquor sector collectively strengthened, with Maotai and Wuliangye leading the gains. AI concept stocks remained active, and the semiconductor industry chain attracted capital attention.</p>
           </div>
           <div class="card" style="border-left:3px solid var(--primary)">
-            <h4 style="font-weight:600">📊 资金面分析</h4>
-            <p class="text-muted" style="font-size:13px;margin-top:4px">两市成交额1.28万亿，较昨日放量8.5%。北向资金净流入52.3亿，主要流入消费和科技板块。融资余额小幅回升。</p>
+            <h4 style="font-weight:600">📊 Liquidity Analysis</h4>
+            <p class="text-muted" style="font-size:13px;margin-top:4px">The total turnover of the two markets was 1.28 trillion yuan, an increase of 8.5% compared with yesterday. Northbound funds had a net inflow of 5.23 billion yuan, mainly flowing into the consumer and technology sectors. The margin balance slightly rebounded.</p>
           </div>
           <div class="card" style="border-left:3px solid var(--warning)">
-            <h4 style="font-weight:600">⚠️ 风险提示</h4>
-            <p class="text-muted" style="font-size:13px;margin-top:4px">美联储议息会议临近(3/15)，市场波动可能加大。注意光伏板块技术面走弱，隆基绿能跌破20日均线。</p>
+            <h4 style="font-weight:600">⚠️ Risk Warning</h4>
+            <p class="text-muted" style="font-size:13px;margin-top:4px">The Federal Reserve's policy meeting is approaching (3/15), and market volatility may increase. Pay attention to the weakening technical trend in the photovoltaic sector; LONGi Green Energy has fallen below the 20-day moving average.</p>
           </div>
           <div class="card" style="border-left:3px solid var(--success)">
-            <h4 style="font-weight:600">💡 策略建议</h4>
-            <p class="text-muted" style="font-size:13px;margin-top:4px">建议保持中等仓位(50-60%)，超配消费和科技，减配周期。关注美联储决议后的市场方向，短期可适当防守。</p>
+            <h4 style="font-weight:600">💡 Strategy Suggestions</h4>
+            <p class="text-muted" style="font-size:13px;margin-top:4px">It is recommended to maintain a medium position (50-60%), overweight consumer and technology sectors, and underweight cyclical sectors. Pay attention to the market direction after the Federal Reserve's decision, and a short-term defensive approach may be appropriate.</p>
           </div>
         </div>
       </div>
@@ -185,35 +185,35 @@
     <!-- Tab: Strategy Suggestions -->
     <div class="tab-panel" data-group="ai" data-panel="suggest">
       <div class="card">
-        <div class="card-header"><h3 class="card-title">AI 策略优化建议</h3></div>
-        <p class="text-muted" style="margin-bottom:16px">基于你的交易历史和策略表现，AI 生成以下优化建议：</p>
+        <div class="card-header"><h3 class="card-title">AI Strategy Optimization Recommendations</h3></div>
+        <p class="text-muted" style="margin-bottom:16px">Based on your trading history and strategy performance, AI generates the following optimization suggestions:</p>
 
         <div style="display:flex;flex-direction:column;gap:16px">
           <div class="card" style="border-left:3px solid var(--primary)">
             <div style="display:flex;justify-content:space-between;align-items:start">
               <div>
-                <h4 style="font-weight:600">DualMA_Cross 参数优化</h4>
-                <p class="text-muted" style="font-size:13px;margin-top:4px">建议将短期均线从5调整为8，长期均线从20调整为25，可减少假信号约15%，预期 Sharpe 提升至1.55。</p>
+                <h4 style="font-weight:600">DualMA_Cross Parameter Optimization</h4>
+                <p class="text-muted" style="font-size:13px;margin-top:4px">It is recommended to adjust the short-term moving average from 5 to 8 and the long-term moving average from 20 to 25, which can reduce false signals by about 15%, with an expected Sharpe ratio increase to 1.55.</p>
               </div>
-              <button class="btn btn-primary btn-sm" onclick="showToast('参数已应用到 DualMA_Cross','success')">应用</button>
+              <button class="btn btn-primary btn-sm" onclick="showToast('Parameters have been applied to DualMA_Cross','success')">Application</button>
             </div>
           </div>
           <div class="card" style="border-left:3px solid var(--warning)">
             <div style="display:flex;justify-content:space-between;align-items:start">
               <div>
-                <h4 style="font-weight:600">行业集中度警告</h4>
-                <p class="text-muted" style="font-size:13px;margin-top:4px">白酒板块占比92.2%，远超30%阈值。建议分散到银行(25%)、光伏(20%)、科技(25%)，预期回撤降低40%。</p>
+                <h4 style="font-weight:600">Industry concentration warning</h4>
+                <p class="text-muted" style="font-size:13px;margin-top:4px">The Baijiu sector accounts for 92.2%, far exceeding the 30% threshold. It is recommended to diversify into banks (25%), photovoltaics (20%), and technology (25%), with an expected drawdown reduction of 40%.</p>
               </div>
-              <button class="btn btn-secondary btn-sm" onclick="showToast('已跳转到组合配置页','info')">查看配置</button>
+              <button class="btn btn-secondary btn-sm" onclick="showToast('Redirected to the combination configuration page', 'info')">View Configuration</button>
             </div>
           </div>
           <div class="card" style="border-left:3px solid var(--success)">
             <div style="display:flex;justify-content:space-between;align-items:start">
               <div>
-                <h4 style="font-weight:600">新策略机会</h4>
-                <p class="text-muted" style="font-size:13px;margin-top:4px">检测到半导体板块出现量价齐升信号，建议关注配对交易机会。可参考 AI 生成的半导体动量策略。</p>
+                <h4 style="font-weight:600">New Strategic Opportunities</h4>
+                <p class="text-muted" style="font-size:13px;margin-top:4px">A signal of rising volume and price has been detected in the semiconductor sector. It is recommended to pay attention to pair trading opportunities. You can refer to AI-generated semiconductor momentum strategies.</p>
               </div>
-              <button class="btn btn-primary btn-sm" onclick="showToast('AI 正在生成半导体动量策略…','info')">生成策略</button>
+              <button class="btn btn-primary btn-sm" onclick="showToast('AI is generating semiconductor momentum strategy...','info')">Generation strategy</button>
             </div>
           </div>
         </div>

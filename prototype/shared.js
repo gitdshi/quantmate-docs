@@ -1,48 +1,48 @@
 /* ============================================================
-   QuantMate Prototype — Shared JavaScript
-   Sidebar, Tabs, Modals, Dark Mode, Mock Data
+   QuantMate Prototype - Shared JavaScript
+   Sidebar, tabs, modals, dark mode, mock data
    ============================================================ */
 
-// ── Dark Mode ──
 function initDarkMode() {
   const saved = localStorage.getItem('tm-dark');
   if (saved === '1' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
     document.documentElement.classList.add('dark');
   }
 }
+
 function toggleDark() {
   document.documentElement.classList.toggle('dark');
   localStorage.setItem('tm-dark', document.documentElement.classList.contains('dark') ? '1' : '0');
 }
+
 initDarkMode();
 
-// ── Sidebar ──
 const CURRENT_PAGE = location.pathname.split('/').pop()?.replace('.html', '') || 'dashboard';
 
 function buildSidebar() {
   const nav = [
-    { section: '概览' },
+    { section: 'Overview' },
     { name: 'Dashboard', href: 'dashboard.html', icon: 'layout-dashboard', id: 'dashboard' },
-    { section: '研究 & 数据' },
-    { name: '策略研究', href: 'strategies.html', icon: 'file-code', id: 'strategies' },
-    { name: '回测评估', href: 'backtest.html', icon: 'trending-up', id: 'backtest' },
-    { name: '行情数据', href: 'market-data.html', icon: 'database', id: 'market-data' },
-    { name: '因子研究', href: 'factor-lab.html', icon: 'flask-conical', id: 'factor-lab' },
-    { section: '交易 & 组合' },
-    { name: '组合管理', href: 'portfolio.html', icon: 'briefcase', id: 'portfolio' },
-    { name: '交易执行', href: 'trading.html', icon: 'arrow-left-right', id: 'trading' },
-    { name: '分析中心', href: 'analytics.html', icon: 'bar-chart-3', id: 'analytics' },
-    { section: '运维 & 通知' },
-    { name: '监控告警', href: 'alerts.html', icon: 'bell', id: 'alerts', badge: '3' },
-    { name: '报告复盘', href: 'reports.html', icon: 'file-text', id: 'reports' },
-    { section: 'AI & 社区' },
-    { name: 'AI 助手', href: 'ai.html', icon: 'sparkles', id: 'ai' },
-    { name: '模板市场', href: 'marketplace.html', icon: 'store', id: 'marketplace' },
-    { name: '策略分享', href: 'sharing.html', icon: 'share-2', id: 'sharing' },
-    { name: '团队空间', href: 'workspaces.html', icon: 'users', id: 'workspaces' },
-    { section: '系统' },
-    { name: '系统设置', href: 'settings.html', icon: 'settings', id: 'settings' },
-    { name: '账户安全', href: 'account.html', icon: 'shield', id: 'account' },
+    { section: 'Research & Data' },
+    { name: 'Strategy Research', href: 'strategies.html', icon: 'file-code', id: 'strategies' },
+    { name: 'Backtesting', href: 'backtest.html', icon: 'trending-up', id: 'backtest' },
+    { name: 'Market Data', href: 'market-data.html', icon: 'database', id: 'market-data' },
+    { name: 'Factor Lab', href: 'factor-lab.html', icon: 'flask-conical', id: 'factor-lab' },
+    { section: 'Trading & Portfolio' },
+    { name: 'Portfolio', href: 'portfolio.html', icon: 'briefcase', id: 'portfolio' },
+    { name: 'Trading', href: 'trading.html', icon: 'arrow-left-right', id: 'trading' },
+    { name: 'Analytics', href: 'analytics.html', icon: 'bar-chart-3', id: 'analytics' },
+    { section: 'Ops & Alerts' },
+    { name: 'Alerts', href: 'alerts.html', icon: 'bell', id: 'alerts', badge: '3' },
+    { name: 'Reports', href: 'reports.html', icon: 'file-text', id: 'reports' },
+    { section: 'AI & Collaboration' },
+    { name: 'AI Assistant', href: 'ai.html', icon: 'sparkles', id: 'ai' },
+    { name: 'Marketplace', href: 'marketplace.html', icon: 'store', id: 'marketplace' },
+    { name: 'Sharing', href: 'sharing.html', icon: 'share-2', id: 'sharing' },
+    { name: 'Workspaces', href: 'workspaces.html', icon: 'users', id: 'workspaces' },
+    { section: 'System' },
+    { name: 'Settings', href: 'settings.html', icon: 'settings', id: 'settings' },
+    { name: 'Account Security', href: 'account.html', icon: 'shield', id: 'account' },
   ];
 
   let html = `
@@ -51,7 +51,7 @@ function buildSidebar() {
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
         QuantMate
       </div>
-      <button class="btn btn-ghost btn-icon" onclick="toggleSidebar()" title="收起侧边栏">
+      <button class="btn btn-ghost btn-icon" onclick="toggleSidebar()" title="Collapse sidebar">
         ${icon('panel-left-close')}
       </button>
     </div>
@@ -73,8 +73,8 @@ function buildSidebar() {
         <div class="sidebar-user-name">demo_user</div>
         <div class="sidebar-user-email">demo@quantmate.io</div>
       </div>
-      <button class="btn btn-ghost btn-icon" onclick="toggleDark()" title="切换主题">${icon('moon')}</button>
-      <a href="login.html" class="btn btn-ghost btn-icon" title="退出登录">${icon('log-out')}</a>
+      <button class="btn btn-ghost btn-icon" onclick="toggleDark()" title="Toggle theme">${icon('moon')}</button>
+      <a href="login.html" class="btn btn-ghost btn-icon" title="Log out">${icon('log-out')}</a>
     </div>`;
 
   const sidebar = document.getElementById('sidebar');
@@ -86,7 +86,12 @@ function toggleSidebar() {
   if (s) s.classList.toggle('collapsed');
 }
 
-// ── Tabs ──
+function panelsForGroup(group) {
+  return document.querySelectorAll(
+    `.tab-panel[data-group="${group}"], .detail-panel[data-group="${group}"]`
+  );
+}
+
 function initTabs() {
   document.querySelectorAll('.tabs').forEach(tabBar => {
     tabBar.querySelectorAll('.tab-btn').forEach(btn => {
@@ -95,32 +100,30 @@ function initTabs() {
         tabBar.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         const target = btn.dataset.tab;
-        document.querySelectorAll(`.tab-panel[data-group="${group}"]`).forEach(p => {
-          p.classList.toggle('active', p.dataset.panel === target);
+        panelsForGroup(group).forEach(panel => {
+          panel.classList.toggle('active', panel.dataset.panel === target);
         });
       });
     });
   });
 }
 
-// ── Modals ──
 function openModal(id) {
   const el = document.getElementById(id);
   if (el) el.classList.add('open');
 }
+
 function closeModal(id) {
   const el = document.getElementById(id);
   if (el) el.classList.remove('open');
 }
-// Close on overlay click
-document.addEventListener('click', e => {
-  if (e.target.classList.contains('modal-overlay') && e.target.classList.contains('open')) {
-    e.target.classList.remove('open');
+
+document.addEventListener('click', event => {
+  if (event.target.classList.contains('modal-overlay') && event.target.classList.contains('open')) {
+    event.target.classList.remove('open');
   }
 });
 
-// ── Lucide Icon Helper ──
-// Uses inline SVG paths for common icons (no CDN dependency)
 const ICONS = {
   'layout-dashboard': '<path d="M3 3h7v9H3z"/><path d="M14 3h7v5h-7z"/><path d="M14 12h7v9h-7z"/><path d="M3 16h7v5H3z"/>',
   'file-code': '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="m10 13-2 2 2 2"/><path d="m14 17 2-2-2-2"/>',
@@ -185,11 +188,10 @@ const ICONS = {
 };
 
 function icon(name, cls = '') {
-  const paths = ICONS[name] || ICONS['info'];
+  const paths = ICONS[name] || ICONS.info;
   return `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">${paths}</svg>`;
 }
 
-// ── Page Shell ──
 function pageShell(title, subtitle) {
   return `<div class="page-header">
     <div class="flex items-center justify-between">
@@ -202,123 +204,135 @@ function pageShell(title, subtitle) {
   </div>`;
 }
 
-// ── Mock Data ──
 const MOCK = {
   stocks: [
-    { code: '600519.SH', name: '贵州茅台', price: 1856.00, change: +2.35, industry: '白酒' },
-    { code: '000001.SZ', name: '平安银行', price: 12.48, change: -0.64, industry: '银行' },
-    { code: '601318.SH', name: '中国平安', price: 48.92, change: +1.12, industry: '保险' },
-    { code: '000858.SZ', name: '五粮液', price: 156.30, change: +1.85, industry: '白酒' },
-    { code: '600036.SH', name: '招商银行', price: 35.67, change: -0.32, industry: '银行' },
-    { code: '002415.SZ', name: '海康威视', price: 34.21, change: +3.12, industry: '安防' },
-    { code: '600900.SH', name: '长江电力', price: 28.45, change: +0.56, industry: '电力' },
-    { code: '601012.SH', name: '隆基绿能', price: 22.18, change: -2.41, industry: '光伏' },
+    { code: 'AAPL', name: 'Apple', price: 185.6, change: 2.35, industry: 'Consumer Tech' },
+    { code: 'MSFT', name: 'Microsoft', price: 412.48, change: -0.64, industry: 'Software' },
+    { code: 'NVDA', name: 'NVIDIA', price: 948.92, change: 1.12, industry: 'Semiconductors' },
+    { code: 'AMZN', name: 'Amazon', price: 156.3, change: 1.85, industry: 'E-Commerce' },
+    { code: 'JPM', name: 'JPMorgan', price: 185.67, change: -0.32, industry: 'Banking' },
+    { code: 'META', name: 'Meta', price: 512.21, change: 3.12, industry: 'Internet' },
+    { code: 'XOM', name: 'Exxon Mobil', price: 118.45, change: 0.56, industry: 'Energy' },
+    { code: 'TSLA', name: 'Tesla', price: 222.18, change: -2.41, industry: 'EV' },
   ],
   strategies: [
-    { id: 1, name: 'DualMA_Cross', type: 'CTA', status: 'active', version: 3, builtin: true, desc: '双均线交叉策略' },
-    { id: 2, name: 'RSI_Reversal', type: 'CTA', status: 'active', version: 2, builtin: true, desc: 'RSI 反转策略' },
-    { id: 3, name: 'BollingerBand', type: 'CTA', status: 'active', version: 1, builtin: true, desc: '布林带突破策略' },
-    { id: 4, name: 'MACD_Trend', type: 'CTA', status: 'active', version: 1, builtin: true, desc: 'MACD 趋势跟踪' },
-    { id: 5, name: 'MyAlpha01', type: 'Custom', status: 'active', version: 5, builtin: false, desc: '多因子选股 + 动量' },
-    { id: 6, name: 'MeanRevert_v2', type: 'Custom', status: 'draft', version: 2, builtin: false, desc: '均值回归测试' },
+    { id: 1, name: 'DualMA_Cross', type: 'CTA', status: 'active', version: 3, builtin: true, desc: 'Dual moving average crossover strategy' },
+    { id: 2, name: 'RSI_Reversal', type: 'CTA', status: 'active', version: 2, builtin: true, desc: 'RSI reversal strategy' },
+    { id: 3, name: 'BollingerBand', type: 'CTA', status: 'active', version: 1, builtin: true, desc: 'Bollinger breakout strategy' },
+    { id: 4, name: 'MACD_Trend', type: 'CTA', status: 'active', version: 1, builtin: true, desc: 'MACD trend following' },
+    { id: 5, name: 'MyAlpha01', type: 'Custom', status: 'active', version: 5, builtin: false, desc: 'Multi-factor stock selection with momentum' },
+    { id: 6, name: 'MeanRevert_v2', type: 'Custom', status: 'draft', version: 2, builtin: false, desc: 'Mean reversion draft strategy' },
   ],
   backtests: [
-    { id: 'BT-001', strategy: 'DualMA_Cross', symbol: '600519.SH', status: 'completed', return: 23.5, sharpe: 1.42, maxDD: -12.3, date: '2026-03-13' },
-    { id: 'BT-002', strategy: 'RSI_Reversal', symbol: '000858.SZ', status: 'completed', return: 15.2, sharpe: 1.18, maxDD: -8.7, date: '2026-03-13' },
-    { id: 'BT-003', strategy: 'MyAlpha01', symbol: '601318.SH', status: 'running', return: null, sharpe: null, maxDD: null, date: '2026-03-14' },
-    { id: 'BT-004', strategy: 'BollingerBand', symbol: '600036.SH', status: 'failed', return: null, sharpe: null, maxDD: null, date: '2026-03-14' },
-    { id: 'BT-005', strategy: 'DualMA_Cross', symbol: '000001.SZ', status: 'queued', return: null, sharpe: null, maxDD: null, date: '2026-03-14' },
+    { id: 'BT-001', strategy: 'DualMA_Cross', symbol: 'AAPL', status: 'completed', return: 23.5, sharpe: 1.42, maxDD: -12.3, date: '2026-03-13' },
+    { id: 'BT-002', strategy: 'RSI_Reversal', symbol: 'AMZN', status: 'completed', return: 15.2, sharpe: 1.18, maxDD: -8.7, date: '2026-03-13' },
+    { id: 'BT-003', strategy: 'MyAlpha01', symbol: 'NVDA', status: 'running', return: null, sharpe: null, maxDD: null, date: '2026-03-14' },
+    { id: 'BT-004', strategy: 'BollingerBand', symbol: 'JPM', status: 'failed', return: null, sharpe: null, maxDD: null, date: '2026-03-14' },
+    { id: 'BT-005', strategy: 'DualMA_Cross', symbol: 'MSFT', status: 'queued', return: null, sharpe: null, maxDD: null, date: '2026-03-14' },
   ],
   positions: [
-    { symbol: '600519.SH', name: '贵州茅台', strategy: 'DualMA_Cross', dir: '多', qty: 100, entry: 1820.00, current: 1856.00, pnl: 3600, pnlPct: 1.98 },
-    { symbol: '000858.SZ', name: '五粮液', strategy: 'RSI_Reversal', dir: '多', qty: 500, entry: 148.50, current: 156.30, pnl: 3900, pnlPct: 5.25 },
-    { symbol: '601012.SH', name: '隆基绿能', strategy: 'MyAlpha01', dir: '多', qty: 1000, entry: 24.60, current: 22.18, pnl: -2420, pnlPct: -9.84 },
+    { symbol: 'AAPL', name: 'Apple', strategy: 'DualMA_Cross', dir: 'Long', qty: 100, entry: 182, current: 185.6, pnl: 360, pnlPct: 1.98 },
+    { symbol: 'AMZN', name: 'Amazon', strategy: 'RSI_Reversal', dir: 'Long', qty: 500, entry: 148.5, current: 156.3, pnl: 3900, pnlPct: 5.25 },
+    { symbol: 'TSLA', name: 'Tesla', strategy: 'MyAlpha01', dir: 'Long', qty: 1000, entry: 246, current: 222.18, pnl: -23820, pnlPct: -9.68 },
   ],
   orders: [
-    { id: 'ORD-001', time: '09:31:02', symbol: '600519.SH', dir: '买入', type: '限价', price: 1820.00, qty: 100, filled: 100, status: '已成交' },
-    { id: 'ORD-002', time: '09:35:15', symbol: '000858.SZ', dir: '买入', type: '市价', price: 148.50, qty: 500, filled: 500, status: '已成交' },
-    { id: 'ORD-003', time: '10:02:30', symbol: '601012.SH', dir: '买入', type: '限价', price: 24.60, qty: 1000, filled: 1000, status: '已成交' },
-    { id: 'ORD-004', time: '14:25:00', symbol: '002415.SZ', dir: '卖出', type: '限价', price: 35.00, qty: 200, filled: 0, status: '待成交' },
-    { id: 'ORD-005', time: '14:30:00', symbol: '600036.SH', dir: '买入', type: '止损', price: 34.50, qty: 300, filled: 0, status: '已撤单' },
+    { id: 'ORD-001', time: '09:31:02', symbol: 'AAPL', dir: 'Buy', type: 'Limit', price: 182, qty: 100, filled: 100, status: 'filled' },
+    { id: 'ORD-002', time: '09:35:15', symbol: 'AMZN', dir: 'Buy', type: 'Market', price: 148.5, qty: 500, filled: 500, status: 'filled' },
+    { id: 'ORD-003', time: '10:02:30', symbol: 'TSLA', dir: 'Buy', type: 'Limit', price: 246, qty: 1000, filled: 1000, status: 'filled' },
+    { id: 'ORD-004', time: '14:25:00', symbol: 'META', dir: 'Sell', type: 'Limit', price: 515, qty: 200, filled: 0, status: 'pending' },
+    { id: 'ORD-005', time: '14:30:00', symbol: 'JPM', dir: 'Buy', type: 'Stop', price: 184.5, qty: 300, filled: 0, status: 'cancelled' },
   ],
   alerts: [
-    { id: 1, time: '14:32:00', type: '价格异动', level: '警告', symbol: '601012.SH', msg: '隆基绿能 跌幅超过 5%', status: '未处理' },
-    { id: 2, time: '13:15:00', type: '系统异常', level: '严重', symbol: '', msg: 'Worker 进程异常退出', status: '已确认' },
-    { id: 3, time: '10:05:00', type: '数据延迟', level: '信息', symbol: '', msg: 'Tushare 数据延迟 > 5分钟', status: '已解决' },
+    { id: 1, time: '14:32:00', type: 'Price move', level: 'Warning', symbol: 'TSLA', msg: 'Tesla dropped more than 5%', status: 'Open' },
+    { id: 2, time: '13:15:00', type: 'System error', level: 'Critical', symbol: '', msg: 'Worker process exited unexpectedly', status: 'Acknowledged' },
+    { id: 3, time: '10:05:00', type: 'Data delay', level: 'Info', symbol: '', msg: 'Market feed delayed by more than 5 minutes', status: 'Resolved' },
   ],
   factors: [
-    { name: 'momentum_20d', ic: 0.052, ir: 1.23, ret: 8.5, desc: '20日动量因子' },
-    { name: 'value_pe', ic: 0.038, ir: 0.95, ret: 6.2, desc: 'PE估值因子' },
-    { name: 'quality_roe', ic: 0.045, ir: 1.10, ret: 7.8, desc: 'ROE质量因子' },
-    { name: 'size_ln_mv', ic: -0.031, ir: -0.78, ret: -3.1, desc: '市值规模因子' },
-    { name: 'volatility_60d', ic: -0.028, ir: -0.65, ret: -2.5, desc: '60日波动率因子' },
-    { name: 'turnover_20d', ic: 0.022, ir: 0.55, ret: 4.1, desc: '20日换手率因子' },
+    { name: 'momentum_20d', ic: 0.052, ir: 1.23, ret: 8.5, desc: '20-day momentum factor' },
+    { name: 'value_pe', ic: 0.038, ir: 0.95, ret: 6.2, desc: 'PE valuation factor' },
+    { name: 'quality_roe', ic: 0.045, ir: 1.10, ret: 7.8, desc: 'ROE quality factor' },
+    { name: 'size_ln_mv', ic: -0.031, ir: -0.78, ret: -3.1, desc: 'Market cap factor' },
+    { name: 'volatility_60d', ic: -0.028, ir: -0.65, ret: -2.5, desc: '60-day volatility factor' },
+    { name: 'turnover_20d', ic: 0.022, ir: 0.55, ret: 4.1, desc: '20-day turnover factor' },
   ],
 };
 
-// ── Utility ──
-function pnlColor(val) { return val >= 0 ? 'text-success' : 'text-destructive'; }
-function pnlSign(val) { return val >= 0 ? '+' : ''; }
+function pnlColor(val) {
+  return val >= 0 ? 'text-success' : 'text-destructive';
+}
+
+function pnlSign(val) {
+  return val >= 0 ? '+' : '';
+}
+
 function statusBadge(status) {
   const map = {
-    'completed': 'badge-success', '已成交': 'badge-success', 'active': 'badge-success', 'online': 'badge-success', '已解决': 'badge-success',
-    'running': 'badge-primary', '执行中': 'badge-primary', '运行中': 'badge-primary',
-    'queued': 'badge-warning', '待成交': 'badge-warning', 'pending': 'badge-warning', '未处理': 'badge-warning',
-    'failed': 'badge-destructive', '已撤单': 'badge-muted', 'draft': 'badge-muted', '已确认': 'badge-primary',
-    '信息': 'badge-primary', '警告': 'badge-warning', '严重': 'badge-destructive',
+    completed: 'badge-success',
+    filled: 'badge-success',
+    active: 'badge-success',
+    online: 'badge-success',
+    Resolved: 'badge-success',
+    running: 'badge-primary',
+    queued: 'badge-warning',
+    pending: 'badge-warning',
+    Open: 'badge-warning',
+    failed: 'badge-destructive',
+    cancelled: 'badge-muted',
+    draft: 'badge-muted',
+    Acknowledged: 'badge-primary',
+    Info: 'badge-primary',
+    Warning: 'badge-warning',
+    Critical: 'badge-destructive',
   };
   return `<span class="badge ${map[status] || 'badge-muted'}">${status}</span>`;
 }
 
-// ── Init on DOM ready ──
 document.addEventListener('DOMContentLoaded', () => {
   buildSidebar();
   initTabs();
 });
 
-// ── Toast Notifications ──
 function showToast(msg, type) {
   type = type || 'info';
-  var container = document.getElementById('toast-container');
+  let container = document.getElementById('toast-container');
   if (!container) {
     container = document.createElement('div');
     container.id = 'toast-container';
     container.className = 'toast-container';
     document.body.appendChild(container);
   }
-  var t = document.createElement('div');
-  t.className = 'toast toast-' + type;
-  var icons = { success: '✓', error: '✕', info: 'ℹ', warning: '⚠' };
-  t.innerHTML = '<span>' + (icons[type] || 'ℹ') + '</span> ' + msg;
-  container.appendChild(t);
-  setTimeout(function () { if (t.parentNode) t.parentNode.removeChild(t); }, 3000);
+  const toast = document.createElement('div');
+  toast.className = 'toast toast-' + type;
+  const icons = { success: 'OK', error: 'ERR', info: 'INFO', warning: 'WARN' };
+  toast.innerHTML = '<span>' + (icons[type] || 'INFO') + '</span> ' + msg;
+  container.appendChild(toast);
+  setTimeout(() => {
+    if (toast.parentNode) toast.parentNode.removeChild(toast);
+  }, 3000);
 }
 
-// ── Confirm Dialog ──
 function showConfirm(msg, onYes) {
-  var overlay = document.createElement('div');
+  const overlay = document.createElement('div');
   overlay.className = 'confirm-overlay';
-  overlay.innerHTML = '<div class="confirm-box"><h4>确认操作</h4><p>' + msg + '</p><div class="confirm-actions"><button class="btn btn-secondary btn-sm" id="cfmNo">取消</button><button class="btn btn-primary btn-sm" id="cfmYes">确认</button></div></div>';
+  overlay.innerHTML = '<div class="confirm-box"><h4>Confirm action</h4><p>' + msg + '</p><div class="confirm-actions"><button class="btn btn-secondary btn-sm" id="cfmNo">Cancel</button><button class="btn btn-primary btn-sm" id="cfmYes">Confirm</button></div></div>';
   document.body.appendChild(overlay);
   overlay.querySelector('#cfmNo').onclick = function () { document.body.removeChild(overlay); };
   overlay.querySelector('#cfmYes').onclick = function () { document.body.removeChild(overlay); if (onYes) onYes(); };
-  overlay.addEventListener('click', function (e) { if (e.target === overlay) document.body.removeChild(overlay); });
+  overlay.addEventListener('click', function (event) { if (event.target === overlay) document.body.removeChild(overlay); });
 }
 
-// ── Helper: close modal + toast ──
 function submitModal(id, msg, type) {
   closeModal(id);
   showToast(msg, type || 'success');
 }
 
-// ── Helper: activate a tab programmatically ──
 function activateTab(group, tabName) {
-  var bar = document.querySelector('.tabs[data-group="' + group + '"]');
+  const bar = document.querySelector('.tabs[data-group="' + group + '"]');
   if (!bar) return;
-  bar.querySelectorAll('.tab-btn').forEach(function (b) {
-    b.classList.toggle('active', b.dataset.tab === tabName);
+  bar.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.tab === tabName);
   });
-  document.querySelectorAll('.tab-panel[data-group="' + group + '"]').forEach(function (p) {
-    p.classList.toggle('active', p.dataset.panel === tabName);
+  panelsForGroup(group).forEach(panel => {
+    panel.classList.toggle('active', panel.dataset.panel === tabName);
   });
 }

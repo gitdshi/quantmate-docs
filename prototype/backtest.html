@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>QuantMate — 回测评估</title>
+  <title>QuantMate - Backtesting Evaluation</title>
   <link rel="stylesheet" href="shared.css">
   <script src="https://cdn.tailwindcss.com?v=3.4"></script>
 </head>
@@ -14,30 +14,30 @@
     <div class="page-header">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
         <div>
-          <h1 class="page-title">回测评估</h1>
-          <p class="page-subtitle">策略回测引擎 · 多维度绩效分析</p>
+          <h1 class="page-title">Backtesting Evaluation</h1>
+          <p class="page-subtitle">Strategy Backtesting Engine · Multi-Dimensional Performance Analysis</p>
         </div>
-        <button class="btn btn-primary" onclick="openModal('newBT')">+ 新建回测</button>
+        <button class="btn btn-primary" onclick="openModal('newBT')">New Backtest</button>
       </div>
     </div>
 
     <div class="tabs" data-group="bt">
-      <button class="tab-btn active" data-tab="runs">回测列表</button>
-      <button class="tab-btn" data-tab="result">回测结果</button>
-      <button class="tab-btn" data-tab="compare">策略对比</button>
-      <button class="tab-btn" data-tab="optimize">参数优化</button>
+      <button class="tab-btn active" data-tab="runs">Backtesting List</button>
+      <button class="tab-btn" data-tab="result">Backtest results</button>
+      <button class="tab-btn" data-tab="compare">Strategy Comparison</button>
+      <button class="tab-btn" data-tab="optimize">Parameter Optimization</button>
     </div>
 
     <!-- Tab: Runs -->
     <div class="tab-panel active" data-group="bt" data-panel="runs">
       <div class="filter-bar">
-        <input type="text" class="form-input" placeholder="🔍 搜索策略..." style="max-width:240px">
-        <select class="form-select" style="max-width:140px"><option>全部状态</option><option>已完成</option><option>运行中</option><option>失败</option><option>排队中</option></select>
-        <select class="form-select" style="max-width:140px"><option>最近7天</option><option>最近30天</option><option>全部</option></select>
+        <input type="text" class="form-input" placeholder="🔍 Search strategy..." style="max-width:240px">
+        <select class="form-select" style="max-width:140px"><option>All Statuses</option><option>Completed</option><option>Running</option><option>Failure</option><option>In line</option></select>
+        <select class="form-select" style="max-width:140px"><option>Last 7 days</option><option>The last 30 days</option><option>All</option></select>
       </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>ID</th><th>策略</th><th>标的</th><th>状态</th><th>收益率</th><th>Sharpe</th><th>最大回撤</th><th>日期</th><th>操作</th></tr></thead>
+          <thead><tr><th>ID</th><th>Strategy</th><th>Target</th><th>State</th><th>Yield</th><th>Sharpe</th><th>Maximum drawdown</th><th>Date</th><th>Operation</th></tr></thead>
           <tbody id="btTable"></tbody>
         </table>
       </div>
@@ -47,59 +47,59 @@
     <div class="tab-panel" data-group="bt" data-panel="result">
       <div class="stat-grid cols-4">
         <div class="stat-card">
-          <div class="stat-label">总收益率</div>
+          <div class="stat-label">Total return</div>
           <div class="stat-value text-success">+23.50%</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">年化收益</div>
+          <div class="stat-label">Annualized Return</div>
           <div class="stat-value text-success">+31.20%</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Sharpe 比率</div>
+          <div class="stat-label">Sharpe Ratio</div>
           <div class="stat-value">1.42</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">最大回撤</div>
+          <div class="stat-label">Maximum drawdown</div>
           <div class="stat-value text-destructive">-12.30%</div>
         </div>
       </div>
 
       <div class="stat-grid cols-4" style="margin-top:12px">
         <div class="stat-card">
-          <div class="stat-label">胜率</div>
+          <div class="stat-label">Win rate</div>
           <div class="stat-value">62.5%</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">盈亏比</div>
+          <div class="stat-label">Profit and Loss Ratio</div>
           <div class="stat-value">1.85</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">总交易次数</div>
+          <div class="stat-label">Total number of transactions</div>
           <div class="stat-value">48</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">平均持仓天数</div>
+          <div class="stat-label">Average holding period</div>
           <div class="stat-value">6.3</div>
         </div>
       </div>
 
       <div class="grid-2">
         <div class="card">
-          <div class="card-header"><h3 class="card-title">净值曲线 vs 基准</h3></div>
+          <div class="card-header"><h3 class="card-title">Net Value Curve vs Benchmark</h3></div>
           <div class="chart-placeholder" style="height:260px"><canvas id="btNavCanvas"></canvas></div>
         </div>
         <div class="card">
-          <div class="card-header"><h3 class="card-title">回撤分析</h3></div>
+          <div class="card-header"><h3 class="card-title">Drawdown Analysis</h3></div>
           <div class="chart-placeholder" style="height:260px"><canvas id="btDDCanvas"></canvas></div>
         </div>
       </div>
 
       <div class="grid-2">
         <div class="card">
-          <div class="card-header"><h3 class="card-title">月度收益热力图</h3></div>
+          <div class="card-header"><h3 class="card-title">Monthly Revenue Heatmap</h3></div>
           <div style="overflow-x:auto">
             <table style="font-size:12px;text-align:center">
-              <thead><tr><th></th><th>1月</th><th>2月</th><th>3月</th><th>4月</th><th>5月</th><th>6月</th><th>7月</th><th>8月</th><th>9月</th><th>10月</th><th>11月</th><th>12月</th></tr></thead>
+              <thead><tr><th></th><th>January</th><th>February</th><th>March</th><th>April</th><th>May</th><th>June</th><th>July</th><th>August</th><th>September</th><th>October</th><th>November</th><th>December</th></tr></thead>
               <tbody>
                 <tr><td>2025</td><td class="heatmap-cell positive">3.2%</td><td class="heatmap-cell negative">-1.5%</td><td class="heatmap-cell positive">4.8%</td><td class="heatmap-cell positive">2.1%</td><td class="heatmap-cell negative">-0.8%</td><td class="heatmap-cell positive">5.3%</td><td class="heatmap-cell positive">1.9%</td><td class="heatmap-cell negative">-3.2%</td><td class="heatmap-cell positive">6.1%</td><td class="heatmap-cell positive">2.7%</td><td class="heatmap-cell positive">1.4%</td><td class="heatmap-cell positive">3.6%</td></tr>
                 <tr><td>2026</td><td class="heatmap-cell positive">4.1%</td><td class="heatmap-cell positive">2.8%</td><td class="heatmap-cell positive">1.5%</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
@@ -108,10 +108,10 @@
           </div>
         </div>
         <div class="card">
-          <div class="card-header"><h3 class="card-title">交易分布</h3></div>
+          <div class="card-header"><h3 class="card-title">Transaction Distribution</h3></div>
           <div class="chart-placeholder" style="height:180px">
             <div style="display:flex;align-items:flex-end;gap:4px;height:100%;padding:20px">
-              <div style="flex:1;background:var(--success);height:60%;border-radius:3px 3px 0 0" title="盈利交易 30"></div>
+              <div style="flex:1;background:var(--success);height:60%;border-radius:3px 3px 0 0" title="Profitable Trade 30"></div>
               <div style="flex:1;background:var(--success);height:45%;border-radius:3px 3px 0 0"></div>
               <div style="flex:1;background:var(--destructive);height:20%;border-radius:3px 3px 0 0"></div>
               <div style="flex:1;background:var(--success);height:70%;border-radius:3px 3px 0 0"></div>
@@ -130,28 +130,28 @@
     <!-- Tab: Compare -->
     <div class="tab-panel" data-group="bt" data-panel="compare">
       <div class="card">
-        <div class="card-header"><h3 class="card-title">策略对比选择</h3></div>
+        <div class="card-header"><h3 class="card-title">Strategy Comparison and Selection</h3></div>
         <div style="display:flex;gap:12px;flex-wrap:wrap">
           <label class="flex items-center gap-2"><input type="checkbox" checked> DualMA_Cross (BT-001)</label>
           <label class="flex items-center gap-2"><input type="checkbox" checked> RSI_Reversal (BT-002)</label>
           <label class="flex items-center gap-2"><input type="checkbox"> BollingerBand</label>
           <label class="flex items-center gap-2"><input type="checkbox"> MACD_Trend</label>
-          <button class="btn btn-primary btn-sm" style="margin-left:auto" onclick="showToast('对比报告已生成','success')">生成对比</button>
+          <button class="btn btn-primary btn-sm" style="margin-left:auto" onclick="showToast('Comparison report has been generated','success')">Generate comparison</button>
         </div>
       </div>
 
       <div class="table-wrap" style="margin-top:16px">
         <table>
-          <thead><tr><th>指标</th><th>DualMA_Cross</th><th>RSI_Reversal</th></tr></thead>
+          <thead><tr><th>Indicator</th><th>DualMA_Cross</th><th>RSI_Reversal</th></tr></thead>
           <tbody>
-            <tr><td>总收益率</td><td class="text-success">+23.50%</td><td class="text-success">+15.20%</td></tr>
-            <tr><td>年化收益</td><td class="text-success">+31.20%</td><td class="text-success">+20.10%</td></tr>
+            <tr><td>Total return</td><td class="text-success">+23.50%</td><td class="text-success">+15.20%</td></tr>
+            <tr><td>Annualized Return</td><td class="text-success">+31.20%</td><td class="text-success">+20.10%</td></tr>
             <tr><td>Sharpe</td><td><b>1.42</b></td><td>1.18</td></tr>
-            <tr><td>最大回撤</td><td class="text-destructive">-12.30%</td><td class="text-destructive">-8.70%</td></tr>
-            <tr><td>胜率</td><td>62.5%</td><td>58.3%</td></tr>
-            <tr><td>盈亏比</td><td><b>1.85</b></td><td>1.52</td></tr>
-            <tr><td>总交易次数</td><td>48</td><td>36</td></tr>
-            <tr><td>Calmar 比率</td><td><b>2.54</b></td><td>2.31</td></tr>
+            <tr><td>Maximum drawdown</td><td class="text-destructive">-12.30%</td><td class="text-destructive">-8.70%</td></tr>
+            <tr><td>Win rate</td><td>62.5%</td><td>58.3%</td></tr>
+            <tr><td>Profit and Loss Ratio</td><td><b>1.85</b></td><td>1.52</td></tr>
+            <tr><td>Total number of transactions</td><td>48</td><td>36</td></tr>
+            <tr><td>Calmar Ratio</td><td><b>2.54</b></td><td>2.31</td></tr>
           </tbody>
         </table>
       </div>
@@ -160,30 +160,30 @@
     <!-- Tab: Optimize -->
     <div class="tab-panel" data-group="bt" data-panel="optimize">
       <div class="card">
-        <div class="card-header"><h3 class="card-title">参数优化配置</h3></div>
+        <div class="card-header"><h3 class="card-title">Parameter Optimization Configuration</h3></div>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px">
           <div>
-            <label class="form-label">策略</label>
+            <label class="form-label">Strategy</label>
             <select class="form-select"><option>DualMA_Cross</option><option>RSI_Reversal</option></select>
           </div>
           <div>
-            <label class="form-label">参数: short_window</label>
-            <div style="display:flex;gap:8px"><input class="form-input" value="3" style="width:60px"><span class="text-muted" style="line-height:38px">~</span><input class="form-input" value="15" style="width:60px"><span class="text-muted" style="line-height:38px">步长</span><input class="form-input" value="1" style="width:50px"></div>
+            <label class="form-label">Parameter: short_window</label>
+            <div style="display:flex;gap:8px"><input class="form-input" value="3" style="width:60px"><span class="text-muted" style="line-height:38px">~</span><input class="form-input" value="15" style="width:60px"><span class="text-muted" style="line-height:38px">Step Length</span><input class="form-input" value="1" style="width:50px"></div>
           </div>
           <div>
-            <label class="form-label">参数: long_window</label>
-            <div style="display:flex;gap:8px"><input class="form-input" value="10" style="width:60px"><span class="text-muted" style="line-height:38px">~</span><input class="form-input" value="60" style="width:60px"><span class="text-muted" style="line-height:38px">步长</span><input class="form-input" value="5" style="width:50px"></div>
+            <label class="form-label">Parameter: long_window</label>
+            <div style="display:flex;gap:8px"><input class="form-input" value="10" style="width:60px"><span class="text-muted" style="line-height:38px">~</span><input class="form-input" value="60" style="width:60px"><span class="text-muted" style="line-height:38px">Step Length</span><input class="form-input" value="5" style="width:50px"></div>
           </div>
           <div>
-            <label class="form-label">优化目标</label>
-            <select class="form-select"><option>Sharpe 比率</option><option>总收益率</option><option>Calmar 比率</option></select>
+            <label class="form-label">Optimization Goal</label>
+            <select class="form-select"><option>Sharpe Ratio</option><option>Total return</option><option>Calmar Ratio</option></select>
           </div>
         </div>
-        <div style="margin-top:16px"><button class="btn btn-primary" onclick="showToast('优化任务已启动，预计 143 组参数组合','info')">开始优化 (共 143 组合)</button></div>
+        <div style="margin-top:16px"><button class="btn btn-primary" onclick="showToast('Optimization task has started, approximately 143 parameter combinations','info')">Start optimization (a total of 143 combinations)</button></div>
       </div>
 
       <div class="card" style="margin-top:16px">
-        <div class="card-header"><h3 class="card-title">优化结果热力图</h3></div>
+        <div class="card-header"><h3 class="card-title">Optimization Result Heatmap</h3></div>
         <div class="chart-placeholder" style="height:240px">
           <div style="display:grid;grid-template-columns:repeat(11,1fr);gap:2px;padding:20px;height:100%">
             <div class="heatmap-cell positive" style="padding:4px;font-size:10px">1.42</div>
@@ -199,7 +199,7 @@
             <div class="heatmap-cell negative" style="padding:4px;font-size:10px">-0.45</div>
           </div>
         </div>
-        <p class="text-muted" style="font-size:12px;margin-top:4px">X轴: short_window (3~15) · Y轴: long_window (10~60) · 颜色: Sharpe 比率</p>
+        <p class="text-muted" style="font-size:12px;margin-top:4px">X-axis: short_window (3~15) · Y-axis: long_window (10~60) · Color: Sharpe ratio</p>
       </div>
     </div>
 
@@ -209,18 +209,18 @@
 <!-- New Backtest Modal -->
 <div class="modal-overlay" id="newBT">
   <div class="modal" style="max-width:600px">
-    <div class="modal-header"><h3 class="modal-title">新建回测</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('newBT')">✕</button></div>
+    <div class="modal-header"><h3 class="modal-title">New Backtest</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('newBT')">✕</button></div>
     <div class="modal-body">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-        <div><label class="form-label">策略</label><select class="form-select"><option>DualMA_Cross</option><option>RSI_Reversal</option><option>BollingerBand</option><option>MyAlpha01</option></select></div>
-        <div><label class="form-label">标的</label><input class="form-input" value="600519.SH" placeholder="股票代码"></div>
-        <div><label class="form-label">开始日期</label><input type="date" class="form-input" value="2024-01-01"></div>
-        <div><label class="form-label">结束日期</label><input type="date" class="form-input" value="2026-03-13"></div>
-        <div><label class="form-label">初始资金</label><input type="number" class="form-input" value="1000000"></div>
-        <div><label class="form-label">基准</label><select class="form-select"><option>沪深300</option><option>上证50</option><option>中证500</option></select></div>
+        <div><label class="form-label">Strategy</label><select class="form-select"><option>DualMA_Cross</option><option>RSI_Reversal</option><option>BollingerBand</option><option>MyAlpha01</option></select></div>
+        <div><label class="form-label">Subject</label><input class="form-input" value="600519.SH" placeholder="Stock code"></div>
+        <div><label class="form-label">Start Date</label><input type="date" class="form-input" value="2024-01-01"></div>
+        <div><label class="form-label">End Date</label><input type="date" class="form-input" value="2026-03-13"></div>
+        <div><label class="form-label">Initial Funds</label><input type="number" class="form-input" value="1000000"></div>
+        <div><label class="form-label">Benchmark</label><select class="form-select"><option>CSI 300</option><option>SSE 50</option><option>CSI 500</option></select></div>
       </div>
     </div>
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('newBT')">取消</button><button class="btn btn-primary" onclick="submitModal('newBT','回测已提交，请在列表中查看进度')">开始回测</button></div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('newBT')>Cancel</button><button class="btn btn-primary" onclick="submitModal('newBT', 'Backtest has been submitted, please check the progress in the list')">Start backtesting</button></div>
   </div>
 </div>
 
@@ -235,7 +235,7 @@ MOCK.backtests.forEach(b => {
     <td>${b.sharpe ?? '-'}</td>
     <td class="${b.maxDD !== null ? 'text-destructive' : ''}">${b.maxDD !== null ? b.maxDD+'%' : '-'}</td>
     <td>${b.date}</td>
-    <td><button class="btn btn-ghost btn-sm" onclick="activateTab('bt','result');showToast('已加载 ${b.id} 回测结果','info')">查看</button><button class="btn btn-ghost btn-sm" onclick="showConfirm('确定重新运行 ${b.id} 回测？',function(){showToast('${b.id} 已加入回测队列','success')})">重跑</button></td>
+    <td><button class="btn btn-ghost btn-sm" onclick="activateTab('bt','result');showToast('Backtest results for ${b.id} have been loaded','info'> view</button>< Battenklaas = "Benben-Gersteben-Smu" Onklik = "Shawkonfilm ('Are you sure you want to rerun the backtest for ${b.id}?', function(){showToast('${b.id} has been added to the backtest queue', 'success')})">Rerun</button></td>
   </tr>`;
 });
 
@@ -265,8 +265,8 @@ function drawBTNav() {
   drawLine(bench, '#9ca3af');
   // Legend
   ctx.font = '12px system-ui';
-  ctx.fillStyle = '#3b82f6'; ctx.fillRect(W-180, 10, 12, 3); ctx.fillText('策略', W-164, 15);
-  ctx.fillStyle = '#9ca3af'; ctx.fillRect(W-100, 10, 12, 3); ctx.fillText('沪深300', W-84, 15);
+  ctx.fillStyle = '#3b82f6'; ctx.fillRect(W-180, 10, 12, 3); ctx.fillText('Strategy', W-164, 15);
+  ctx.fillStyle = '#9ca3af'; ctx.fillRect(W-100, 10, 12, 3); ctx.fillText('CSI 300', W-84, 15);
 }
 function drawDD() {
   const c = document.getElementById('btDDCanvas');
@@ -303,7 +303,7 @@ window.addEventListener('resize', () => { drawBTNav(); drawDD(); });
       var stat=row.cells[3].textContent;
       var show=true;
       if(q&&strat.indexOf(q)<0)show=false;
-      if(s&&s!=='全部状态'&&stat.indexOf(s.replace('已完成','completed').replace('运行中','running').replace('失败','failed').replace('排队中','queued'))<0&&stat.indexOf(s)<0)show=false;
+      if(s&&s!=='All Statuses'&&stat.indexOf(s.replace('Completed','completed').replace('Running','running').replace('Failure','failed').replace('In line','queued'))<0&&stat.indexOf(s)<0)show=false;
       row.style.display=show?'':'none';
     });
   }

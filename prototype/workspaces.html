@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>QuantMate — 团队空间</title>
+  <title>QuantMate - Team Space</title>
   <link rel="stylesheet" href="shared.css">
   <script src="https://cdn.tailwindcss.com?v=3.4"></script>
 </head>
@@ -14,18 +14,18 @@
     <div class="page-header">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
         <div>
-          <h1 class="page-title">团队空间</h1>
-          <p class="page-subtitle">团队协作 · 项目管理 · 权限控制</p>
+          <h1 class="page-title">Team Space</h1>
+          <p class="page-subtitle">Team collaboration | Project management | Access control</p>
         </div>
-        <button class="btn btn-primary" onclick="openModal('newWS')">+ 新建空间</button>
+        <button class="btn btn-primary" onclick="openModal('newWS')">New Space</button>
       </div>
     </div>
 
     <div class="tabs" data-group="ws">
-      <button class="tab-btn active" data-tab="spaces">我的空间</button>
-      <button class="tab-btn" data-tab="members">成员管理</button>
-      <button class="tab-btn" data-tab="activity">活动日志</button>
-      <button class="tab-btn" data-tab="permissions">权限设置</button>
+      <button class="tab-btn active" data-tab="spaces">My Space</button>
+      <button class="tab-btn" data-tab="members">Member Management</button>
+      <button class="tab-btn" data-tab="activity">Activity Log</button>
+      <button class="tab-btn" data-tab="permissions">Permission Settings</button>
     </div>
 
     <!-- Tab: Spaces -->
@@ -34,51 +34,51 @@
         <div class="card" style="border-left:4px solid var(--primary)">
           <div style="display:flex;justify-content:space-between;align-items:start">
             <div>
-              <h3 style="font-weight:600;font-size:16px">量化研究团队</h3>
-              <p class="text-muted" style="font-size:13px;margin:4px 0">策略研发与回测优化</p>
+              <h3 style="font-weight:600;font-size:16px">Quantitative Research Team</h3>
+              <p class="text-muted" style="font-size:13px;margin:4px 0">Strategy Development and Backtesting Optimization</p>
             </div>
-            <span class="badge badge-success">活跃</span>
+            <span class="badge badge-success">Active</span>
           </div>
           <div style="display:flex;gap:16px;margin-top:12px;font-size:13px;color:var(--muted-foreground)">
-            <span>👥 5 成员</span><span>📄 12 策略</span><span>📊 28 回测</span>
+            <span>?? 5 members</span><span>?? 12 strategies</span><span>?? 28 backtests</span>
           </div>
           <div style="display:flex;gap:8px;margin-top:12px">
-            <button class="btn btn-primary btn-sm">进入</button>
-            <button class="btn btn-ghost btn-sm">设置</button>
+            <button class="btn btn-primary btn-sm">Enter</button>
+            <button class="btn btn-ghost btn-sm">Settings</button>
           </div>
         </div>
 
         <div class="card" style="border-left:4px solid var(--success)">
           <div style="display:flex;justify-content:space-between;align-items:start">
             <div>
-              <h3 style="font-weight:600;font-size:16px">个人工作区</h3>
-              <p class="text-muted" style="font-size:13px;margin:4px 0">个人策略开发与测试</p>
+              <h3 style="font-weight:600;font-size:16px">Personal Workspace</h3>
+              <p class="text-muted" style="font-size:13px;margin:4px 0">Personal Strategy Development and Testing</p>
             </div>
-            <span class="badge badge-primary">私有</span>
+            <span class="badge badge-primary">Private</span>
           </div>
           <div style="display:flex;gap:16px;margin-top:12px;font-size:13px;color:var(--muted-foreground)">
-            <span>👤 1 成员</span><span>📄 6 策略</span><span>📊 15 回测</span>
+            <span>?? 1 member</span><span>?? 6 strategies</span><span>?? 15 backtests</span>
           </div>
           <div style="display:flex;gap:8px;margin-top:12px">
-            <button class="btn btn-primary btn-sm">进入</button>
-            <button class="btn btn-ghost btn-sm">设置</button>
+            <button class="btn btn-primary btn-sm">Enter</button>
+            <button class="btn btn-ghost btn-sm">Settings</button>
           </div>
         </div>
 
         <div class="card" style="border-left:4px solid var(--warning)">
           <div style="display:flex;justify-content:space-between;align-items:start">
             <div>
-              <h3 style="font-weight:600;font-size:16px">学习交流组</h3>
-              <p class="text-muted" style="font-size:13px;margin:4px 0">量化交易学习与讨论</p>
+              <h3 style="font-weight:600;font-size:16px">Study and Exchange Group</h3>
+              <p class="text-muted" style="font-size:13px;margin:4px 0">Quantitative Trading Learning and Discussion</p>
             </div>
-            <span class="badge badge-warning">开放</span>
+            <span class="badge badge-warning">Open</span>
           </div>
           <div style="display:flex;gap:16px;margin-top:12px;font-size:13px;color:var(--muted-foreground)">
-            <span>👥 23 成员</span><span>📄 8 模板</span><span>💬 156 讨论</span>
+            <span>?? 23 members</span><span>?? 8 templates</span><span>?? 156 discussions</span>
           </div>
           <div style="display:flex;gap:8px;margin-top:12px">
-            <button class="btn btn-primary btn-sm">进入</button>
-            <button class="btn btn-ghost btn-sm">设置</button>
+            <button class="btn btn-primary btn-sm">Enter</button>
+            <button class="btn btn-ghost btn-sm">Settings</button>
           </div>
         </div>
       </div>
@@ -87,16 +87,16 @@
     <!-- Tab: Members -->
     <div class="tab-panel" data-group="ws" data-panel="members">
       <div class="card">
-        <div class="card-header"><h3 class="card-title">量化研究团队 — 成员</h3><button class="btn btn-primary btn-sm" onclick="showToast('邀请链接已复制到剪贴板','success')">+ 邀请成员</button></div>
+        <div class="card-header"><h3 class="card-title">Quantitative Research Team - Members</h3><button class="btn btn-primary btn-sm" onclick="showToast('Invitation link has been copied to the clipboard','success')">Invite Members</button></div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>用户</th><th>角色</th><th>加入时间</th><th>最后活跃</th><th>贡献</th><th>操作</th></tr></thead>
+            <thead><tr><th>User</th><th>Role</th><th>Join Date</th><th>Last Active</th><th>Contribution</th><th>Actions</th></tr></thead>
             <tbody>
-              <tr><td><b>demo_user</b><br><span class="text-muted" style="font-size:12px">demo@quantmate.io</span></td><td><span class="badge badge-primary">管理员</span></td><td>2026-01-01</td><td>刚刚</td><td>12 策略 · 28 回测</td><td><button class="btn btn-ghost btn-sm" onclick="showToast('编辑成员角色','info')">编辑</button></td></tr>
-              <tr><td><b>alice_quant</b><br><span class="text-muted" style="font-size:12px">alice@example.com</span></td><td><span class="badge badge-success">编辑者</span></td><td>2026-01-15</td><td>2小时前</td><td>5 策略 · 12 回测</td><td><button class="btn btn-ghost btn-sm" onclick="showToast('编辑成员角色','info')">编辑</button><button class="btn btn-ghost btn-sm" onclick="showConfirm('确认移除成员 alice_quant？',()=>showToast('成员已移除','warning'))">移除</button></td></tr>
-              <tr><td><b>bob_dev</b><br><span class="text-muted" style="font-size:12px">bob@example.com</span></td><td><span class="badge badge-success">编辑者</span></td><td>2026-02-01</td><td>昨天</td><td>3 策略 · 8 回测</td><td><button class="btn btn-ghost btn-sm" onclick="showToast('编辑成员角色','info')">编辑</button><button class="btn btn-ghost btn-sm" onclick="showConfirm('确认移除成员 bob_dev？',()=>showToast('成员已移除','warning'))">移除</button></td></tr>
-              <tr><td><b>charlie_analyst</b><br><span class="text-muted" style="font-size:12px">charlie@example.com</span></td><td><span class="badge badge-muted">查看者</span></td><td>2026-02-15</td><td>3天前</td><td>0 策略 · 3 回测</td><td><button class="btn btn-ghost btn-sm" onclick="showToast('编辑成员角色','info')">编辑</button><button class="btn btn-ghost btn-sm" onclick="showConfirm('确认移除成员 charlie_analyst？',()=>showToast('成员已移除','warning'))">移除</button></td></tr>
-              <tr><td><b>diana_risk</b><br><span class="text-muted" style="font-size:12px">diana@example.com</span></td><td><span class="badge badge-warning">风控</span></td><td>2026-03-01</td><td>1小时前</td><td>2 规则 · 5 报告</td><td><button class="btn btn-ghost btn-sm" onclick="showToast('编辑成员角色','info')">编辑</button><button class="btn btn-ghost btn-sm" onclick="showConfirm('确认移除成员 diana_risk？',()=>showToast('成员已移除','warning'))">移除</button></td></tr>
+              <tr><td><b>demo_user</b><br><span class="text-muted" style="font-size:12px">demo@quantmate.io</span></td><td><span class="badge badge-primary">Administrator</span></td><td>2026-01-01</td><td>Just now</td><td>12 strategies · 28 backtests</td><td><button class="btn btn-ghost btn-sm" onclick="showToast('Edit member role','info')">Edit</button></td></tr>
+              <tr><td><b>alice_quant</b><br><span class="text-muted" style="font-size:12px">alice@example.com</span></td><td><span class="badge badge-success">Editor</span></td><td>2026-01-15</td><td>2 hours ago</td><td>5 strategies ? 12 backtests</td><td><button class="btn btn-ghost btn-sm" onclick="showToast('Edit member role','info')">Edit</button><button class="btn btn-ghost btn-sm" onclick="showConfirm('Confirm removal of member alice_quant?', ()=>showToast('Member removed','warning'))">Remove</button></td></tr>
+              <tr><td><b>bob_dev</b><br><span class="text-muted" style="font-size:12px">bob@example.com</span></td><td><span class="badge badge-success">Editor</span></td><td>2026-02-01</td><td>Yesterday</td><td>3 strategies ? 8 backtests</td><td><button class="btn btn-ghost btn-sm" onclick="showToast('Edit member role','info')">Edit</button><button class="btn btn-ghost btn-sm" onclick="showConfirm('Confirm removal of member bob_dev?', ()=>showToast('Member removed','warning'))">Remove</button></td></tr>
+              <tr><td><b>charlie_analyst</b><br><span class="text-muted" style="font-size:12px">charlie@example.com</span></td><td><span class="badge badge-muted">Viewer</span></td><td>2026-02-15</td><td>3 days ago</td><td>0 strategies ? 3 backtests</td><td><button class="btn btn-ghost btn-sm" onclick="showToast('Edit member role','info')">Edit</button><button class="btn btn-ghost btn-sm" onclick="showConfirm('Confirm removal of member charlie_analyst?', ()=>showToast('Member removed','warning'))">Remove</button></td></tr>
+              <tr><td><b>diana_risk</b><br><span class="text-muted" style="font-size:12px">diana@example.com</span></td><td><span class="badge badge-warning">Risk Control</span></td><td>2026-03-01</td><td>1 hour ago</td><td>2 rules ? 5 reports</td><td><button class="btn btn-ghost btn-sm" onclick="showToast('Edit member role','info')">Edit</button><button class="btn btn-ghost btn-sm" onclick="showConfirm('Confirm removal of member diana_risk?', ()=>showToast('Member removed','warning'))">Remove</button></td></tr>
             </tbody>
           </table>
         </div>
@@ -106,32 +106,32 @@
     <!-- Tab: Activity -->
     <div class="tab-panel" data-group="ws" data-panel="activity">
       <div class="card">
-        <div class="card-header"><h3 class="card-title">活动日志</h3></div>
+        <div class="card-header"><h3 class="card-title">Activity Log</h3></div>
         <div style="display:flex;flex-direction:column;gap:12px;border-left:2px solid var(--border);padding-left:20px;margin-left:8px">
           <div style="position:relative">
             <div style="position:absolute;left:-27px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--primary);border:2px solid var(--card)"></div>
-            <div style="font-size:12px;color:var(--muted-foreground)">14:30 · 今天</div>
-            <div><b>demo_user</b> 更新了策略 <b>DualMA_Cross</b> (v2 → v3)</div>
+            <div style="font-size:12px;color:var(--muted-foreground)">14:30 · Today</div>
+            <div><b>demo_user</b> updated strategy <b>DualMA_Cross</b> (v2 -> v3)</div>
           </div>
           <div style="position:relative">
             <div style="position:absolute;left:-27px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--success);border:2px solid var(--card)"></div>
-            <div style="font-size:12px;color:var(--muted-foreground)">13:15 · 今天</div>
-            <div><b>alice_quant</b> 完成回测 <b>BT-006</b> · RSI_Reversal · Sharpe 1.35</div>
+            <div style="font-size:12px;color:var(--muted-foreground)">13:15 · Today</div>
+            <div><b>alice_quant</b> completed backtest <b>BT-006</b> ? RSI_Reversal ? Sharpe 1.35</div>
           </div>
           <div style="position:relative">
             <div style="position:absolute;left:-27px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--warning);border:2px solid var(--card)"></div>
-            <div style="font-size:12px;color:var(--muted-foreground)">11:20 · 今天</div>
-            <div><b>diana_risk</b> 修改了风控规则: 单股最大仓位 30% → 20%</div>
+            <div style="font-size:12px;color:var(--muted-foreground)">11:20 · Today</div>
+            <div><b>diana_risk</b> modified the risk rule: max single-stock position 30% -> 20%</div>
           </div>
           <div style="position:relative">
             <div style="position:absolute;left:-27px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--muted-foreground);border:2px solid var(--card)"></div>
-            <div style="font-size:12px;color:var(--muted-foreground)">09:00 · 今天</div>
-            <div><b>bob_dev</b> 新建策略 <b>MomentumAlpha_v1</b></div>
+            <div style="font-size:12px;color:var(--muted-foreground)">09:00 · Today</div>
+            <div><b>bob_dev</b> created strategy <b>MomentumAlpha_v1</b></div>
           </div>
           <div style="position:relative">
             <div style="position:absolute;left:-27px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--muted-foreground);border:2px solid var(--card)"></div>
-            <div style="font-size:12px;color:var(--muted-foreground)">16:45 · 昨天</div>
-            <div><b>charlie_analyst</b> 查看了月度绩效报告</div>
+            <div style="font-size:12px;color:var(--muted-foreground)">16:45 · Yesterday</div>
+            <div><b>charlie_analyst</b> Reviewed the monthly performance report</div>
           </div>
         </div>
       </div>
@@ -140,19 +140,19 @@
     <!-- Tab: Permissions -->
     <div class="tab-panel" data-group="ws" data-panel="permissions">
       <div class="card">
-        <div class="card-header"><h3 class="card-title">角色权限矩阵</h3></div>
+        <div class="card-header"><h3 class="card-title">Role Permission Matrix</h3></div>
         <div class="table-wrap">
           <table style="text-align:center">
-            <thead><tr><th style="text-align:left">权限</th><th>管理员</th><th>编辑者</th><th>风控</th><th>查看者</th></tr></thead>
+            <thead><tr><th style="text-align:left">Permission</th><th>Administrator</th><th>Editor</th><th>Risk Control</th><th>Viewer</th></tr></thead>
             <tbody>
-              <tr><td style="text-align:left">查看策略</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td></tr>
-              <tr><td style="text-align:left">编辑策略</td><td>✅</td><td>✅</td><td>❌</td><td>❌</td></tr>
-              <tr><td style="text-align:left">创建回测</td><td>✅</td><td>✅</td><td>✅</td><td>❌</td></tr>
-              <tr><td style="text-align:left">修改风控规则</td><td>✅</td><td>❌</td><td>✅</td><td>❌</td></tr>
-              <tr><td style="text-align:left">管理成员</td><td>✅</td><td>❌</td><td>❌</td><td>❌</td></tr>
-              <tr><td style="text-align:left">删除策略</td><td>✅</td><td>❌</td><td>❌</td><td>❌</td></tr>
-              <tr><td style="text-align:left">导出数据</td><td>✅</td><td>✅</td><td>✅</td><td>❌</td></tr>
-              <tr><td style="text-align:left">查看交易记录</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td></tr>
+              <tr><td style="text-align:left">View Strategy</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td></tr>
+              <tr><td style="text-align:left">Edit Strategy</td><td>✅</td><td>✅</td><td>❌</td><td>❌</td></tr>
+              <tr><td style="text-align:left">Create Backtest</td><td>✅</td><td>✅</td><td>✅</td><td>❌</td></tr>
+              <tr><td style="text-align:left">Modify risk rules</td><td>?</td><td>?</td><td>?</td><td>?</td></tr>
+              <tr><td style="text-align:left">Manage Members</td><td>✅</td><td>❌</td><td>❌</td><td>❌</td></tr>
+              <tr><td style="text-align:left">Delete strategy</td><td>?</td><td>?</td><td>?</td><td>?</td></tr>
+              <tr><td style="text-align:left">Export Data</td><td>✅</td><td>✅</td><td>✅</td><td>❌</td></tr>
+              <tr><td style="text-align:left">View transaction history</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td></tr>
             </tbody>
           </table>
         </div>
@@ -165,15 +165,15 @@
 <!-- New Workspace Modal -->
 <div class="modal-overlay" id="newWS">
   <div class="modal" style="max-width:480px">
-    <div class="modal-header"><h3 class="modal-title">新建空间</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('newWS')">✕</button></div>
+    <div class="modal-header"><h3 class="modal-title">New Space</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('newWS')">✕</button></div>
     <div class="modal-body">
       <div style="display:flex;flex-direction:column;gap:16px">
-        <div><label class="form-label">空间名称</label><input type="text" class="form-input" placeholder="例如: 我的量化团队"></div>
-        <div><label class="form-label">描述</label><textarea class="form-textarea" rows="3" placeholder="空间描述..."></textarea></div>
-        <div><label class="form-label">可见性</label><select class="form-select"><option>私有 — 仅邀请成员可见</option><option>内部 — 组织内可见</option><option>公开 — 所有人可见</option></select></div>
+        <div><label class="form-label">Space Name</label><input type="text" class="form-input" placeholder="For example: my quant team"></div>
+        <div><label class="form-label">Description</label><textarea class="form-textarea" rows="3" placeholder="Workspace description..."></textarea></div>
+        <div><label class="form-label">Visibility</label><select class="form-select"><option>Private - Visible to invited members only</option><option>Internal - Visible within the organization</option><option>Public - Visible to everyone</option></select></div>
       </div>
     </div>
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('newWS')">取消</button><button class="btn btn-primary" onclick="submitModal('newWS','工作空间已创建','success')">创建空间</button></div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('newWS')">Cancel</button><button class="btn btn-primary" onclick="submitModal('newWS', 'Workspace has been created', 'success')">Create Space</button></div>
   </div>
 </div>
 
@@ -183,8 +183,8 @@ document.querySelectorAll('[data-panel="spaces"] .card').forEach(card=>{
   const title=(card.querySelector('h3')||{}).textContent||'';
   card.querySelectorAll('.btn-sm').forEach(btn=>{
     const t=btn.textContent.trim();
-    if(t==='进入') btn.onclick=()=>showToast('已进入「'+title+'」工作空间','success');
-    else if(t==='设置') btn.onclick=()=>showToast('打开「'+title+'」设置','info');
+    if(t==='Enter') btn.onclick=()=>showToast('Entered "' + title + '" workspace','success');
+    else if(t==='Settings') btn.onclick=()=>showToast('Opened settings for "' + title + '"','info');
   });
 });
 </script>

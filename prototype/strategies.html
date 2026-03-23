@@ -1,288 +1,700 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>QuantMate — 策略研究</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>QuantMate - Strategy Research</title>
   <link rel="stylesheet" href="shared.css">
   <script src="https://cdn.tailwindcss.com?v=3.4"></script>
+  <style>
+    .strategies-shell {
+      display: grid;
+      grid-template-columns: minmax(320px, 420px) minmax(0, 1fr);
+      gap: 16px;
+      align-items: start;
+    }
+    .strategy-list-card,
+    .strategy-detail-card,
+    .strategy-template-grid .card {
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    }
+    .strategy-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .strategy-item {
+      border: 1px solid hsl(var(--border));
+      border-radius: 10px;
+      padding: 14px 16px;
+      background: hsl(var(--background));
+      transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+      cursor: pointer;
+    }
+    .strategy-item:hover {
+      background: hsl(var(--accent) / 0.5);
+      border-color: hsl(var(--ring) / 0.45);
+    }
+    .strategy-item.active {
+      background: hsl(var(--primary) / 0.06);
+      border-color: hsl(var(--primary) / 0.35);
+      box-shadow: 0 0 0 1px hsl(var(--primary) / 0.15);
+    }
+    .strategy-item-header,
+    .strategy-detail-header,
+    .meta-row,
+    .template-actions,
+    .detail-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .strategy-item-meta,
+    .strategy-detail-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+      font-size: 12px;
+      color: hsl(var(--muted-foreground));
+    }
+    .detail-tabs {
+      margin-top: 18px;
+      margin-bottom: 18px;
+    }
+    .detail-panel {
+      display: none;
+    }
+    .detail-panel.active {
+      display: block;
+    }
+    .detail-panel.code-fullscreen {
+      position: fixed;
+      inset: 16px;
+      z-index: 120;
+      background: hsl(var(--card));
+      border: 1px solid hsl(var(--border));
+      border-radius: 14px;
+      box-shadow: 0 24px 60px rgba(15, 23, 42, 0.28);
+      padding: 20px;
+      overflow: auto;
+    }
+    .detail-panel.code-fullscreen .detail-code {
+      min-height: calc(100vh - 180px);
+    }
+    .fullscreen-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 110;
+      background: rgba(2, 6, 23, 0.45);
+      display: none;
+    }
+    .fullscreen-backdrop.active {
+      display: block;
+    }
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+    .detail-code {
+      min-height: 420px;
+      font-size: 13px;
+      line-height: 1.6;
+      margin: 0;
+    }
+    .detail-section-title {
+      margin: 0 0 14px;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+    .empty-spot {
+      border: 1px dashed hsl(var(--border));
+      border-radius: 12px;
+      padding: 36px 24px;
+      text-align: center;
+      color: hsl(var(--muted-foreground));
+      background: hsl(var(--muted) / 0.35);
+    }
+    .version-table td:last-child {
+      min-width: 180px;
+    }
+    .strategy-filter-bar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: nowrap;
+      margin-bottom: 16px;
+    }
+    .strategy-filter-bar .search-wrap {
+      position: relative;
+      flex: 1;
+      min-width: 0;
+    }
+    .strategy-filter-bar .search-wrap svg {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      color: hsl(var(--muted-foreground));
+    }
+    .strategy-filter-bar .search-wrap input {
+      padding-left: 36px;
+    }
+    .strategy-filter-bar select {
+      width: 160px;
+      flex: 0 0 160px;
+    }
+    .strategy-template-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    @media (max-width: 1024px) {
+      .strategies-shell {
+        grid-template-columns: 1fr;
+      }
+    }
+    @media (max-width: 640px) {
+      .strategy-filter-bar {
+        flex-wrap: wrap;
+      }
+      .strategy-filter-bar select,
+      .strategy-filter-bar .search-wrap {
+        width: 100%;
+        flex: 1 1 100%;
+      }
+    }
+  </style>
 </head>
 <body>
 <div class="app-layout">
   <aside class="sidebar" id="sidebar"></aside>
   <main class="main-content" id="main">
-
     <div class="page-header">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
         <div>
-          <h1 class="page-title">策略研究</h1>
-          <p class="page-subtitle">策略编辑、管理与版本控制</p>
+          <h1 class="page-title">Strategy Research</h1>
+          <p class="page-subtitle">Edit, manage, and version control strategies</p>
         </div>
-        <div style="display:flex;gap:8px">
-          <button class="btn btn-secondary" onclick="openModal('importModal')">导入策略</button>
-          <button class="btn btn-primary" onclick="openModal('createModal')">+ 新建策略</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-secondary" onclick="openModal('importModal')">Import strategy</button>
+          <button class="btn btn-primary" onclick="openModal('createModal')">+ New strategy</button>
         </div>
       </div>
     </div>
 
-    <!-- Tabs -->
-    <div class="tabs" data-group="strat">
-      <button class="tab-btn active" data-tab="list">策略列表</button>
-      <button class="tab-btn" data-tab="editor">代码编辑器</button>
-      <button class="tab-btn" data-tab="versions">版本历史</button>
-      <button class="tab-btn" data-tab="templates">策略模板</button>
+    <div class="tabs" data-group="strat-main">
+      <button class="tab-btn active" data-tab="list">Strategy list</button>
+      <button class="tab-btn" data-tab="templates">Templates</button>
     </div>
 
-    <!-- Tab: Strategy List -->
-    <div class="tab-panel active" data-group="strat" data-panel="list">
-      <div class="filter-bar">
-        <input type="text" class="form-input" placeholder="🔍 搜索策略名称..." style="max-width:280px">
-        <select class="form-select" style="max-width:160px">
-          <option>全部类型</option><option>CTA</option><option>Custom</option><option>AI</option>
+    <div class="tab-panel active" data-group="strat-main" data-panel="list">
+      <div class="strategy-filter-bar">
+        <div class="search-wrap">
+          <span id="strategySearchIcon"></span>
+          <input id="strategySearch" type="text" class="form-input" placeholder="Search strategy name...">
+        </div>
+        <select id="typeFilter" class="form-select">
+          <option value="all">All types</option>
+          <option value="CTA">CTA</option>
+          <option value="Custom">Custom</option>
+          <option value="AI">AI</option>
         </select>
-        <select class="form-select" style="max-width:160px">
-          <option>全部状态</option><option>active</option><option>draft</option>
+        <select id="statusFilter" class="form-select">
+          <option value="all">All status</option>
+          <option value="active">active</option>
+          <option value="draft">draft</option>
         </select>
       </div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr><th>名称</th><th>类型</th><th>描述</th><th>版本</th><th>来源</th><th>状态</th><th>操作</th></tr>
-          </thead>
-          <tbody id="stratTable"></tbody>
-        </table>
+
+      <div class="strategies-shell">
+        <section class="card strategy-list-card">
+          <div class="meta-row" style="margin-bottom:14px">
+            <div>
+              <h3 class="card-title" style="margin:0">Strategies</h3>
+              <div class="text-muted" style="font-size:13px;margin-top:4px">Pick one strategy first, then work on code, params, or history.</div>
+            </div>
+            <span id="strategyCount" class="badge badge-muted">0 items</span>
+          </div>
+          <div id="strategyList" class="strategy-list"></div>
+        </section>
+
+        <section class="card strategy-detail-card">
+          <div id="strategyDetailEmpty" class="empty-spot">
+            <div style="font-size:15px;font-weight:600;color:hsl(var(--foreground));margin-bottom:6px">No strategy selected</div>
+            <div style="font-size:13px">Code editor and version history are child capabilities of a selected strategy, not peer modules.</div>
+          </div>
+
+          <div id="strategyDetail" style="display:none">
+            <div class="strategy-detail-header" style="align-items:flex-start">
+              <div>
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                  <h3 id="detailName" class="card-title" style="margin:0"></h3>
+                  <span id="detailType"></span>
+                  <span id="detailStatus"></span>
+                </div>
+                <p id="detailDescription" class="text-muted" style="font-size:13px;margin:8px 0 0"></p>
+                <div id="detailMeta" class="strategy-detail-meta"></div>
+              </div>
+              <div class="detail-toolbar" style="flex-wrap:wrap;justify-content:flex-end">
+                <button class="btn btn-ghost btn-sm" onclick="showToast('Strategy duplicated (prototype)','success')">Duplicate</button>
+                <button class="btn btn-ghost btn-sm" onclick="location.href='backtest.html'">Backtest</button>
+                <button class="btn btn-primary btn-sm" onclick="showToast('Strategy saved (prototype)','success')">Save</button>
+              </div>
+            </div>
+
+            <div class="tabs detail-tabs" data-group="strat-detail">
+              <button class="tab-btn active" data-tab="code">Code editor</button>
+              <button class="tab-btn" data-tab="params">Parameters</button>
+              <button class="tab-btn" data-tab="versions">Version history</button>
+            </div>
+
+            <div class="detail-panel active" data-group="strat-detail" data-panel="code">
+              <div class="detail-toolbar" style="margin-bottom:12px;justify-content:flex-end">
+                <button id="codeFullscreenBtn" class="btn btn-ghost btn-sm" onclick="toggleCodeFullscreen()">Full screen</button>
+                <button class="btn btn-ghost btn-sm" onclick="showToast('Code formatted','success')">Format</button>
+                <button class="btn btn-ghost btn-sm" onclick="showToast('Syntax check passed','success')">Validate</button>
+              </div>
+              <pre id="detailCode" class="code-block detail-code"></pre>
+              <div style="display:flex;gap:12px;margin-top:12px;align-items:center;flex-wrap:wrap">
+                <span class="badge badge-success">Syntax OK</span>
+                <span id="detailUpdated" class="text-muted" style="font-size:13px"></span>
+              </div>
+            </div>
+
+            <div class="detail-panel" data-group="strat-detail" data-panel="params">
+              <h4 class="detail-section-title">Strategy parameters</h4>
+              <div id="detailParams" class="detail-grid"></div>
+            </div>
+
+            <div class="detail-panel" data-group="strat-detail" data-panel="versions">
+              <h4 class="detail-section-title">Version history</h4>
+              <div class="table-wrap version-table">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Version</th>
+                      <th>Time</th>
+                      <th>Author</th>
+                      <th>Note</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="detailVersions"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
     </div>
 
-    <!-- Tab: Editor -->
-    <div class="tab-panel" data-group="strat" data-panel="editor">
-      <div class="card">
-        <div class="card-header">
-          <h3 class="card-title">代码编辑器 — DualMA_Cross</h3>
-          <div style="display:flex;gap:8px">
-            <button class="btn btn-ghost btn-sm" onclick="showToast('代码已格式化','success')">格式化</button>
-            <button class="btn btn-ghost btn-sm" onclick="showToast('语法验证通过 ✓','success')">验证语法</button>
-            <button class="btn btn-primary btn-sm" onclick="showToast('策略已保存','success')">保存</button>
-          </div>
-        </div>
-        <pre class="code-block" style="min-height:400px;font-size:13px;line-height:1.6"><code># DualMA_Cross Strategy v3
-# 双均线交叉策略
-
-import pandas as pd
-import numpy as np
-
-class DualMACross:
-    """双均线交叉策略
-    短期均线上穿长期均线时买入，下穿时卖出
-    """
-    
-    def __init__(self, short_window=5, long_window=20):
-        self.short_window = short_window
-        self.long_window = long_window
-        self.name = "DualMA_Cross"
-    
-    def generate_signals(self, df: pd.DataFrame) -> pd.DataFrame:
-        df['ma_short'] = df['close'].rolling(self.short_window).mean()
-        df['ma_long'] = df['close'].rolling(self.long_window).mean()
-
-        df['signal'] = 0
-        df.loc[df['ma_short'] > df['ma_long'], 'signal'] = 1
-        df.loc[df['ma_short'] &lt; df['ma_long'], 'signal'] = -1
-
-        df['position'] = df['signal'].diff()
-        return df
-
-    def on_bar(self, bar):
-        """逐K线回调"""
-        signal = self.generate_signals(bar)
-        if signal['position'].iloc[-1] == 2:
-            return {'action': 'BUY', 'size': 100}
-        elif signal['position'].iloc[-1] == -2:
-            return {'action': 'SELL', 'size': 100}
-        return None</code></pre>
-        <div style="display:flex;gap:12px;margin-top:12px;align-items:center">
-          <span class="badge badge-success">语法正确</span>
-          <span class="text-muted" style="font-size:13px">Python 3.11 · 最后修改 2026-03-13 10:24</span>
-        </div>
-      </div>
-
-      <!-- Parameters Panel -->
-      <div class="card">
-        <div class="card-header"><h3 class="card-title">策略参数</h3></div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px">
-          <div>
-            <label class="form-label">短期窗口 (short_window)</label>
-            <input type="number" class="form-input" value="5">
-          </div>
-          <div>
-            <label class="form-label">长期窗口 (long_window)</label>
-            <input type="number" class="form-input" value="20">
-          </div>
-          <div>
-            <label class="form-label">初始资金</label>
-            <input type="number" class="form-input" value="1000000">
-          </div>
-          <div>
-            <label class="form-label">手续费率 (%)</label>
-            <input type="number" class="form-input" value="0.03" step="0.01">
-          </div>
-        </div>
-      </div>
+    <div class="tab-panel" data-group="strat-main" data-panel="templates">
+      <div class="strategy-template-grid" id="templateGrid"></div>
     </div>
-
-    <!-- Tab: Version History -->
-    <div class="tab-panel" data-group="strat" data-panel="versions">
-      <div class="card">
-        <div class="card-header"><h3 class="card-title">版本历史 — DualMA_Cross</h3></div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>版本</th><th>时间</th><th>提交者</th><th>说明</th><th>操作</th></tr></thead>
-            <tbody>
-              <tr><td><span class="badge badge-primary">v3</span></td><td>2026-03-13 10:24</td><td>demo_user</td><td>优化均线周期, 增加止损逻辑</td><td><button class="btn btn-ghost btn-sm" onclick="showToast('正在查看 v3 版本','info')">查看</button><button class="btn btn-ghost btn-sm" onclick="showConfirm('确定要回滚到 v3 版本？',function(){showToast('已回滚到 v3','success')})">回滚</button></td></tr>
-              <tr><td><span class="badge badge-muted">v2</span></td><td>2026-03-10 16:05</td><td>demo_user</td><td>增加动态仓位管理</td><td><button class="btn btn-ghost btn-sm" onclick="showToast('正在查看 v2 版本','info')">查看</button><button class="btn btn-ghost btn-sm" onclick="showConfirm('确定要回滚到 v2 版本？',function(){showToast('已回滚到 v2','success')})">回滚</button><button class="btn btn-ghost btn-sm" onclick="showToast('显示 v3 与 v2 差异','info')">Diff</button></td></tr>
-              <tr><td><span class="badge badge-muted">v1</span></td><td>2026-03-05 09:30</td><td>demo_user</td><td>初始版本</td><td><button class="btn btn-ghost btn-sm" onclick="showToast('正在查看 v1 版本','info')">查看</button><button class="btn btn-ghost btn-sm" onclick="showConfirm('确定要回滚到 v1 版本？',function(){showToast('已回滚到 v1','success')})">回滚</button><button class="btn btn-ghost btn-sm" onclick="showToast('显示 v3 与 v1 差异','info')">Diff</button></td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- Tab: Templates -->
-    <div class="tab-panel" data-group="strat" data-panel="templates">
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px">
-        <div class="card">
-          <div class="card-header"><h3 class="card-title">双均线交叉</h3><span class="badge badge-primary">CTA</span></div>
-          <p class="text-muted" style="font-size:13px;margin:8px 0">经典的双均线金叉/死叉策略，适合趋势行情</p>
-          <div style="display:flex;gap:8px"><button class="btn btn-primary btn-sm">使用模板</button><button class="btn btn-ghost btn-sm">预览</button></div>
-        </div>
-        <div class="card">
-          <div class="card-header"><h3 class="card-title">RSI 反转</h3><span class="badge badge-primary">CTA</span></div>
-          <p class="text-muted" style="font-size:13px;margin:8px 0">基于 RSI 超买超卖信号的反转策略</p>
-          <div style="display:flex;gap:8px"><button class="btn btn-primary btn-sm">使用模板</button><button class="btn btn-ghost btn-sm">预览</button></div>
-        </div>
-        <div class="card">
-          <div class="card-header"><h3 class="card-title">布林带突破</h3><span class="badge badge-primary">CTA</span></div>
-          <p class="text-muted" style="font-size:13px;margin:8px 0">利用布林带上下轨判断突破买卖点</p>
-          <div style="display:flex;gap:8px"><button class="btn btn-primary btn-sm">使用模板</button><button class="btn btn-ghost btn-sm">预览</button></div>
-        </div>
-        <div class="card">
-          <div class="card-header"><h3 class="card-title">多因子选股</h3><span class="badge badge-warning">Alpha</span></div>
-          <p class="text-muted" style="font-size:13px;margin:8px 0">基于因子打分的多因子选股框架，可自定义因子权重</p>
-          <div style="display:flex;gap:8px"><button class="btn btn-primary btn-sm">使用模板</button><button class="btn btn-ghost btn-sm">预览</button></div>
-        </div>
-        <div class="card">
-          <div class="card-header"><h3 class="card-title">配对交易</h3><span class="badge badge-warning">统计套利</span></div>
-          <p class="text-muted" style="font-size:13px;margin:8px 0">协整配对交易策略，适合低波动环境</p>
-          <div style="display:flex;gap:8px"><button class="btn btn-primary btn-sm">使用模板</button><button class="btn btn-ghost btn-sm">预览</button></div>
-        </div>
-        <div class="card">
-          <div class="card-header"><h3 class="card-title">网格交易</h3><span class="badge badge-muted">网格</span></div>
-          <p class="text-muted" style="font-size:13px;margin:8px 0">自动化网格挂单策略，适合震荡行情</p>
-          <div style="display:flex;gap:8px"><button class="btn btn-primary btn-sm">使用模板</button><button class="btn btn-ghost btn-sm">预览</button></div>
-        </div>
-      </div>
-    </div>
-
   </main>
 </div>
+<div id="codeFullscreenBackdrop" class="fullscreen-backdrop" onclick="exitCodeFullscreen()"></div>
 
-<!-- Create Strategy Modal -->
 <div class="modal-overlay" id="createModal">
   <div class="modal" style="max-width:560px">
     <div class="modal-header">
-      <h3 class="modal-title">新建策略</h3>
-      <button class="btn btn-ghost btn-icon" onclick="closeModal('createModal')">✕</button>
+      <h3 class="modal-title">Create strategy</h3>
+      <button class="btn btn-ghost btn-icon" onclick="closeModal('createModal')">x</button>
     </div>
     <div class="modal-body">
       <div style="display:flex;flex-direction:column;gap:16px">
-        <div><label class="form-label">策略名称</label><input type="text" class="form-input" placeholder="例如: MyStrategy_v1"></div>
-        <div><label class="form-label">策略类型</label>
-          <select class="form-select"><option>CTA</option><option>Alpha</option><option>套利</option><option>自定义</option></select>
-        </div>
-        <div><label class="form-label">描述</label><textarea class="form-textarea" rows="3" placeholder="策略简要说明..."></textarea></div>
-        <div><label class="form-label">基于模板</label>
-          <select class="form-select"><option>空白策略</option><option>双均线交叉</option><option>RSI 反转</option><option>布林带突破</option><option>多因子选股</option></select>
-        </div>
+        <div><label class="form-label">Strategy name</label><input type="text" class="form-input" placeholder="Example: MyStrategy_v1"></div>
+        <div><label class="form-label">Strategy type</label><select class="form-select"><option>CTA</option><option>Alpha</option><option>Arbitrage</option><option>Custom</option></select></div>
+        <div><label class="form-label">Description</label><textarea class="form-textarea" rows="3" placeholder="Short strategy note..."></textarea></div>
+        <div><label class="form-label">From template</label><select class="form-select"><option>Blank strategy</option><option>Dual MA Cross</option><option>RSI Reversal</option><option>Bollinger Breakout</option><option>Multi-Factor Alpha</option></select></div>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal('createModal')">取消</button>
-      <button class="btn btn-primary" onclick="submitModal('createModal','策略已创建，可在列表中查看')">创建</button>
+      <button class="btn btn-secondary" onclick="closeModal('createModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitModal('createModal','Draft strategy created','success')">Create</button>
     </div>
   </div>
 </div>
 
-<!-- Import Modal -->
 <div class="modal-overlay" id="importModal">
   <div class="modal" style="max-width:480px">
     <div class="modal-header">
-      <h3 class="modal-title">导入策略</h3>
-      <button class="btn btn-ghost btn-icon" onclick="closeModal('importModal')">✕</button>
+      <h3 class="modal-title">Import strategy</h3>
+      <button class="btn btn-ghost btn-icon" onclick="closeModal('importModal')">x</button>
     </div>
     <div class="modal-body">
-      <div style="border:2px dashed var(--border);border-radius:8px;padding:40px;text-align:center;color:var(--muted-foreground)">
-        <p style="font-size:14px">将 .py 文件拖拽到此处，或点击上传</p>
-        <button class="btn btn-secondary" style="margin-top:12px" onclick="showToast('文件选择器已打开（原型演示）','info')">选择文件</button>
+      <div style="border:2px dashed hsl(var(--border));border-radius:10px;padding:40px;text-align:center;color:hsl(var(--muted-foreground))">
+        <p style="font-size:14px">Drop a .py file here or click upload</p>
+        <button class="btn btn-secondary" style="margin-top:12px" onclick="showToast('File chooser opened (prototype)','info')">Choose file</button>
       </div>
-      <p class="text-muted" style="font-size:12px;margin-top:8px">支持 Python (.py) 格式，最大 500KB</p>
+      <p class="text-muted" style="font-size:12px;margin-top:8px">Supports Python (.py), max 500KB</p>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal('importModal')">取消</button>
-      <button class="btn btn-primary" onclick="submitModal('importModal','策略文件已导入')">导入</button>
+      <button class="btn btn-secondary" onclick="closeModal('importModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitModal('importModal','Strategy file imported','success')">Import</button>
     </div>
   </div>
 </div>
 
 <script src="shared.js"></script>
 <script>
-const tbody = document.getElementById('stratTable');
-MOCK.strategies.forEach(s => {
-  tbody.innerHTML += `<tr>
-    <td><b>${s.name}</b></td>
-    <td><span class="badge badge-primary">${s.type}</span></td>
-    <td class="text-muted">${s.desc}</td>
-    <td>v${s.version}</td>
-    <td>${s.builtin ? '内置' : '自建'}</td>
-    <td>${statusBadge(s.status)}</td>
-    <td>
-      <button class="btn btn-ghost btn-sm" onclick="activateTab('strat','editor');showToast('已加载 ${s.name}','info')">编辑</button>
-      <button class="btn btn-ghost btn-sm" onclick="location.href='backtest.html'">回测</button>
-      <button class="btn btn-ghost btn-sm" onclick="showToast('${s.name} 已复制','success')">复制</button>
-    </td>
-  </tr>`;
-});
+const STRATEGY_DATA = [
+  {
+    id: 1,
+    name: 'DualMA_Cross',
+    type: 'CTA',
+    status: 'active',
+    version: 3,
+    source: 'Built-in',
+    author: 'demo_user',
+    description: 'Classic dual moving average crossover strategy.',
+    createdAt: '2026-02-18 09:20',
+    updatedAt: '2026-03-13 10:24',
+    code: `# DualMA_Cross Strategy v3
+import pandas as pd
 
-// Template buttons
-document.querySelectorAll('.tab-panel[data-panel="templates"] .btn-primary.btn-sm').forEach(function(b){
-  if(b.textContent.trim()==='使用模板') b.onclick=function(){activateTab('strat','editor');showToast('模板已加载到编辑器','success');};
-});
-document.querySelectorAll('.tab-panel[data-panel="templates"] .btn-ghost.btn-sm').forEach(function(b){
-  if(b.textContent.trim()==='预览') b.onclick=function(){showToast('模板预览（原型演示）','info');};
-});
+class DualMACross:
+    def __init__(self, short_window=5, long_window=20):
+        self.short_window = short_window
+        self.long_window = long_window
 
-// Filters
-(function(){
-  var search=document.querySelector('.filter-bar .form-input');
-  var selType=document.querySelectorAll('.filter-bar .form-select')[0];
-  var selStat=document.querySelectorAll('.filter-bar .form-select')[1];
-  function filterStrat(){
-    var q=(search?search.value:'').toLowerCase();
-    var t=selType?selType.value:'';
-    var s=selStat?selStat.value:'';
-    tbody.querySelectorAll('tr').forEach(function(row){
-      var name=row.cells[0].textContent.toLowerCase();
-      var type=row.cells[1].textContent;
-      var stat=row.cells[5].textContent;
-      var show=true;
-      if(q&&name.indexOf(q)<0)show=false;
-      if(t&&t!=='全部类型'&&type.indexOf(t)<0)show=false;
-      if(s&&s!=='全部状态'&&stat.indexOf(s)<0)show=false;
-      row.style.display=show?'':'none';
-    });
+    def generate_signals(self, df: pd.DataFrame) -> pd.DataFrame:
+        df['ma_short'] = df['close'].rolling(self.short_window).mean()
+        df['ma_long'] = df['close'].rolling(self.long_window).mean()
+        df['signal'] = 0
+        df.loc[df['ma_short'] > df['ma_long'], 'signal'] = 1
+        df.loc[df['ma_short'] < df['ma_long'], 'signal'] = -1
+        return df
+`,
+    parameters: [
+      { label: 'short_window', value: '5' },
+      { label: 'long_window', value: '20' },
+      { label: 'initial_capital', value: '1000000' },
+      { label: 'fee_rate', value: '0.03' }
+    ],
+    versions: [
+      { version: 'v3', time: '2026-03-13 10:24', author: 'demo_user', note: 'Optimized MA periods and stop-loss rules' },
+      { version: 'v2', time: '2026-03-10 16:05', author: 'demo_user', note: 'Added dynamic position sizing' },
+      { version: 'v1', time: '2026-03-05 09:30', author: 'demo_user', note: 'Initial version' }
+    ]
+  },
+  {
+    id: 2,
+    name: 'RSI_Reversal',
+    type: 'CTA',
+    status: 'active',
+    version: 2,
+    source: 'Built-in',
+    author: 'demo_user',
+    description: 'RSI based reversal strategy for oversold and overbought zones.',
+    createdAt: '2026-02-20 14:10',
+    updatedAt: '2026-03-11 09:42',
+    code: `# RSI_Reversal Strategy
+class RSIReversal:
+    def __init__(self, rsi_window=14, overbought=70, oversold=30):
+        self.rsi_window = rsi_window
+        self.overbought = overbought
+        self.oversold = oversold
+`,
+    parameters: [
+      { label: 'rsi_window', value: '14' },
+      { label: 'overbought', value: '70' },
+      { label: 'oversold', value: '30' },
+      { label: 'max_holding_days', value: '8' }
+    ],
+    versions: [
+      { version: 'v2', time: '2026-03-11 09:42', author: 'demo_user', note: 'Tuned reversal confirmation' },
+      { version: 'v1', time: '2026-03-02 18:10', author: 'demo_user', note: 'Initial version' }
+    ]
+  },
+  {
+    id: 3,
+    name: 'BollingerBand',
+    type: 'CTA',
+    status: 'active',
+    version: 1,
+    source: 'Built-in',
+    author: 'demo_user',
+    description: 'Breakout strategy based on Bollinger Bands.',
+    createdAt: '2026-02-21 11:00',
+    updatedAt: '2026-03-08 16:18',
+    code: `# BollingerBand Strategy
+class BollingerBreakout:
+    def __init__(self, window=20, std=2):
+        self.window = window
+        self.std = std
+`,
+    parameters: [
+      { label: 'window', value: '20' },
+      { label: 'std_multiplier', value: '2' },
+      { label: 'take_profit', value: '6%' },
+      { label: 'stop_loss', value: '3%' }
+    ],
+    versions: [
+      { version: 'v1', time: '2026-03-08 16:18', author: 'demo_user', note: 'First runnable version' }
+    ]
+  },
+  {
+    id: 4,
+    name: 'MyAlpha01',
+    type: 'Custom',
+    status: 'active',
+    version: 5,
+    source: 'User-defined',
+    author: 'demo_user',
+    description: 'Multi-factor stock selection with momentum overlay.',
+    createdAt: '2026-01-29 09:45',
+    updatedAt: '2026-03-14 11:36',
+    code: `# MyAlpha01
+class MultiFactorAlpha:
+    def score(self, factors):
+        return 0.35 * factors['quality'] + 0.4 * factors['momentum'] - 0.25 * factors['volatility']
+`,
+    parameters: [
+      { label: 'quality_weight', value: '0.35' },
+      { label: 'momentum_weight', value: '0.40' },
+      { label: 'volatility_weight', value: '-0.25' },
+      { label: 'rebalance', value: 'weekly' }
+    ],
+    versions: [
+      { version: 'v5', time: '2026-03-14 11:36', author: 'demo_user', note: 'Added risk exposure limits' },
+      { version: 'v4', time: '2026-03-09 14:12', author: 'demo_user', note: 'Normalized factor scores' },
+      { version: 'v3', time: '2026-03-04 17:08', author: 'demo_user', note: 'Added momentum factor' }
+    ]
+  },
+  {
+    id: 5,
+    name: 'MeanRevert_v2',
+    type: 'Custom',
+    status: 'draft',
+    version: 2,
+    source: 'User-defined',
+    author: 'demo_user',
+    description: 'Mean reversion draft under parameter validation.',
+    createdAt: '2026-03-01 10:20',
+    updatedAt: '2026-03-12 08:56',
+    code: `# MeanRevert_v2
+class MeanRevert:
+    def __init__(self, lookback=10, z_entry=2.0, z_exit=0.5):
+        self.lookback = lookback
+        self.z_entry = z_entry
+        self.z_exit = z_exit
+`,
+    parameters: [
+      { label: 'lookback', value: '10' },
+      { label: 'z_entry', value: '2.0' },
+      { label: 'z_exit', value: '0.5' },
+      { label: 'status', value: 'draft' }
+    ],
+    versions: [
+      { version: 'v2', time: '2026-03-12 08:56', author: 'demo_user', note: 'Testing entry and exit thresholds' },
+      { version: 'v1', time: '2026-03-06 11:24', author: 'demo_user', note: 'Initial draft' }
+    ]
   }
-  if(search) search.addEventListener('input',filterStrat);
-  if(selType) selType.addEventListener('change',filterStrat);
-  if(selStat) selStat.addEventListener('change',filterStrat);
-})();
+];
+
+const TEMPLATE_DATA = [
+  { name: 'Dual MA Cross', category: 'CTA', desc: 'Classic moving average crossover starter template.' },
+  { name: 'RSI Reversal', category: 'CTA', desc: 'Starter template for RSI mean reversion logic.' },
+  { name: 'Bollinger Breakout', category: 'CTA', desc: 'Band breakout template for trend following.' },
+  { name: 'Multi-Factor Alpha', category: 'Alpha', desc: 'Factor scoring framework with custom weights.' },
+  { name: 'Pair Trading', category: 'Stat Arb', desc: 'Cointegration based spread trading skeleton.' },
+  { name: 'Grid Trading', category: 'Grid', desc: 'Grid execution template for range markets.' }
+];
+
+let currentStrategyId = null;
+let codeFullscreen = false;
+
+function inferVariant(category) {
+  if (category === 'Alpha' || category === 'Stat Arb') return 'badge-warning';
+  if (category === 'Grid') return 'badge-muted';
+  return 'badge-primary';
+}
+
+function renderStrategyList() {
+  const root = document.getElementById('strategyList');
+  const count = document.getElementById('strategyCount');
+  const q = (document.getElementById('strategySearch').value || '').toLowerCase().trim();
+  const type = document.getElementById('typeFilter').value;
+  const status = document.getElementById('statusFilter').value;
+
+  const list = STRATEGY_DATA.filter(item => {
+    const matchQ = !q || item.name.toLowerCase().includes(q) || item.description.toLowerCase().includes(q);
+    const matchType = type === 'all' || item.type === type;
+    const matchStatus = status === 'all' || item.status === status;
+    return matchQ && matchType && matchStatus;
+  });
+
+  count.textContent = `${list.length} items`;
+
+  if (!list.length) {
+    root.innerHTML = `<div class="empty-spot" style="padding:28px 18px">No strategies match the current filters.</div>`;
+    renderStrategyDetail(null);
+    return;
+  }
+
+  if (!currentStrategyId || !list.some(item => item.id === currentStrategyId)) {
+    currentStrategyId = list[0].id;
+  }
+
+  root.innerHTML = list.map(item => `
+    <article class="strategy-item ${item.id === currentStrategyId ? 'active' : ''}" data-id="${item.id}">
+      <div class="strategy-item-header">
+        <div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <strong style="font-size:15px">${item.name}</strong>
+            <span class="badge ${inferVariant(item.type)}">${item.type}</span>
+            ${statusBadge(item.status)}
+          </div>
+          <div class="text-muted" style="font-size:13px;margin-top:6px">${item.description}</div>
+        </div>
+        <span class="badge badge-muted">v${item.version}</span>
+      </div>
+      <div class="strategy-item-meta">
+        <span>Source: ${item.source}</span>
+        <span>ID: ${item.id}</span>
+      </div>
+    </article>
+  `).join('');
+
+  root.querySelectorAll('.strategy-item').forEach(node => {
+    node.addEventListener('click', function (event) {
+      currentStrategyId = Number(node.dataset.id);
+      renderStrategyList();
+      renderStrategyDetail(currentStrategyId);
+    });
+  });
+
+  renderStrategyDetail(currentStrategyId);
+}
+
+function renderStrategyDetail(id) {
+  const empty = document.getElementById('strategyDetailEmpty');
+  const detail = document.getElementById('strategyDetail');
+  const strategy = STRATEGY_DATA.find(item => item.id === id);
+
+  if (!strategy) {
+    empty.style.display = 'block';
+    detail.style.display = 'none';
+    return;
+  }
+
+  empty.style.display = 'none';
+  detail.style.display = 'block';
+
+  document.getElementById('detailName').textContent = strategy.name;
+  document.getElementById('detailType').innerHTML = `<span class="badge ${inferVariant(strategy.type)}">${strategy.type}</span>`;
+  document.getElementById('detailStatus').innerHTML = statusBadge(strategy.status);
+  document.getElementById('detailDescription').textContent = strategy.description;
+  document.getElementById('detailMeta').innerHTML = `
+    <span>Version: v${strategy.version}</span>
+    <span>Source: ${strategy.source}</span>
+    <span>Author: ${strategy.author}</span>
+    <span>Created: ${strategy.createdAt}</span>
+  `;
+  document.getElementById('detailCode').textContent = strategy.code;
+  document.getElementById('detailUpdated').textContent = `Python 3.11 - Last updated ${strategy.updatedAt}`;
+  document.getElementById('detailParams').innerHTML = strategy.parameters.map(item => `
+    <div>
+      <label class="form-label">${item.label}</label>
+      <input class="form-input" value="${item.value}" readonly>
+    </div>
+  `).join('');
+  document.getElementById('detailVersions').innerHTML = strategy.versions.map((item, index) => `
+    <tr>
+      <td><span class="badge ${index === 0 ? 'badge-primary' : 'badge-muted'}">${item.version}</span></td>
+      <td>${item.time}</td>
+      <td>${item.author}</td>
+      <td>${item.note}</td>
+      <td>
+        <button class="btn btn-ghost btn-sm" onclick="showToast('Viewing ${item.version} (prototype)','info')">View</button>
+        <button class="btn btn-ghost btn-sm" onclick="showToast('Rolled back to ${item.version} (prototype)','success')">Rollback</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function renderTemplates() {
+  const root = document.getElementById('templateGrid');
+  root.innerHTML = TEMPLATE_DATA.map(item => `
+    <div class="card">
+      <div class="card-header" style="margin-bottom:8px">
+        <h3 class="card-title" style="margin:0">${item.name}</h3>
+        <span class="badge ${inferVariant(item.category)}">${item.category}</span>
+      </div>
+      <p class="text-muted" style="font-size:13px;margin:0 0 12px">${item.desc}</p>
+      <div class="template-actions" style="justify-content:flex-start">
+        <button class="btn btn-primary btn-sm" onclick="useTemplate('${item.name}')">Use template</button>
+        <button class="btn btn-ghost btn-sm" onclick="showToast('Preview: ${item.name}','info')">Preview</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function useTemplate(name) {
+  activateTab('strat-main', 'list');
+  currentStrategyId = 1;
+  renderStrategyList();
+  renderStrategyDetail(currentStrategyId);
+  activateTab('strat-detail', 'code');
+  showToast(`Template ${name} loaded into the workspace (prototype)`, 'success');
+}
+
+function updateCodeFullscreenButton() {
+  const btn = document.getElementById('codeFullscreenBtn');
+  if (btn) {
+    btn.textContent = codeFullscreen ? 'Exit full screen' : 'Full screen';
+  }
+}
+
+function toggleCodeFullscreen() {
+  if (codeFullscreen) {
+    exitCodeFullscreen();
+    return;
+  }
+  const panel = document.querySelector('.detail-panel[data-panel="code"]');
+  const backdrop = document.getElementById('codeFullscreenBackdrop');
+  if (!panel || !backdrop) return;
+  codeFullscreen = true;
+  panel.classList.add('code-fullscreen');
+  backdrop.classList.add('active');
+  document.body.style.overflow = 'hidden';
+  updateCodeFullscreenButton();
+}
+
+function exitCodeFullscreen() {
+  const panel = document.querySelector('.detail-panel[data-panel="code"]');
+  const backdrop = document.getElementById('codeFullscreenBackdrop');
+  codeFullscreen = false;
+  if (panel) panel.classList.remove('code-fullscreen');
+  if (backdrop) backdrop.classList.remove('active');
+  document.body.style.overflow = '';
+  updateCodeFullscreenButton();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const iconRoot = document.getElementById('strategySearchIcon');
+  if (iconRoot) iconRoot.innerHTML = icon('search');
+  document.getElementById('strategySearch').addEventListener('input', renderStrategyList);
+  document.getElementById('typeFilter').addEventListener('change', renderStrategyList);
+  document.getElementById('statusFilter').addEventListener('change', renderStrategyList);
+  renderTemplates();
+  currentStrategyId = 1;
+  renderStrategyList();
+  renderStrategyDetail(currentStrategyId);
+  updateCodeFullscreenButton();
+});
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && codeFullscreen) {
+    exitCodeFullscreen();
+  }
+});
 </script>
 </body>
 </html>

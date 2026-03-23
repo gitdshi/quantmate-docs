@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>QuantMate — 监控告警</title>
+  <title>QuantMate - Monitoring Alerts</title>
   <link rel="stylesheet" href="shared.css">
   <script src="https://cdn.tailwindcss.com?v=3.4"></script>
 </head>
@@ -14,30 +14,30 @@
     <div class="page-header">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
         <div>
-          <h1 class="page-title">监控告警</h1>
-          <p class="page-subtitle">实时监控 · 规则配置 · 告警通知</p>
+          <h1 class="page-title">Monitoring alarm</h1>
+          <p class="page-subtitle">Real-time Monitoring · Rule Configuration · Alert Notifications</p>
         </div>
         <div style="display:flex;gap:8px">
-          <button class="btn btn-secondary" onclick="activateTab('al','channels');showToast('已跳转到通知渠道设置','info')">告警设置</button>
-          <button class="btn btn-primary" onclick="openModal('newRule')">+ 新建规则</button>
+          <button class="btn btn-secondary" onclick="activateTab('al','channels');showToast('Navigated to notification channel settings','info')">Alarm Settings</button>
+          <button class="btn btn-primary" onclick="openModal('newRule')">Create New Rule</button>
         </div>
       </div>
     </div>
 
     <div class="tabs" data-group="al">
-      <button class="tab-btn active" data-tab="live">实时告警</button>
-      <button class="tab-btn" data-tab="rules">规则管理</button>
-      <button class="tab-btn" data-tab="history">告警历史</button>
-      <button class="tab-btn" data-tab="channels">通知渠道</button>
+      <button class="tab-btn active" data-tab="live">Real-time alert</button>
+      <button class="tab-btn" data-tab="rules">Rule Management</button>
+      <button class="tab-btn" data-tab="history">Alarm History</button>
+      <button class="tab-btn" data-tab="channels">Notification Channel</button>
     </div>
 
     <!-- Tab: Live Alerts -->
     <div class="tab-panel active" data-group="al" data-panel="live">
       <div class="stat-grid cols-4">
-        <div class="stat-card"><div class="stat-label">活跃告警</div><div class="stat-value text-warning">3</div></div>
-        <div class="stat-card"><div class="stat-label">严重</div><div class="stat-value text-destructive">1</div></div>
-        <div class="stat-card"><div class="stat-label">今日触发</div><div class="stat-value">8</div></div>
-        <div class="stat-card"><div class="stat-label">活跃规则</div><div class="stat-value">12</div></div>
+        <div class="stat-card"><div class="stat-label">Active Alerts</div><div class="stat-value text-warning">3</div></div>
+        <div class="stat-card"><div class="stat-label">Serious</div><div class="stat-value text-destructive">1</div></div>
+        <div class="stat-card"><div class="stat-label">Triggered today</div><div class="stat-value">8</div></div>
+        <div class="stat-card"><div class="stat-label">Activity Rules</div><div class="stat-value">12</div></div>
       </div>
 
       <div style="display:flex;flex-direction:column;gap:12px">
@@ -46,16 +46,16 @@
           <div style="display:flex;justify-content:space-between;align-items:start">
             <div>
               <div style="display:flex;align-items:center;gap:8px">
-                <span class="badge badge-destructive">严重</span>
-                <span class="badge badge-primary">系统异常</span>
+                <span class="badge badge-destructive">serious</span>
+                <span class="badge badge-primary">System error</span>
                 <span class="text-muted" style="font-size:12px">13:15:00</span>
               </div>
-              <h4 style="margin:8px 0 4px;font-weight:600">Worker 进程异常退出</h4>
-              <p class="text-muted" style="font-size:13px">Worker 进程在执行策略调度时异常退出，影响策略实盘信号生成。建议立即检查服务状态并重启。</p>
+              <h4 style="margin:8px 0 4px;font-weight:600">Worker process exited abnormally</h4>
+              <p class="text-muted" style="font-size:13px">The Worker process exited abnormally while executing policy scheduling, affecting the generation of policy live signals. It is recommended to check the service status immediately and restart it.</p>
             </div>
             <div style="display:flex;gap:8px;flex-shrink:0">
-              <button class="btn btn-ghost btn-sm" onclick="showToast('告警已确认','success')">确认</button>
-              <button class="btn btn-primary btn-sm" onclick="showToast('已跳转到 Worker 状态页','info')">处理</button>
+              <button class="btn btn-ghost btn-sm" onclick="showToast('Alert confirmed','success')">Confirm</button>
+              <button class="btn btn-primary btn-sm" onclick="showToast('Redirected to Worker status page', 'info')">Handle</button>
             </div>
           </div>
         </div>
@@ -65,16 +65,16 @@
           <div style="display:flex;justify-content:space-between;align-items:start">
             <div>
               <div style="display:flex;align-items:center;gap:8px">
-                <span class="badge badge-warning">警告</span>
-                <span class="badge badge-primary">价格异动</span>
+                <span class="badge badge-warning">Warning</span>
+                <span class="badge badge-primary">Price fluctuation</span>
                 <span class="text-muted" style="font-size:12px">14:32:00</span>
               </div>
-              <h4 style="margin:8px 0 4px;font-weight:600">隆基绿能 (601012.SH) 跌幅超过 5%</h4>
-              <p class="text-muted" style="font-size:13px">当前跌幅 -2.41%，触发价格监控规则。持仓 1000 股，浮亏 ¥2,420。</p>
+              <h4 style="margin:8px 0 4px;font-weight:600">LONGi Green Energy (601012.SH) falls more than 5%</h4>
+              <p class="text-muted" style="font-size:13px">Current decline -2.41%, triggering price monitoring rules. Holding 1,000 shares, unrealized loss ¥2,420.</p>
             </div>
             <div style="display:flex;gap:8px;flex-shrink:0">
-              <button class="btn btn-ghost btn-sm" onclick="showToast('已忽略该告警','info')">忽略</button>
-              <button class="btn btn-primary btn-sm" onclick="showToast('已跳转到持仓详情','info')">查看持仓</button>
+              <button class="btn btn-ghost btn-sm" onclick="showToast('The alert has been ignored','info')">Ignore</button>
+              <button class="btn btn-primary btn-sm" onclick="showToast('Redirected to position details','info')">View Positions</button>
             </div>
           </div>
         </div>
@@ -84,15 +84,15 @@
           <div style="display:flex;justify-content:space-between;align-items:start">
             <div>
               <div style="display:flex;align-items:center;gap:8px">
-                <span class="badge badge-primary">信息</span>
-                <span class="badge badge-muted">数据延迟</span>
+                <span class="badge badge-primary">Information</span>
+                <span class="badge badge-muted">Data delay</span>
                 <span class="text-muted" style="font-size:12px">10:05:00</span>
               </div>
-              <h4 style="margin:8px 0 4px;font-weight:600">Tushare 数据延迟 > 5分钟</h4>
-              <p class="text-muted" style="font-size:13px">数据源 Tushare 响应延迟超过阈值，可能影响实时行情。已自动切换备用源。</p>
+              <h4 style="margin:8px 0 4px;font-weight:600">Tushare Data delay > 5 minutes</h4>
+              <p class="text-muted" style="font-size:13px">The data source Tushare response delay has exceeded the threshold, which may affect real-time market quotes. The backup source has been automatically switched.</p>
             </div>
             <div style="display:flex;gap:8px;flex-shrink:0">
-              <span class="badge badge-success">已自动处理</span>
+              <span class="badge badge-success">Automatically processed</span>
             </div>
           </div>
         </div>
@@ -103,14 +103,14 @@
     <div class="tab-panel" data-group="al" data-panel="rules">
       <div class="table-wrap">
         <table>
-          <thead><tr><th>规则名称</th><th>类型</th><th>条件</th><th>级别</th><th>通知渠道</th><th>状态</th><th>操作</th></tr></thead>
+          <thead><tr><th>Rule Name</th><th>Type</th><th>Condition</th><th>Level</th><th>Notification Channel</th><th>State</th><th>Operation</th></tr></thead>
           <tbody>
-            <tr><td>个股涨跌幅异动</td><td>价格</td><td>涨跌幅 &gt; ±5%</td><td><span class="badge badge-warning">警告</span></td><td>微信 + 邮件</td><td><div class="toggle-switch"><input type="checkbox" checked onchange="showToast(this.checked?'规则已启用':'规则已禁用',this.checked?'success':'warning')"><span class="toggle-slider"></span></div></td><td><button class="btn btn-ghost btn-sm" onclick="showToast('规则编辑弹窗已打开','info')">编辑</button></td></tr>
-            <tr><td>组合最大回撤</td><td>风控</td><td>回撤 &gt; 15%</td><td><span class="badge badge-destructive">严重</span></td><td>微信 + 短信</td><td><div class="toggle-switch"><input type="checkbox" checked onchange="showToast(this.checked?'规则已启用':'规则已禁用',this.checked?'success':'warning')"><span class="toggle-slider"></span></div></td><td><button class="btn btn-ghost btn-sm" onclick="showToast('规则编辑弹窗已打开','info')">编辑</button></td></tr>
-            <tr><td>Worker 进程状态</td><td>系统</td><td>进程异常退出</td><td><span class="badge badge-destructive">严重</span></td><td>微信 + 短信 + 邮件</td><td><div class="toggle-switch"><input type="checkbox" checked onchange="showToast(this.checked?'规则已启用':'规则已禁用',this.checked?'success':'warning')"><span class="toggle-slider"></span></div></td><td><button class="btn btn-ghost btn-sm" onclick="showToast('规则编辑弹窗已打开','info')">编辑</button></td></tr>
-            <tr><td>数据同步延迟</td><td>数据</td><td>延迟 &gt; 5分钟</td><td><span class="badge badge-primary">信息</span></td><td>邮件</td><td><div class="toggle-switch"><input type="checkbox" checked onchange="showToast(this.checked?'规则已启用':'规则已禁用',this.checked?'success':'warning')"><span class="toggle-slider"></span></div></td><td><button class="btn btn-ghost btn-sm" onclick="showToast('规则编辑弹窗已打开','info')">编辑</button></td></tr>
-            <tr><td>单股仓位超限</td><td>风控</td><td>仓位 &gt; 20%</td><td><span class="badge badge-warning">警告</span></td><td>微信</td><td><div class="toggle-switch"><input type="checkbox" checked onchange="showToast(this.checked?'规则已启用':'规则已禁用',this.checked?'success':'warning')"><span class="toggle-slider"></span></div></td><td><button class="btn btn-ghost btn-sm" onclick="showToast('规则编辑弹窗已打开','info')">编辑</button></td></tr>
-            <tr><td>策略信号通知</td><td>交易</td><td>新信号触发</td><td><span class="badge badge-primary">信息</span></td><td>微信</td><td><div class="toggle-switch"><input type="checkbox" onchange="showToast(this.checked?'规则已启用':'规则已禁用',this.checked?'success':'warning')"><span class="toggle-slider"></span></div></td><td><button class="btn btn-ghost btn-sm" onclick="showToast('规则编辑弹窗已打开','info')">编辑</button></td></tr>
+            <tr><td>Individual stock price fluctuations</td><td>Price</td><td>Price change > ±5%</td><td><span class="badge badge-warning">Warning</span></td><td>WeChat Email</td><td><div class="toggle-switch"><input type="checkbox" checked onchange="showToast(this.checked ? 'Rule enabled' : 'Rule disabled', this.checked ? 'success' : 'warning')"><span class="toggle-slider"></span></div></td><td><button class="btn btn-ghost btn-sm" onclick="showToast('The rule editing popup has been opened','info')">Edit</button></td></tr>
+            <tr><td>Portfolio Maximum Drawdown</td><td>Risk control</td><td>Drawdown > 15%</td><td><span class="badge badge-destructive">Severe</span></td><td>WeChat SMS</td><td><div class="toggle-switch"><input type="checkbox" checked onchange="showToast(this.checked ? 'Rule enabled' : 'Rule disabled', this.checked ? 'success' : 'warning')"><span class="toggle-slider"></span></div></td><td><button class="btn btn-ghost btn-sm" onclick="showToast('The rule editing popup has been opened','info')">Edit</button></td></tr>
+            <tr><td>Worker Process Status</td><td>system</td><td>Process exited abnormally</td><td><span class="badge badge-destructive">Severe</span></td><td>WeChat SMS Email</td><td><div class=""toggle-switch"><input type="checkbox" checked onchange="showToast(this.checked ? 'Rule enabled' : 'Rule disabled', this.checked ? 'success' : 'warning')"><span class="toggle-slider"></span></div></td><td><button class="btn btn-ghost btn-sm" onclick="showToast('The rule editing popup has been opened','info')">Edit</button></td></tr>
+            <tr><td>Data synchronization delay</td><td>Data</td><td>Delay > 5 minutes</td><td><span class="badge badge-primary">Information</span></td><td>Email</td><td><div class="toggle-switch"><input type="checkbox" checked onchange="showToast(this.checked ? 'Rule enabled' : 'Rule disabled', this.checked ? 'success' : 'warning')"><span class="toggle-slider"></span></div></td><td><button class="btn btn-ghost btn-sm" onclick="showToast('The rule editing popup has been opened','info')">Edit</button></td></tr>
+            <tr><td>Single stock position exceeds limit</td><td>Risk control</td><td>Position > 20%</td><td><span class="badge badge-warning">Warning</span></td><td>WeChat</td><td><div class=""toggle-switch"><input type="checkbox" checked onchange="showToast(this.checked ? 'Rule enabled' : 'Rule disabled', this.checked ? 'success' : 'warning')"><span class="toggle-slider"></span></div></td><td><button class="btn btn-ghost btn-sm" onclick="showToast('The rule editing popup has been opened','info')">Edit</button></td></tr>
+            <tr><td>Strategy Signal Notification</td><td>Transaction</td><td>New signal triggered</td><td><span class="badge badge-primary">Information</span></td><td>WeChat</td><td><div class="toggle-switch"><input type="checkbox" onchange="showToast(this.checked ? 'Rule enabled' : 'Rule disabled', this.checked ? 'success' : 'warning')"><span class="toggle-slider"></span></div></td><td><button class="btn btn-ghost btn-sm" onclick="showToast('The rule editing popup has been opened','info')">Edit</button></td></tr>
           </tbody>
         </table>
       </div>
@@ -120,20 +120,20 @@
     <div class="tab-panel" data-group="al" data-panel="history">
       <div class="filter-bar">
         <input type="date" class="form-input" value="2026-03-01" style="max-width:160px">
-        <span class="text-muted" style="line-height:38px">至</span>
+        <span class="text-muted" style="line-height:38px">to</span>
         <input type="date" class="form-input" value="2026-03-14" style="max-width:160px">
-        <select class="form-select" style="max-width:120px"><option>全部级别</option><option>严重</option><option>警告</option><option>信息</option></select>
-        <select class="form-select" style="max-width:120px"><option>全部状态</option><option>已解决</option><option>已确认</option><option>未处理</option></select>
+        <select class="form-select" style="max-width:120px"><option>All levels</option><option>serious</option><option>Warning</option><option>Information</option></select>
+        <select class="form-select" style="max-width:120px"><option>All Statuses</option><option>Resolved</option><option>Confirmed</option><option>Unhandled</option></select>
       </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>时间</th><th>类型</th><th>级别</th><th>消息</th><th>状态</th><th>处理人</th></tr></thead>
+          <thead><tr><th>Time</th><th>Type</th><th>Level</th><th>Message</th><th>State</th><th>Handler</th></tr></thead>
           <tbody>
-            <tr><td>2026-03-14 14:32</td><td>价格异动</td><td><span class="badge badge-warning">警告</span></td><td>隆基绿能 跌幅超过5%</td><td><span class="badge badge-warning">未处理</span></td><td>-</td></tr>
-            <tr><td>2026-03-14 13:15</td><td>系统异常</td><td><span class="badge badge-destructive">严重</span></td><td>Worker 进程异常退出</td><td><span class="badge badge-primary">已确认</span></td><td>demo_user</td></tr>
-            <tr><td>2026-03-14 10:05</td><td>数据延迟</td><td><span class="badge badge-primary">信息</span></td><td>Tushare 数据延迟>5分钟</td><td><span class="badge badge-success">已解决</span></td><td>系统</td></tr>
-            <tr><td>2026-03-13 15:00</td><td>风控</td><td><span class="badge badge-warning">警告</span></td><td>行业集中度超限 (白酒64.9%)</td><td><span class="badge badge-success">已解决</span></td><td>demo_user</td></tr>
-            <tr><td>2026-03-12 09:35</td><td>交易</td><td><span class="badge badge-primary">信息</span></td><td>RSI_Reversal 触发买入信号</td><td><span class="badge badge-success">已解决</span></td><td>系统</td></tr>
+            <tr><td>2026-03-14 14:32</td><td>Price fluctuation</td><td><span class="badge badge-warning">Warning</span></td><td>Longi Green Energy fell more than 5%</td><td><span class="badge badge-warning">Unhandled</span></td><td>-</td></tr>
+            <tr><td>2026-03-14 13:15</td><td>System error</td><td><span class="badge badge-destructive">Severe</span></td><td>Worker process exited abnormally</td><td><span class="badge badge-primary">Confirmed</span></td><td>demo_user</td></tr>
+            <tr><td>2026-03-14 10:05</td><td>Data delay</td><td><span class="badge badge-primary">Information</span></td><td>Tushare data delayed >5 minutes</td><td><span class="badge badge-success">Resolved</span></td><td>system</td></tr>
+            <tr><td>2026-03-13 15:00</td><td>Risk control</td><td><span class="badge badge-warning">Warning</span></td><td>Industry concentration exceeds limit (Baijiu 64.9%)</td><td><span class="badge badge-success">Resolved</span></td><td>demo_user</td></tr>
+            <tr><td>2026-03-12 09:35</td><td>Transaction</td><td><span class="badge badge-primary">Information</span></td><td>RSI_Reversal triggered a buy signal</td><td><span class="badge badge-success">Resolved</span></td><td>system</td></tr>
           </tbody>
         </table>
       </div>
@@ -143,22 +143,22 @@
     <div class="tab-panel" data-group="al" data-panel="channels">
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px">
         <div class="card">
-          <div class="card-header"><h3 class="card-title">微信推送</h3><div class="toggle-switch"><input type="checkbox" checked onchange="showToast(this.checked?'微信推送已启用':'微信推送已禁用',this.checked?'success':'warning')"><span class="toggle-slider"></span></div></div>
-          <p class="text-muted" style="font-size:13px">通过企业微信 Webhook 推送告警消息</p>
+          <div class="card-header"><h3 class="card-title">WeChat Push</h3><div class="toggle-switch"><input type="checkbox" checked onchange="showToast(this.checked ? 'WeChat push notifications enabled' : 'WeChat push notifications disabled', this.checked ? 'success' : 'warning')"><span class="toggle-slider"></span></div></div>
+          <p class="text-muted" style="font-size:13px">Push alert messages through Enterprise WeChat Webhook</p>
           <div style="margin-top:12px"><label class="form-label">Webhook URL</label><input type="text" class="form-input" value="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=***"></div>
-          <button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="showToast('微信 Webhook 连接成功','success')">测试连接</button>
+          <button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="showToast('WeChat Webhook connected successfully','success')">Test connection</button>
         </div>
         <div class="card">
-          <div class="card-header"><h3 class="card-title">邮件通知</h3><div class="toggle-switch"><input type="checkbox" checked onchange="showToast(this.checked?'邮件通知已启用':'邮件通知已禁用',this.checked?'success':'warning')"><span class="toggle-slider"></span></div></div>
-          <p class="text-muted" style="font-size:13px">发送告警邮件到指定邮箱</p>
-          <div style="margin-top:12px"><label class="form-label">邮箱地址</label><input type="email" class="form-input" value="demo@quantmate.io"></div>
-          <button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="showToast('测试邮件已发送','success')">测试发送</button>
+          <div class="card-header"><h3 class="card-title">Email Notification</h3><div class="toggle-switch"><input type="checkbox" checked onchange="showToast(this.checked ? 'Email notifications enabled' : 'Email notifications disabled', this.checked ? 'success' : 'warning')"><span class="toggle-slider"></span></div></div>
+          <p class="text-muted" style="font-size:13px">Send alert emails to the specified mailbox</p>
+          <div style="margin-top:12px"><label class="form-label">Email Address</label><input type="email" class="form-input" value="demo@quantmate.io"></div>
+          <button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="showToast('Test email has been sent','success')">Test send</button>
         </div>
         <div class="card">
-          <div class="card-header"><h3 class="card-title">短信通知</h3><div class="toggle-switch"><input type="checkbox" onchange="showToast(this.checked?'短信通知已启用':'短信通知已禁用',this.checked?'success':'warning')"><span class="toggle-slider"></span></div></div>
-          <p class="text-muted" style="font-size:13px;color:var(--warning)">仅用于严重级别告警</p>
-          <div style="margin-top:12px"><label class="form-label">手机号</label><input type="tel" class="form-input" value="138****8888"></div>
-          <button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="showToast('测试短信已发送','success')">测试发送</button>
+          <div class="card-header"><h3 class="card-title">SMS Notification</h3><div class="toggle-switch"><input type="checkbox" onchange="showToast(this.checked ? 'SMS notifications enabled' : 'SMS notifications disabled', this.checked ? 'success' : 'warning')"><span class="toggle-slider"></span></div></div>
+          <p class="text-muted" style="font-size:13px;color:var(--warning)">For use only for severe-level alarms</p>
+          <div style="margin-top:12px"><label class="form-label">Phone Number</label><input type="tel" class="form-input" value="138****8888"></div>
+          <button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="showToast('Test message sent', 'success')">Test send</button>
         </div>
       </div>
     </div>
@@ -169,17 +169,17 @@
 <!-- New Rule Modal -->
 <div class="modal-overlay" id="newRule">
   <div class="modal" style="max-width:560px">
-    <div class="modal-header"><h3 class="modal-title">新建告警规则</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('newRule')">✕</button></div>
+    <div class="modal-header"><h3 class="modal-title">Create New Alert Rule</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('newRule')">✕</button></div>
     <div class="modal-body">
       <div style="display:flex;flex-direction:column;gap:16px">
-        <div><label class="form-label">规则名称</label><input type="text" class="form-input" placeholder="例如: 个股涨停提醒"></div>
-        <div><label class="form-label">规则类型</label><select class="form-select"><option>价格异动</option><option>风控</option><option>系统监控</option><option>数据质量</option><option>交易信号</option></select></div>
-        <div><label class="form-label">触发条件</label><div style="display:flex;gap:8px"><select class="form-select"><option>涨跌幅</option><option>价格</option><option>成交量</option></select><select class="form-select" style="max-width:80px"><option>&gt;</option><option>&lt;</option><option>=</option></select><input type="number" class="form-input" value="5" style="max-width:100px"><span style="line-height:38px">%</span></div></div>
-        <div><label class="form-label">告警级别</label><select class="form-select"><option>信息</option><option>警告</option><option>严重</option></select></div>
-        <div><label class="form-label">通知渠道</label><div style="display:flex;gap:12px"><label class="flex items-center gap-2"><input type="checkbox" checked> 微信</label><label class="flex items-center gap-2"><input type="checkbox" checked> 邮件</label><label class="flex items-center gap-2"><input type="checkbox"> 短信</label></div></div>
+        <div><label class="form-label">Rule Name</label><input type="text" class="form-input" placeholder="For example: individual stock limit-up alert"></div>
+        <div><label class="form-label">Rule Type</label><select class="form-select"><option>Price fluctuation</option><option>Risk control</option><option>System Monitoring</option><option>Data Quality</option><option>Trading Signal</option></select></div>
+        <div><label class="form-label">Trigger Conditions</label><div style="display:flex;gap:8px"><select class="form-select"><option>Change Range</option><option>Price</option><option>Trading Volume</option></select><select class="form-select" style="max-width:80px"><option>&gt;</option><option>&lt;</option><option>=</option></select><input type="number" class="form-input" value="5" style="max-width:100px"><span style="line-height:38px">%</span></div></div>
+        <div><label class="form-label">Alarm Level</label><select class="form-select"><option>Information</option><option>Warning</option><option>serious</option></select></div>
+        <div><label class="form-label">Notification Channel</label><div style="display:flex;gap:12px"><label class="flex items-center gap-2"><input type="checkbox" checked> WeChat</label><label class="flex items-center gap-2"><input type="checkbox" checked> Email</label><label class="flex items-center gap-2"><input type="checkbox"> Text message</label></div></div>
       </div>
     </div>
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('newRule')">取消</button><button class="btn btn-primary" onclick="submitModal('newRule','告警规则已创建','success')">创建规则</button></div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('newRule')>Cancel</button><button class="btn btn-primary" onclick="submitModal('newRule','Alert rule has been created','success')">Create Rule</button></div>
   </div>
 </div>
 

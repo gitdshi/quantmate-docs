@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>QuantMate — 因子实验室</title>
+  <title>QuantMate - Factor Lab</title>
   <link rel="stylesheet" href="shared.css">
   <script src="https://cdn.tailwindcss.com?v=3.4"></script>
 </head>
@@ -14,42 +14,42 @@
     <div class="page-header">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
         <div>
-          <h1 class="page-title">因子实验室</h1>
-          <p class="page-subtitle">因子研究 · IC/IR分析 · 因子组合 · 归因分析</p>
+          <h1 class="page-title">Factor Laboratory</h1>
+          <p class="page-subtitle">Factor Research · IC/IR Analysis · Factor Portfolio · Attribution Analysis</p>
         </div>
-        <button class="btn btn-primary" onclick="openModal('newFactor')">+ 创建因子</button>
+        <button class="btn btn-primary" onclick="openModal('newFactor')">Create factor</button>
       </div>
     </div>
 
     <div class="tabs" data-group="fl">
-      <button class="tab-btn active" data-tab="library">因子库</button>
-      <button class="tab-btn" data-tab="icir">IC/IR 分析</button>
-      <button class="tab-btn" data-tab="combine">因子组合</button>
-      <button class="tab-btn" data-tab="backtest">因子回测</button>
+      <button class="tab-btn active" data-tab="library">Factor library</button>
+      <button class="tab-btn" data-tab="icir">IC/IR Analysis</button>
+      <button class="tab-btn" data-tab="combine">Factor combination</button>
+      <button class="tab-btn" data-tab="backtest">Factor Backtesting</button>
     </div>
 
     <!-- Factor Library -->
     <div class="tab-panel active" data-group="fl" data-panel="library">
       <div class="filter-bar" style="margin-bottom:16px">
-        <input type="text" class="form-input" style="width:200px" placeholder="搜索因子...">
-        <select class="form-select" style="width:140px"><option>所有类别</option><option>价值</option><option>动量</option><option>质量</option><option>波动率</option><option>技术</option></select>
-        <select class="form-select" style="width:120px"><option>按 IC 排序</option><option>按 IR 排序</option><option>按名称排序</option></select>
+        <input type="text" class="form-input" style="width:200px" placeholder="Searching for factors...">
+        <select class="form-select" style="width:140px"><option>All categories</option><option>Value</option><option>Momentum</option><option>Quality</option><option>Volatility</option><option>Technology</option></select>
+        <select class="form-select" style="width:120px"><option>Sort by IC</option><option>Sort by IR</option><option>Sort by name</option></select>
       </div>
 
       <div class="table-wrap">
         <table>
-          <thead><tr><th>因子名称</th><th>类别</th><th>描述</th><th>IC均值</th><th>IC_IR</th><th>胜率</th><th>状态</th><th>操作</th></tr></thead>
+          <thead><tr><th>Factor Name</th><th>Category</th><th>Description</th><th>IC mean</th><th>IC_IR</th><th>Win rate</th><th>State</th><th>Operation</th></tr></thead>
           <tbody id="factorTable"></tbody>
         </table>
       </div>
 
       <div class="card" style="margin-top:16px">
-        <div class="card-header"><h3 class="card-title">因子分布概览</h3></div>
+        <div class="card-header"><h3 class="card-title">Overview of Factor Distribution</h3></div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px">
-          <div style="text-align:center"><div style="font-size:24px;font-weight:700;color:var(--primary)">32</div><div class="text-muted" style="font-size:13px">总因子数</div></div>
-          <div style="text-align:center"><div style="font-size:24px;font-weight:700;color:var(--success)">18</div><div class="text-muted" style="font-size:13px">有效因子</div></div>
-          <div style="text-align:center"><div style="font-size:24px;font-weight:700;color:var(--warning)">8</div><div class="text-muted" style="font-size:13px">待验证</div></div>
-          <div style="text-align:center"><div style="font-size:24px;font-weight:700;color:var(--destructive)">6</div><div class="text-muted" style="font-size:13px">已失效</div></div>
+          <div style="text-align:center"><div style="font-size:24px;font-weight:700;color:var(--primary)">32</div><div class="text-muted" style="font-size:13px">Total number of factors</div></div>
+          <div style="text-align:center"><div style="font-size:24px;font-weight:700;color:var(--success)">18</div><div class="text-muted" style="font-size:13px">Active ingredient</div></div>
+          <div style="text-align:center"><div style="font-size:24px;font-weight:700;color:var(--warning)">8</div><div class="text-muted" style="font-size:13px">To be verified</div></div>
+          <div style="text-align:center"><div style="font-size:24px;font-weight:700;color:var(--destructive)">6</div><div class="text-muted" style="font-size:13px">Expired</div></div>
         </div>
       </div>
     </div>
@@ -58,31 +58,31 @@
     <div class="tab-panel" data-group="fl" data-panel="icir">
       <div class="card">
         <div class="card-header">
-          <h3 class="card-title">因子 IC / IR 分析</h3>
-          <select class="form-select" style="width:200px"><option>EP (市盈率倒数)</option><option>BP (市净率倒数)</option><option>MOM_20 (20日动量)</option><option>VOL_20 (20日波动率)</option><option>ROE_TTM</option></select>
+          <h3 class="card-title">Factor IC / IR Analysis</h3>
+          <select class="form-select" style="width:200px"><option>EP (Earnings Yield)</option><option>BP (Price-to-Book Ratio Inverse)</option><option>MOM_20 (20-day Momentum)</option><option>VOL_20 (20-day volatility)</option><option>ROE_TTM</option></select>
         </div>
 
         <div class="stat-grid cols-4" style="margin-bottom:16px">
-          <div class="stat-card"><div class="stat-label">IC 均值</div><div class="stat-value" style="color:var(--success)">0.048</div></div>
-          <div class="stat-card"><div class="stat-label">IC 标准差</div><div class="stat-value">0.112</div></div>
+          <div class="stat-card"><div class="stat-label">IC Mean</div><div class="stat-value" style="color:var(--success)">0.048</div></div>
+          <div class="stat-card"><div class="stat-label">IC Standard Deviation</div><div class="stat-value">0.112</div></div>
           <div class="stat-card"><div class="stat-label">IC_IR</div><div class="stat-value" style="color:var(--primary)">0.429</div></div>
-          <div class="stat-card"><div class="stat-label">IC > 0 占比</div><div class="stat-value">62.5%</div></div>
+          <div class="stat-card"><div class="stat-label">IC > 0 Proportion</div><div class="stat-value">62.5%</div></div>
         </div>
 
-        <div class="card-header"><h3 class="card-title">IC 时间序列</h3></div>
+        <div class="card-header"><h3 class="card-title">IC time series</h3></div>
         <canvas id="icChart" height="200"></canvas>
       </div>
 
       <div class="card" style="margin-top:16px">
-        <div class="card-header"><h3 class="card-title">分层回测（多空组合）</h3></div>
+        <div class="card-header"><h3 class="card-title">Layered Backtesting (Long-Short Portfolio)</h3></div>
         <div class="stat-grid cols-4" style="margin-bottom:16px">
-          <div class="stat-card"><div class="stat-label">多头年化</div><div class="stat-value" style="color:var(--success)">+18.3%</div></div>
-          <div class="stat-card"><div class="stat-label">空头年化</div><div class="stat-value" style="color:var(--destructive)">-5.2%</div></div>
-          <div class="stat-card"><div class="stat-label">多空收益</div><div class="stat-value" style="color:var(--success)">+23.5%</div></div>
-          <div class="stat-card"><div class="stat-label">单调性</div><div class="stat-value">0.89</div></div>
+          <div class="stat-card"><div class="stat-label">Bull Annualized</div><div class="stat-value" style="color:var(--success)">+18.3%</div></div>
+          <div class="stat-card"><div class="stat-label">Short Annualized</div><div class="stat-value" style="color:var(--destructive)">-5.2%</div></div>
+          <div class="stat-card"><div class="stat-label">Long and short returns</div><div class="stat-value" style="color:var(--success)">+23.5%</div></div>
+          <div class="stat-card"><div class="stat-label">Monotonicity</div><div class="stat-value">0.89</div></div>
         </div>
 
-        <div class="card-header"><h3 class="card-title">五分组累计收益</h3></div>
+        <div class="card-header"><h3 class="card-title">Cumulative earnings of five groups</h3></div>
         <canvas id="quintileChart" height="200"></canvas>
       </div>
     </div>
@@ -90,61 +90,61 @@
     <!-- Factor Combination -->
     <div class="tab-panel" data-group="fl" data-panel="combine">
       <div class="card">
-        <div class="card-header"><h3 class="card-title">因子组合方案</h3><button class="btn btn-primary btn-sm" onclick="showToast('请配置新方案参数','info')">+ 新建方案</button></div>
+        <div class="card-header"><h3 class="card-title">Factor Combination Plan</h3><button class="btn btn-primary btn-sm" onclick="showToast('Please configure the new plan parameters','info')">New Project</button></div>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px">
 
           <div class="card" style="border:1px solid var(--border)">
-            <h4 style="font-weight:600;margin-bottom:8px">等权多因子组合</h4>
-            <p class="text-muted" style="font-size:13px;margin-bottom:12px">EP + BP + MOM_20 + ROE_TTM 等权加权</p>
+            <h4 style="font-weight:600;margin-bottom:8px">Equal-weighted multi-factor portfolio</h4>
+            <p class="text-muted" style="font-size:13px;margin-bottom:12px">EP BP MOM_20 ROE_TTM equal-weighted</p>
             <div style="display:flex;flex-direction:column;gap:6px;font-size:13px;margin-bottom:12px">
-              <div style="display:flex;justify-content:space-between"><span>EP</span><span>权重: 25%</span></div>
-              <div style="display:flex;justify-content:space-between"><span>BP</span><span>权重: 25%</span></div>
-              <div style="display:flex;justify-content:space-between"><span>MOM_20</span><span>权重: 25%</span></div>
-              <div style="display:flex;justify-content:space-between"><span>ROE_TTM</span><span>权重: 25%</span></div>
+              <div style="display:flex;justify-content:space-between"><span>EP</span><span>Weight: 25%</span></div>
+              <div style="display:flex;justify-content:space-between"><span>BP</span><span>Weight: 25%</span></div>
+              <div style="display:flex;justify-content:space-between"><span>MOM_20</span><span>Weight: 25%</span></div>
+              <div style="display:flex;justify-content:space-between"><span>ROE_TTM</span><span>Weight: 25%</span></div>
             </div>
             <div style="display:flex;gap:12px;font-size:13px;margin-bottom:12px">
-              <span>合成IC: <b style="color:var(--success)">0.065</b></span>
-              <span>合成IR: <b style="color:var(--primary)">0.58</b></span>
+              <span>Synthetic IC: <b style="color:var(--success)">0.065</b></span>
+              <span>Synthetic IR: <b style="color:var(--primary)">0.58</b></span>
             </div>
-            <div style="display:flex;gap:8px"><button class="btn btn-primary btn-sm">回测</button><button class="btn btn-ghost btn-sm">编辑</button></div>
+            <div style="display:flex;gap:8px"><button class="btn btn-primary btn-sm">Backtest</button><button class="btn btn-ghost btn-sm">Edit</button></div>
           </div>
 
           <div class="card" style="border:1px solid var(--border)">
-            <h4 style="font-weight:600;margin-bottom:8px">IC 加权组合</h4>
-            <p class="text-muted" style="font-size:13px;margin-bottom:12px">基于历史 IC 动态调整权重</p>
+            <h4 style="font-weight:600;margin-bottom:8px">IC Weighted Combination</h4>
+            <p class="text-muted" style="font-size:13px;margin-bottom:12px">Dynamically adjust weights based on historical IC</p>
             <div style="display:flex;flex-direction:column;gap:6px;font-size:13px;margin-bottom:12px">
-              <div style="display:flex;justify-content:space-between"><span>EP</span><span>权重: 32%</span></div>
-              <div style="display:flex;justify-content:space-between"><span>ROE_TTM</span><span>权重: 28%</span></div>
-              <div style="display:flex;justify-content:space-between"><span>MOM_20</span><span>权重: 22%</span></div>
-              <div style="display:flex;justify-content:space-between"><span>BP</span><span>权重: 18%</span></div>
+              <div style="display:flex;justify-content:space-between"><span>EP</span><span>Weight: 32%</span></div>
+              <div style="display:flex;justify-content:space-between"><span>ROE_TTM</span><span>Weight: 28%</span></div>
+              <div style="display:flex;justify-content:space-between"><span>MOM_20</span><span>Weight: 22%</span></div>
+              <div style="display:flex;justify-content:space-between"><span>BP</span><span>Weight: 18%</span></div>
             </div>
             <div style="display:flex;gap:12px;font-size:13px;margin-bottom:12px">
-              <span>合成IC: <b style="color:var(--success)">0.078</b></span>
-              <span>合成IR: <b style="color:var(--primary)">0.72</b></span>
+              <span>Synthetic IC: <b style="color:var(--success)">0.078</b></span>
+              <span>Synthetic IR: <b style="color:var(--primary)">0.72</b></span>
             </div>
-            <div style="display:flex;gap:8px"><button class="btn btn-primary btn-sm">回测</button><button class="btn btn-ghost btn-sm">编辑</button></div>
+            <div style="display:flex;gap:8px"><button class="btn btn-primary btn-sm">Backtest</button><button class="btn btn-ghost btn-sm">Edit</button></div>
           </div>
 
           <div class="card" style="border:1px solid var(--border)">
-            <h4 style="font-weight:600;margin-bottom:8px">最大化 IR 组合</h4>
-            <p class="text-muted" style="font-size:13px;margin-bottom:12px">优化求解最大化 IR 的权重</p>
+            <h4 style="font-weight:600;margin-bottom:8px">Maximize IR combination</h4>
+            <p class="text-muted" style="font-size:13px;margin-bottom:12px">Optimize to solve for the weights that maximize IR</p>
             <div style="display:flex;flex-direction:column;gap:6px;font-size:13px;margin-bottom:12px">
-              <div style="display:flex;justify-content:space-between"><span>EP</span><span>权重: 38%</span></div>
-              <div style="display:flex;justify-content:space-between"><span>ROE_TTM</span><span>权重: 35%</span></div>
-              <div style="display:flex;justify-content:space-between"><span>MOM_20</span><span>权重: 15%</span></div>
-              <div style="display:flex;justify-content:space-between"><span>VOL_20</span><span>权重: 12%</span></div>
+              <div style="display:flex;justify-content:space-between"><span>EP</span><span>Weight: 38%</span></div>
+              <div style="display:flex;justify-content:space-between"><span>ROE_TTM</span><span>Weight: 35%</span></div>
+              <div style="display:flex;justify-content:space-between"><span>MOM_20</span><span>Weight: 15%</span></div>
+              <div style="display:flex;justify-content:space-between"><span>VOL_20</span><span>Weight: 12%</span></div>
             </div>
             <div style="display:flex;gap:12px;font-size:13px;margin-bottom:12px">
-              <span>合成IC: <b style="color:var(--success)">0.082</b></span>
-              <span>合成IR: <b style="color:var(--primary)">0.85</b></span>
+              <span>Synthetic IC: <b style="color:var(--success)">0.082</b></span>
+              <span>Synthetic IR: <b style="color:var(--primary)">0.85</b></span>
             </div>
-            <div style="display:flex;gap:8px"><button class="btn btn-primary btn-sm">回测</button><button class="btn btn-ghost btn-sm">编辑</button></div>
+            <div style="display:flex;gap:8px"><button class="btn btn-primary btn-sm">Backtest</button><button class="btn btn-ghost btn-sm">Edit</button></div>
           </div>
         </div>
       </div>
 
       <div class="card" style="margin-top:16px">
-        <div class="card-header"><h3 class="card-title">因子相关性矩阵</h3></div>
+        <div class="card-header"><h3 class="card-title">Factor Correlation Matrix</h3></div>
         <div class="table-wrap">
           <table style="text-align:center;font-size:13px">
             <thead><tr><th></th><th>EP</th><th>BP</th><th>MOM_20</th><th>VOL_20</th><th>ROE_TTM</th><th>SIZE</th></tr></thead>
@@ -164,23 +164,23 @@
     <!-- Factor Backtest -->
     <div class="tab-panel" data-group="fl" data-panel="backtest">
       <div class="card">
-        <div class="card-header"><h3 class="card-title">因子回测结果</h3></div>
+        <div class="card-header"><h3 class="card-title">Factor backtesting results</h3></div>
         <div class="stat-grid cols-4" style="margin-bottom:16px">
-          <div class="stat-card"><div class="stat-label">年化收益率</div><div class="stat-value" style="color:var(--success)">+24.8%</div></div>
-          <div class="stat-card"><div class="stat-label">夏普比率</div><div class="stat-value">1.85</div></div>
-          <div class="stat-card"><div class="stat-label">最大回撤</div><div class="stat-value" style="color:var(--destructive)">-12.6%</div></div>
-          <div class="stat-card"><div class="stat-label">信息比率</div><div class="stat-value">1.42</div></div>
+          <div class="stat-card"><div class="stat-label">Annualized Rate of Return</div><div class="stat-value" style="color:var(--success)">+24.8%</div></div>
+          <div class="stat-card"><div class="stat-label">Sharpe Ratio</div><div class="stat-value">1.85</div></div>
+          <div class="stat-card"><div class="stat-label">Maximum Drawdown</div><div class="stat-value" style="color:var(--destructive)">-12.6%</div></div>
+          <div class="stat-card"><div class="stat-label">Information Ratio</div><div class="stat-value">1.42</div></div>
         </div>
 
-        <div class="card-header"><h3 class="card-title">因子组合 vs 基准 净值曲线</h3></div>
+        <div class="card-header"><h3 class="card-title">Factor Combination vs Benchmark Net Value Curve</h3></div>
         <canvas id="factorNavChart" height="220"></canvas>
       </div>
 
       <div class="card" style="margin-top:16px">
-        <div class="card-header"><h3 class="card-title">因子贡献归因</h3></div>
+        <div class="card-header"><h3 class="card-title">Factor Contribution Attribution</h3></div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>因子</th><th>权重</th><th>因子收益</th><th>贡献</th><th>贡献占比</th></tr></thead>
+            <thead><tr><th>Factor</th><th>weight</th><th>Factor return</th><th>Contribution</th><th>Contribution proportion</th></tr></thead>
             <tbody>
               <tr><td><b>EP</b></td><td>35%</td><td style="color:var(--success)">+8.2%</td><td style="color:var(--success)">+2.87%</td><td>
                 <div style="display:flex;align-items:center;gap:8px"><div class="progress-bar" style="width:100px;height:8px"><div class="progress-fill" style="width:35%"></div></div>35%</div>
@@ -206,20 +206,20 @@
 <!-- New Factor Modal -->
 <div class="modal-overlay" id="newFactor">
   <div class="modal" style="max-width:560px">
-    <div class="modal-header"><h3 class="modal-title">创建因子</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('newFactor')">✕</button></div>
+    <div class="modal-header"><h3 class="modal-title">Create Factor</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('newFactor')">✕</button></div>
     <div class="modal-body">
       <div style="display:flex;flex-direction:column;gap:16px">
-        <div><label class="form-label">因子名称</label><input type="text" class="form-input" placeholder="例如: 营收增速_TTM"></div>
-        <div><label class="form-label">类别</label><select class="form-select"><option>价值</option><option>动量</option><option>质量</option><option>波动率</option><option>成长</option><option>技术</option><option>自定义</option></select></div>
-        <div><label class="form-label">因子公式 / 描述</label><textarea class="form-textarea" rows="4" placeholder="revenue_growth = (revenue_ttm - revenue_ttm_lag4) / abs(revenue_ttm_lag4)"></textarea></div>
+        <div><label class="form-label">Factor Name</label><input type="text" class="form-input" placeholder="For example: Revenue Growth_TTM"></div>
+        <div><label class="form-label">Category</label><select class="form-select"><option>Value</option><option>Momentum</option><option>Quality</option><option>Volatility</option><option>Growth</option><option>Technology</option><option>Custom</option></select></div>
+        <div><label class="form-label">Factor Formula / Description</label><textarea class="form-textarea" rows="4" placeholder="revenue_growth = (revenue_ttm - revenue_ttm_lag4) / abs(revenue_ttm_lag4)"></textarea></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-          <div><label class="form-label">数据频率</label><select class="form-select"><option>日频</option><option>周频</option><option>月频</option><option>季频</option></select></div>
-          <div><label class="form-label">回看窗口</label><input type="number" class="form-input" value="20" min="1"></div>
+          <div><label class="form-label">Data Frequency</label><select class="form-select"><option>daily frequency</option><option>Weekly frequency</option><option>monthly frequency</option><option>Quarterly</option></select></div>
+          <div><label class="form-label">Review Window</label><input type="number" class="form-input" value="20" min="1"></div>
         </div>
-        <div><label class="form-label">标准化方式</label><select class="form-select"><option>Z-Score 标准化</option><option>排序百分位</option><option>MAD 去极值 + Z-Score</option><option>不处理</option></select></div>
+        <div><label class="form-label">Standardization Method</label><select class="form-select"><option>Z-Score Standardization</option><option>Ranking percentile</option><option>MAD Outlier Removal Z-Score</option><option>Do not process</option></select></div>
       </div>
     </div>
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('newFactor')">取消</button><button class="btn btn-primary" onclick="submitModal('newFactor','因子已创建，正在计算中…','success')">创建并计算</button></div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('newFactor')>Cancel</button><button class="btn btn-primary" onclick="submitModal('newFactor', 'The factor has been created and is being calculated...', 'success')">Create and calculate</button></div>
   </div>
 </div>
 
@@ -228,21 +228,21 @@
 document.addEventListener('DOMContentLoaded',function(){
   // Populate factor table
   var factors=[
-    {name:'EP',cat:'价值',desc:'市盈率倒数 (Earnings/Price)',ic:0.048,ir:0.429,win:'62.5%',st:'有效'},
-    {name:'BP',cat:'价值',desc:'市净率倒数 (Book/Price)',ic:0.035,ir:0.312,win:'58.3%',st:'有效'},
-    {name:'MOM_20',cat:'动量',desc:'20日收益率动量',ic:0.041,ir:0.385,win:'60.8%',st:'有效'},
-    {name:'VOL_20',cat:'波动率',desc:'20日收益率标准差',ic:-0.022,ir:-0.198,win:'43.2%',st:'失效'},
-    {name:'ROE_TTM',cat:'质量',desc:'过去12个月净资产收益率',ic:0.055,ir:0.510,win:'65.0%',st:'有效'},
-    {name:'SIZE',cat:'规模',desc:'总市值对数',ic:-0.032,ir:-0.280,win:'45.8%',st:'待验证'},
-    {name:'TURNOVER',cat:'技术',desc:'20日平均换手率',ic:0.018,ir:0.162,win:'53.3%',st:'待验证'},
-    {name:'REV_GROWTH',cat:'成长',desc:'营收增速 TTM',ic:0.038,ir:0.355,win:'59.2%',st:'有效'},
+    {name:'EP',cat:'Value',desc:'Earnings/Price (E/P) ratio',ic:0.048,ir:0.429,win:'62.5%',st:'Effective'},
+    {name:'BP',cat:'Value',desc:'Price-to-Book Ratio (Book/Price)',ic:0.035,ir:0.312,win:'58.3%',st:'Effective'},
+    {name:'MOM_20',cat:'Momentum',desc:'20-Day Yield Momentum',ic:0.041,ir:0.385,win:'60.8%',st:'Effective'},
+    {name:'VOL_20',cat:'Volatility',desc:'20-day return standard deviation',ic:-0.022,ir:-0.198,win:'43.2%',st:'Invalid'},
+    {name:'ROE_TTM',cat:'Quality',desc:'Return on equity over the past 12 months',ic:0.055,ir:0.510,win:'65.0%',st:'Effective'},
+    {name:'SIZE',cat:'Scale',desc:'Logarithm of total market value',ic:-0.032,ir:-0.280,win:'45.8%',st:'To be verified'},
+    {name:'TURNOVER',cat:'Technology',desc:'20-day average turnover rate',ic:0.018,ir:0.162,win:'53.3%',st:'To be verified'},
+    {name:'REV_GROWTH',cat:'Growth',desc:'Revenue Growth TTM',ic:0.038,ir:0.355,win:'59.2%',st:'Effective'},
   ];
   var tb=document.getElementById('factorTable');
   factors.forEach(function(f){
     var icColor=f.ic>=0?'var(--success)':'var(--destructive)';
     var irColor=f.ir>=0.3?'var(--primary)':f.ir>=0?'var(--muted-foreground)':'var(--destructive)';
-    var stBadge=f.st==='有效'?'badge-success':f.st==='失效'?'badge-destructive':'badge-warning';
-    tb.innerHTML+='<tr><td><b>'+f.name+'</b></td><td><span class="badge badge-muted">'+f.cat+'</span></td><td style="font-size:13px">'+f.desc+'</td><td style="color:'+icColor+';font-weight:600">'+f.ic.toFixed(3)+'</td><td style="color:'+irColor+';font-weight:600">'+f.ir.toFixed(3)+'</td><td>'+f.win+'</td><td><span class="badge '+stBadge+'">'+f.st+'</span></td><td><button class="btn btn-ghost btn-sm">详情</button></td></tr>';
+    var stBadge=f.st==='Effective'?'badge-success':f.st==='Invalid'?'badge-destructive':'badge-warning';
+    tb.innerHTML+='<tr><td><b>'+f.name+'</b></td><td><span class="badge badge-muted">'+f.cat+'</span></td><td style="font-size:13px">'+f.desc+'</td><td style="color:'+icColor+';font-weight:600">'+f.ic.toFixed(3)+'</td><td style="color:'+irColor+';font-weight:600">'+f.ir.toFixed(3)+'</td><td>'+f.win+'</td><td><span class="badge '+stBadge+'">'+f.st+'</span></td><td><button class="btn btn-ghost btn-sm">Details</button></td></tr>';
   });
 
   // IC time series chart
@@ -276,7 +276,7 @@ document.addEventListener('DOMContentLoaded',function(){
     var ctx=c2.getContext('2d'); c2.width=c2.parentElement.offsetWidth-40; c2.height=200;
     var w=c2.width,h=c2.height;
     var colors=['hsl(221,83%,53%)','hsl(221,83%,63%)','hsl(0,0%,60%)','hsl(0,60%,60%)','hsl(0,84%,50%)'];
-    var labels=['Q1(多)','Q2','Q3','Q4','Q5(空)'];
+    var labels=['Q1 (Multiple)','Q2','Q3','Q4','Q5 (blank)'];
     var returns=[0.183,0.124,0.072,0.018,-0.052];
     for(var q=0;q<5;q++){
       var pts=[];var v=1;
@@ -308,15 +308,15 @@ document.addEventListener('DOMContentLoaded',function(){
     ctx.strokeStyle='hsl(0,0%,60%)';ctx.lineWidth=1.5;ctx.setLineDash([4,4]);ctx.beginPath();
     for(var i=0;i<bpts.length;i++){var x=40+i*(w-60)/(bpts.length-1),y=h-30-(bpts[i]-0.95)/(1.6-0.95)*(h-50);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}
     ctx.stroke();ctx.setLineDash([]);
-    ctx.font='12px sans-serif';ctx.fillStyle='hsl(221,83%,53%)';ctx.fillText('因子组合',w-80,30);
-    ctx.fillStyle='hsl(0,0%,60%)';ctx.fillText('沪深300',w-80,48);
+    ctx.font='12px sans-serif';ctx.fillStyle='hsl(221,83%,53%)';ctx.fillText('Factor combination',w-80,30);
+    ctx.fillStyle='hsl(0,0%,60%)';ctx.fillText('CSI 300',w-80,48);
   }
 
   // Factor table detail buttons
   document.querySelectorAll('#factorTable .btn-ghost').forEach(function(btn){
-    if(btn.textContent.trim()==='详情'){
+    if(btn.textContent.trim()==='Details'){
       var name=(btn.closest('tr').querySelector('b')||{}).textContent||'';
-      btn.onclick=function(){activateTab('fl','icir');showToast('加载因子「'+name+'」IC/IR 分析','info')};
+      btn.onclick=function(){activateTab('fl','icir');showToast('Load factor "'+name+'IC/IR Analysis','info')};
     }
   });
 
@@ -324,14 +324,14 @@ document.addEventListener('DOMContentLoaded',function(){
   document.querySelectorAll('[data-panel="combine"] .card[style*="border:1px"]').forEach(function(card){
     var title=(card.querySelector('h4')||{}).textContent||'';
     card.querySelectorAll('.btn-sm').forEach(function(btn){
-      if(btn.textContent.trim()==='回测') btn.onclick=function(){activateTab('fl','backtest');showToast('开始回测「'+title+'」','info')};
-      else if(btn.textContent.trim()==='编辑') btn.onclick=function(){showToast('编辑「'+title+'」','info')};
+      if(btn.textContent.trim()==='Backtesting') btn.onclick=function(){activateTab('fl','backtest');showToast('Start backtesting "'+title+'」','info')};
+      else if(btn.textContent.trim()==='Edit') btn.onclick=function(){showToast('Edit "'+title+'」','info')};
     });
   });
 
   // IC/IR analysis select
   var icSelect=document.querySelector('[data-panel="icir"] .form-select');
-  if(icSelect) icSelect.addEventListener('change',function(){showToast('已切换至因子 '+this.value,'success')});
+  if(icSelect) icSelect.addEventListener('change',function(){showToast('Switched to factor '+this.value,'success')});
 
   // Factor library filter
   (function(){
@@ -348,7 +348,7 @@ document.addEventListener('DOMContentLoaded',function(){
         var badges=r.querySelectorAll('.badge-muted');
         var rowCat=badges.length?badges[0].textContent:'';
         var matchQ=!q||txt.includes(q);
-        var matchC=cat==='所有类别'||rowCat===cat;
+        var matchC=cat==='All categories'||rowCat===cat;
         r.style.display=matchQ&&matchC?'':'none';
       });
     }

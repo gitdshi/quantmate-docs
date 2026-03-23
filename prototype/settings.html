@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>QuantMate — 系统设置</title>
+  <title>QuantMate - System Settings</title>
   <link rel="stylesheet" href="shared.css">
   <script src="https://cdn.tailwindcss.com?v=3.4"></script>
 </head>
@@ -12,212 +12,212 @@
   <main class="main-content" id="main">
 
     <div class="page-header">
-      <h1 class="page-title">系统设置</h1>
-      <p class="page-subtitle">全局配置 · 数据源 · 通知 · 界面</p>
+      <h1 class="page-title">System Settings</h1>
+      <p class="page-subtitle">Global Settings · Data Source · Notifications · Interface</p>
     </div>
 
     <div class="tabs" data-group="st">
-      <button class="tab-btn active" data-tab="general">通用设置</button>
-      <button class="tab-btn" data-tab="datasource">数据源</button>
-      <button class="tab-btn" data-tab="trading-cfg">交易配置</button>
-      <button class="tab-btn" data-tab="notification">通知设置</button>
-      <button class="tab-btn" data-tab="ui">界面偏好</button>
-      <button class="tab-btn" data-tab="system">系统信息</button>
+      <button class="tab-btn active" data-tab="general">General Settings</button>
+      <button class="tab-btn" data-tab="datasource">Data source</button>
+      <button class="tab-btn" data-tab="trading-cfg">Trading Configuration</button>
+      <button class="tab-btn" data-tab="notification">Notification Settings</button>
+      <button class="tab-btn" data-tab="ui">Interface Preferences</button>
+      <button class="tab-btn" data-tab="system">System Information</button>
     </div>
 
     <!-- Tab: General -->
     <div class="tab-panel active" data-group="st" data-panel="general">
       <div class="card">
-        <div class="card-header"><h3 class="card-title">基本设置</h3></div>
+        <div class="card-header"><h3 class="card-title">Basic Settings</h3></div>
         <div style="display:flex;flex-direction:column;gap:20px;max-width:600px">
           <div>
-            <label class="form-label">平台名称</label>
+            <label class="form-label">Platform Name</label>
             <input type="text" class="form-input" value="QuantMate">
           </div>
           <div>
-            <label class="form-label">默认货币</label>
-            <select class="form-select"><option>CNY (人民币)</option><option>USD (美元)</option><option>HKD (港币)</option></select>
+            <label class="form-label">Default currency</label>
+            <select class="form-select"><option>CNY (Renminbi)</option><option>USD (US Dollar)</option><option>HKD (Hong Kong Dollar)</option></select>
           </div>
           <div>
-            <label class="form-label">时区</label>
+            <label class="form-label">Time zone</label>
             <select class="form-select"><option>Asia/Shanghai (UTC+8)</option><option>America/New_York (UTC-5)</option></select>
           </div>
           <div>
-            <label class="form-label">语言</label>
-            <select class="form-select"><option>简体中文</option><option>English</option></select>
+            <label class="form-label">Language</label>
+            <select class="form-select"><option>Simplified Chinese</option><option>English</option></select>
           </div>
           <div>
-            <label class="form-label">日志级别</label>
+            <label class="form-label">Log Level</label>
             <select class="form-select"><option>INFO</option><option>DEBUG</option><option>WARNING</option><option>ERROR</option></select>
           </div>
         </div>
-        <div style="margin-top:20px"><button class="btn btn-primary" onclick="showToast('基本设置已保存','success')">保存设置</button></div>
+        <div style="margin-top:20px"><button class="btn btn-primary" onclick="showToast('Basic settings have been saved','success')">Save Settings</button></div>
       </div>
     </div>
 
     <!-- Tab: Datasource -->
     <div class="tab-panel" data-group="st" data-panel="datasource">
       <div class="card">
-        <div class="card-header"><h3 class="card-title">数据源配置</h3></div>
+        <div class="card-header"><h3 class="card-title">Data Source Configuration</h3></div>
         <div style="display:flex;flex-direction:column;gap:20px;max-width:600px">
           <div>
             <label class="form-label">Tushare Token</label>
             <input type="password" class="form-input" value="****************************">
-            <p class="text-muted" style="font-size:12px;margin-top:4px">获取地址: tushare.pro</p>
+            <p class="text-muted" style="font-size:12px;margin-top:4px">Get address: tushare.pro</p>
           </div>
           <div>
-            <label class="form-label">数据刷新频率</label>
-            <select class="form-select"><option>实时 (每5分钟)</option><option>15分钟</option><option>30分钟</option><option>1小时</option></select>
+            <label class="form-label">Data refresh frequency</label>
+            <select class="form-select"><option>Real-time (every 5 minutes)</option><option>15 minutes</option><option>30 minutes</option><option>1 hour</option></select>
           </div>
           <div>
-            <label class="form-label">历史数据范围</label>
-            <select class="form-select"><option>2010年至今</option><option>2015年至今</option><option>2020年至今</option></select>
+            <label class="form-label">Historical data range</label>
+            <select class="form-select"><option>From 2010 to the present</option><option>From 2015 to present</option><option>From 2020 to the present</option></select>
           </div>
         </div>
       </div>
 
       <div class="card">
-        <div class="card-header"><h3 class="card-title">数据库配置</h3></div>
+        <div class="card-header"><h3 class="card-title">Database Configuration</h3></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:600px">
-          <div><label class="form-label">主机</label><input type="text" class="form-input" value="localhost"></div>
-          <div><label class="form-label">端口</label><input type="number" class="form-input" value="3306"></div>
-          <div><label class="form-label">数据库名</label><input type="text" class="form-input" value="quantmate"></div>
-          <div><label class="form-label">用户名</label><input type="text" class="form-input" value="quantmate_user"></div>
+          <div><label class="form-label">Host</label><input type="text" class="form-input" value="localhost"></div>
+          <div><label class="form-label">Port</label><input type="number" class="form-input" value="3306"></div>
+          <div><label class="form-label">Database Name</label><input type="text" class="form-input" value="quantmate"></div>
+          <div><label class="form-label">Username</label><input type="text" class="form-input" value="quantmate_user"></div>
         </div>
         <div style="margin-top:12px;display:flex;gap:8px">
-          <button class="btn btn-ghost btn-sm" onclick="showToast('数据库连接测试成功','success')">测试连接</button>
-          <span class="badge badge-success">连接正常</span>
+          <button class="btn btn-ghost btn-sm" onclick="showToast('Database connection test successful','success')">Test connection</button>
+          <span class="badge badge-success">Connection is normal</span>
         </div>
       </div>
 
-      <!-- 数据项开关管理 -->
+      <!-- Data Item Switch Management -->
       <div class="card">
         <div class="card-header">
-          <h3 class="card-title">数据项开关管理</h3>
+          <h3 class="card-title">Data Item Switch Management</h3>
           <div style="display:flex;align-items:center;gap:8px">
-            <span class="badge badge-primary" id="dsItemSummary">已启用 6 / 10 项</span>
+            <span class="badge badge-primary" id="dsItemSummary">6 / 10 items enabled</span>
           </div>
         </div>
-        <p class="text-muted" style="font-size:13px;margin-bottom:16px">根据数据源接口权限，控制每个数据项是否在初始化及每日同步过程中被处理。关闭的数据项不会消耗 API 调用额度，已入库数据不受影响。</p>
+        <p class="text-muted" style="font-size:13px;margin-bottom:16px">According to the data source interface permissions, control whether each data item is processed during initialization and daily synchronization. Disabled data items will not consume API call quota, and data already stored is not affected.</p>
 
-        <!-- Tushare 数据项 -->
+        <!-- Tushare Data item -->
         <div style="margin-bottom:20px">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding:8px 12px;background:hsl(var(--muted));border-radius:var(--radius)">
             <div style="display:flex;align-items:center;gap:8px">
               <span style="font-weight:700;font-size:15px">Tushare</span>
-              <span class="badge badge-success">已连接</span>
-              <span class="text-muted" style="font-size:12px">积分: 5000</span>
+              <span class="badge badge-success">Connected</span>
+              <span class="text-muted" style="font-size:12px">Points: 5000</span>
             </div>
             <div style="display:flex;gap:6px">
-              <button class="btn btn-ghost btn-sm" onclick="toggleAllItems('tushare',true)">全部启用</button>
-              <button class="btn btn-ghost btn-sm" onclick="toggleAllItems('tushare',false)">全部禁用</button>
+              <button class="btn btn-ghost btn-sm" onclick="toggleAllItems('tushare',true)">Enable all</button>
+              <button class="btn btn-ghost btn-sm" onclick="toggleAllItems('tushare',false)">Disable all</button>
             </div>
           </div>
           <div class="table-wrap">
             <table>
-              <thead><tr><th style="width:40px">开关</th><th>数据项</th><th>接口标识</th><th>权限要求</th><th>最后同步</th><th>状态</th></tr></thead>
+              <thead><tr><th style="width:40px">Switch</th><th>Data item</th><th>Interface Identifier</th><th>Permission requirements</th><th>Final sync</th><th>State</th></tr></thead>
               <tbody id="tushareItems">
                 <tr data-source="tushare">
                   <td><div class="toggle-switch"><input type="checkbox" checked data-item="stock_basic"><span class="toggle-slider"></span></div></td>
-                  <td style="font-weight:600">股票列表</td>
+                  <td style="font-weight:600">Stock List</td>
                   <td class="font-mono" style="font-size:12px">stock_basic</td>
-                  <td><span class="badge badge-success">基础</span></td>
+                  <td><span class="badge badge-success">Foundation</span></td>
                   <td class="text-muted" style="font-size:12px">2026-03-14 16:30</td>
-                  <td><span class="badge badge-success">成功</span></td>
+                  <td><span class="badge badge-success">Success</span></td>
                 </tr>
                 <tr data-source="tushare">
                   <td><div class="toggle-switch"><input type="checkbox" checked data-item="stock_daily"><span class="toggle-slider"></span></div></td>
-                  <td style="font-weight:600">日线行情</td>
+                  <td style="font-weight:600">Daily market conditions</td>
                   <td class="font-mono" style="font-size:12px">stock_daily</td>
-                  <td><span class="badge badge-success">基础</span></td>
+                  <td><span class="badge badge-success">Foundation</span></td>
                   <td class="text-muted" style="font-size:12px">2026-03-14 16:30</td>
-                  <td><span class="badge badge-success">成功</span></td>
+                  <td><span class="badge badge-success">Success</span></td>
                 </tr>
                 <tr data-source="tushare">
                   <td><div class="toggle-switch"><input type="checkbox" checked data-item="adj_factor"><span class="toggle-slider"></span></div></td>
-                  <td style="font-weight:600">复权因子</td>
+                  <td style="font-weight:600">Adjusted factor</td>
                   <td class="font-mono" style="font-size:12px">adj_factor</td>
-                  <td><span class="badge badge-success">基础</span></td>
+                  <td><span class="badge badge-success">Foundation</span></td>
                   <td class="text-muted" style="font-size:12px">2026-03-14 16:30</td>
-                  <td><span class="badge badge-success">成功</span></td>
+                  <td><span class="badge badge-success">Success</span></td>
                 </tr>
                 <tr data-source="tushare">
                   <td><div class="toggle-switch"><input type="checkbox" checked data-item="daily_basic"><span class="toggle-slider"></span></div></td>
-                  <td style="font-weight:600">每日基本指标</td>
+                  <td style="font-weight:600">Daily Basic Indicators</td>
                   <td class="font-mono" style="font-size:12px">daily_basic</td>
-                  <td><span class="badge badge-warning">积分 ≥ 2000</span></td>
+                  <td><span class="badge badge-warning">Points ≥ 2000</span></td>
                   <td class="text-muted" style="font-size:12px">2026-03-14 16:30</td>
-                  <td><span class="badge badge-success">成功</span></td>
+                  <td><span class="badge badge-success">Success</span></td>
                 </tr>
                 <tr data-source="tushare">
                   <td><div class="toggle-switch"><input type="checkbox" data-item="stock_dividend"><span class="toggle-slider"></span></div></td>
-                  <td style="font-weight:600">分红送股</td>
+                  <td style="font-weight:600">Dividend and Stock Bonus</td>
                   <td class="font-mono" style="font-size:12px">stock_dividend</td>
-                  <td><span class="badge badge-warning">积分 ≥ 2000</span></td>
+                  <td><span class="badge badge-warning">Points ≥ 2000</span></td>
                   <td class="text-muted" style="font-size:12px">—</td>
-                  <td><span class="badge" style="background:hsl(var(--muted));color:hsl(var(--muted-foreground))">未同步</span></td>
+                  <td><span class="badge" style="background:hsl(var(--muted));color:hsl(var(--muted-foreground))">Not synced</span></td>
                 </tr>
                 <tr data-source="tushare">
                   <td><div class="toggle-switch"><input type="checkbox" data-item="top10_holders"><span class="toggle-slider"></span></div></td>
-                  <td style="font-weight:600">十大股东</td>
+                  <td style="font-weight:600">Top 10 shareholders</td>
                   <td class="font-mono" style="font-size:12px">top10_holders</td>
-                  <td><span class="badge badge-destructive">积分 ≥ 5000</span></td>
+                  <td><span class="badge badge-destructive">Points ≥ 5000</span></td>
                   <td class="text-muted" style="font-size:12px">—</td>
-                  <td><span class="badge" style="background:hsl(var(--muted));color:hsl(var(--muted-foreground))">未同步</span></td>
+                  <td><span class="badge" style="background:hsl(var(--muted));color:hsl(var(--muted-foreground))">Not synced</span></td>
                 </tr>
                 <tr data-source="tushare">
                   <td><div class="toggle-switch"><input type="checkbox" checked data-item="index_daily"><span class="toggle-slider"></span></div></td>
-                  <td style="font-weight:600">指数日线</td>
+                  <td style="font-weight:600">Index daily line</td>
                   <td class="font-mono" style="font-size:12px">index_daily</td>
-                  <td><span class="badge badge-success">基础</span></td>
+                  <td><span class="badge badge-success">Foundation</span></td>
                   <td class="text-muted" style="font-size:12px">2026-03-14 16:30</td>
-                  <td><span class="badge badge-success">成功</span></td>
+                  <td><span class="badge badge-success">Success</span></td>
                 </tr>
                 <tr data-source="tushare">
                   <td><div class="toggle-switch"><input type="checkbox" checked data-item="trade_cal"><span class="toggle-slider"></span></div></td>
-                  <td style="font-weight:600">交易日历</td>
+                  <td style="font-weight:600">Trading Calendar</td>
                   <td class="font-mono" style="font-size:12px">trade_cal</td>
-                  <td><span class="badge badge-success">基础</span></td>
+                  <td><span class="badge badge-success">Foundation</span></td>
                   <td class="text-muted" style="font-size:12px">2026-03-14 16:30</td>
-                  <td><span class="badge badge-success">成功</span></td>
+                  <td><span class="badge badge-success">Success</span></td>
                 </tr>
               </tbody>
             </table>
           </div>
         </div>
 
-        <!-- AkShare 数据项 -->
+        <!-- AkShare Data item -->
         <div>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding:8px 12px;background:hsl(var(--muted));border-radius:var(--radius)">
             <div style="display:flex;align-items:center;gap:8px">
               <span style="font-weight:700;font-size:15px">AkShare</span>
-              <span class="badge badge-success">已连接</span>
-              <span class="text-muted" style="font-size:12px">无需Token</span>
+              <span class="badge badge-success">Connected</span>
+              <span class="text-muted" style="font-size:12px">No Token Required</span>
             </div>
             <div style="display:flex;gap:6px">
-              <button class="btn btn-ghost btn-sm" onclick="toggleAllItems('akshare',true)">全部启用</button>
-              <button class="btn btn-ghost btn-sm" onclick="toggleAllItems('akshare',false)">全部禁用</button>
+              <button class="btn btn-ghost btn-sm" onclick="toggleAllItems('akshare',true)">Enable all</button>
+              <button class="btn btn-ghost btn-sm" onclick="toggleAllItems('akshare',false)">Disable all</button>
             </div>
           </div>
           <div class="table-wrap">
             <table>
-              <thead><tr><th style="width:40px">开关</th><th>数据项</th><th>接口标识</th><th>权限要求</th><th>最后同步</th><th>状态</th></tr></thead>
+              <thead><tr><th style="width:40px">Switch</th><th>Data item</th><th>Interface Identifier</th><th>Permission requirements</th><th>Final sync</th><th>State</th></tr></thead>
               <tbody id="akshareItems">
                 <tr data-source="akshare">
                   <td><div class="toggle-switch"><input type="checkbox" checked data-item="ak_trade_cal"><span class="toggle-slider"></span></div></td>
-                  <td style="font-weight:600">交易日历</td>
+                  <td style="font-weight:600">Trading Calendar</td>
                   <td class="font-mono" style="font-size:12px">ak_trade_cal</td>
-                  <td><span class="badge badge-success">无需Token</span></td>
+                  <td><span class="badge badge-success">No Token Required</span></td>
                   <td class="text-muted" style="font-size:12px">2026-03-14 08:00</td>
-                  <td><span class="badge badge-success">成功</span></td>
+                  <td><span class="badge badge-success">Success</span></td>
                 </tr>
                 <tr data-source="akshare">
                   <td><div class="toggle-switch"><input type="checkbox" checked data-item="ak_index_daily"><span class="toggle-slider"></span></div></td>
-                  <td style="font-weight:600">指数日线</td>
+                  <td style="font-weight:600">Index daily line</td>
                   <td class="font-mono" style="font-size:12px">ak_index_daily</td>
-                  <td><span class="badge badge-success">无需Token</span></td>
+                  <td><span class="badge badge-success">No Token Required</span></td>
                   <td class="text-muted" style="font-size:12px">2026-03-14 16:30</td>
-                  <td><span class="badge badge-success">成功</span></td>
+                  <td><span class="badge badge-success">Success</span></td>
                 </tr>
               </tbody>
             </table>
@@ -229,50 +229,50 @@
     <!-- Tab: Trading Config -->
     <div class="tab-panel" data-group="st" data-panel="trading-cfg">
       <div class="card">
-        <div class="card-header"><h3 class="card-title">交易参数</h3></div>
+        <div class="card-header"><h3 class="card-title">Transaction Parameters</h3></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:600px">
-          <div><label class="form-label">默认手续费率 (%)</label><input type="number" class="form-input" value="0.03" step="0.01"></div>
-          <div><label class="form-label">印花税率 (%)</label><input type="number" class="form-input" value="0.05" step="0.01"></div>
-          <div><label class="form-label">滑点 (基点)</label><input type="number" class="form-input" value="2"></div>
-          <div><label class="form-label">默认回测初始资金</label><input type="number" class="form-input" value="1000000"></div>
+          <div><label class="form-label">Default fee rate (%)</label><input type="number" class="form-input" value="0.03" step="0.01"></div>
+          <div><label class="form-label">Stamp duty rate (%)</label><input type="number" class="form-input" value="0.05" step="0.01"></div>
+          <div><label class="form-label">Slippage (basis points)</label><input type="number" class="form-input" value="2"></div>
+          <div><label class="form-label">Default backtest initial capital</label><input type="number" class="form-input" value="1000000"></div>
         </div>
       </div>
 
       <div class="card">
-        <div class="card-header"><h3 class="card-title">风控全局设置</h3></div>
+        <div class="card-header"><h3 class="card-title">Global Risk Control Settings</h3></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:600px">
-          <div><label class="form-label">单股最大仓位 (%)</label><input type="number" class="form-input" value="20"></div>
-          <div><label class="form-label">总仓位上限 (%)</label><input type="number" class="form-input" value="80"></div>
-          <div><label class="form-label">单日亏损限制 (%)</label><input type="number" class="form-input" value="3"></div>
-          <div><label class="form-label">最大回撤限制 (%)</label><input type="number" class="form-input" value="15"></div>
+          <div><label class="form-label">Maximum Position per Single Stock (%)</label><input type="number" class="form-input" value="20"></div>
+          <div><label class="form-label">Total Position Limit (%)</label><input type="number" class="form-input" value="80"></div>
+          <div><label class="form-label">Daily loss limit (%)</label><input type="number" class="form-input" value="3"></div>
+          <div><label class="form-label">Maximum Drawdown Limit (%)</label><input type="number" class="form-input" value="15"></div>
         </div>
-        <div style="margin-top:16px"><button class="btn btn-primary" onclick="showToast('交易配置已保存','success')">保存配置</button></div>
+        <div style="margin-top:16px"><button class="btn btn-primary" onclick="showToast('Transaction settings have been saved','success')">Save Configuration</button></div>
       </div>
     </div>
 
     <!-- Tab: Notification -->
     <div class="tab-panel" data-group="st" data-panel="notification">
       <div class="card">
-        <div class="card-header"><h3 class="card-title">通知偏好</h3></div>
+        <div class="card-header"><h3 class="card-title">Notification preferences</h3></div>
         <div style="display:flex;flex-direction:column;gap:16px;max-width:500px">
           <div style="display:flex;justify-content:space-between;align-items:center">
-            <div><div style="font-weight:600">策略信号通知</div><div class="text-muted" style="font-size:12px">新的买卖信号触发时通知</div></div>
+            <div><div style="font-weight:600">Strategy Signal Notification</div><div class="text-muted" style="font-size:12px">Notify when a new buy or sell signal is triggered</div></div>
             <div class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></div>
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center">
-            <div><div style="font-weight:600">委托成交通知</div><div class="text-muted" style="font-size:12px">委托成交时推送通知</div></div>
+            <div><div style="font-weight:600">Commission Transaction Notice</div><div class="text-muted" style="font-size:12px">Push notification when order is executed</div></div>
             <div class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></div>
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center">
-            <div><div style="font-weight:600">风控预警通知</div><div class="text-muted" style="font-size:12px">触发风控规则时通知</div></div>
+            <div><div style="font-weight:600">Risk Control Alert Notification</div><div class="text-muted" style="font-size:12px">Notify when risk control rules are triggered</div></div>
             <div class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></div>
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center">
-            <div><div style="font-weight:600">数据同步通知</div><div class="text-muted" style="font-size:12px">数据同步完成或异常时通知</div></div>
+            <div><div style="font-weight:600">Data Synchronization Notification</div><div class="text-muted" style="font-size:12px">Notify when data synchronization is complete or an exception occurs</div></div>
             <div class="toggle-switch"><input type="checkbox"><span class="toggle-slider"></span></div>
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center">
-            <div><div style="font-weight:600">每日复盘提醒</div><div class="text-muted" style="font-size:12px">收盘后提醒复盘</div></div>
+            <div><div style="font-weight:600">Daily Review Reminder</div><div class="text-muted" style="font-size:12px">Remind to review after the market closes</div></div>
             <div class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></div>
           </div>
         </div>
@@ -282,60 +282,60 @@
     <!-- Tab: UI -->
     <div class="tab-panel" data-group="st" data-panel="ui">
       <div class="card">
-        <div class="card-header"><h3 class="card-title">界面偏好</h3></div>
+        <div class="card-header"><h3 class="card-title">Interface Preferences</h3></div>
         <div style="display:flex;flex-direction:column;gap:20px;max-width:500px">
           <div>
-            <label class="form-label">主题</label>
+            <label class="form-label">Theme</label>
             <div style="display:flex;gap:12px">
-              <label class="flex items-center gap-2"><input type="radio" name="theme" checked> 跟随系统</label>
-              <label class="flex items-center gap-2"><input type="radio" name="theme"> 浅色</label>
-              <label class="flex items-center gap-2"><input type="radio" name="theme"> 深色</label>
+              <label class="flex items-center gap-2"><input type="radio" name="theme" checked> Follow the system</label>
+              <label class="flex items-center gap-2"><input type="radio" name="theme"> light-colored</label>
+              <label class="flex items-center gap-2"><input type="radio" name="theme"> Dark</label>
             </div>
           </div>
           <div>
-            <label class="form-label">涨跌颜色</label>
+            <label class="form-label">Rise and Fall Colors</label>
             <div style="display:flex;gap:12px">
-              <label class="flex items-center gap-2"><input type="radio" name="color" checked> 红涨绿跌 (A股)</label>
-              <label class="flex items-center gap-2"><input type="radio" name="color"> 绿涨红跌 (美股)</label>
+              <label class="flex items-center gap-2"><input type="radio" name="color" checked> Red rises, green falls (A-shares)</label>
+              <label class="flex items-center gap-2"><input type="radio" name="color"> Green rises, red falls (U.S. stocks)</label>
             </div>
           </div>
           <div>
-            <label class="form-label">默认图表类型</label>
-            <select class="form-select"><option>K线图</option><option>分时图</option><option>折线图</option></select>
+            <label class="form-label">Default chart type</label>
+            <select class="form-select"><option>K-line chart</option><option>Intraday chart</option><option>Line chart</option></select>
           </div>
           <div>
-            <label class="form-label">表格每页行数</label>
+            <label class="form-label">Number of rows per page in the table</label>
             <select class="form-select"><option>20</option><option>50</option><option>100</option></select>
           </div>
           <div>
-            <label class="form-label">侧边栏</label>
+            <label class="form-label">Sidebar</label>
             <div style="display:flex;gap:12px">
-              <label class="flex items-center gap-2"><input type="radio" name="sidebar" checked> 展开</label>
-              <label class="flex items-center gap-2"><input type="radio" name="sidebar"> 默认收起</label>
+              <label class="flex items-center gap-2"><input type="radio" name="sidebar" checked> Expand</label>
+              <label class="flex items-center gap-2"><input type="radio" name="sidebar"> Collapse by default</label>
             </div>
           </div>
         </div>
-        <div style="margin-top:20px"><button class="btn btn-primary" onclick="showToast('界面偏好已保存','success')">保存偏好</button></div>
+        <div style="margin-top:20px"><button class="btn btn-primary" onclick="showToast('Interface preferences have been saved','success')">Save preferences</button></div>
       </div>
     </div>
 
     <!-- Tab: System Info -->
     <div class="tab-panel" data-group="st" data-panel="system">
       <div class="card">
-        <div class="card-header"><h3 class="card-title">系统信息</h3></div>
+        <div class="card-header"><h3 class="card-title">System Information</h3></div>
         <div class="table-wrap">
           <table>
             <tbody>
-              <tr><td style="font-weight:600;width:200px">版本</td><td>QuantMate v1.0.0-beta</td></tr>
-              <tr><td style="font-weight:600">API 版本</td><td>v1</td></tr>
+              <tr><td style="font-weight:600;width:200px">Version</td><td>QuantMate v1.0.0-beta</td></tr>
+              <tr><td style="font-weight:600">API Version</td><td>v1</td></tr>
               <tr><td style="font-weight:600">Python</td><td>3.11.8</td></tr>
-              <tr><td style="font-weight:600">数据库</td><td>MySQL 8.0 <span class="badge badge-success">连接正常</span></td></tr>
-              <tr><td style="font-weight:600">Redis</td><td>7.2 <span class="badge badge-success">连接正常</span></td></tr>
-              <tr><td style="font-weight:600">Worker</td><td>Celery 5.3 <span class="badge badge-destructive">异常</span></td></tr>
-              <tr><td style="font-weight:600">最后部署</td><td>2026-03-13 08:00:00</td></tr>
-              <tr><td style="font-weight:600">运行时间</td><td>1天 6小时 35分钟</td></tr>
-              <tr><td style="font-weight:600">磁盘使用</td><td>42.5 GB / 100 GB (42.5%)</td></tr>
-              <tr><td style="font-weight:600">内存使用</td><td>3.2 GB / 8 GB (40%)</td></tr>
+              <tr><td style="font-weight:600">Database</td><td>MySQL 8.0 <span class=""badge badge-success">Connection is normal</span></td></tr>
+              <tr><td style="font-weight:600">Redis</td><td>7.2 <span class="badge badge-success">Connection is normal</span></td></tr>
+              <tr><td style="font-weight:600">Worker</td><td>Celery 5.3 <span class="badge badge-destructive">Abnormal</span></td></tr>
+              <tr><td style="font-weight:600">Final deployment</td><td>2026-03-13 08:00:00</td></tr>
+              <tr><td style="font-weight:600">Runtime</td><td>1 day 6 hours 35 minutes</td></tr>
+              <tr><td style="font-weight:600">Disk Usage</td><td>42.5 GB / 100 GB (42.5%)</td></tr>
+              <tr><td style="font-weight:600">Memory Usage</td><td>3.2 GB / 8 GB (40%)</td></tr>
             </tbody>
           </table>
         </div>
@@ -349,38 +349,38 @@
 <script>
 // Notification toggles
 document.querySelectorAll('[data-panel="notification"] .toggle-switch input').forEach(t=>{
-  t.addEventListener('change',function(){showToast(this.checked?'通知已启用':'通知已禁用',this.checked?'success':'warning')});
+  t.addEventListener('change',function(){showToast(this.checked?'Notifications are enabled':'Notifications are disabled',this.checked?'success':'warning')});
 });
 // Radio groups
 ['theme','color','sidebar'].forEach(name=>{
   document.querySelectorAll('input[name="'+name+'"]').forEach(r=>{
-    r.addEventListener('change',function(){showToast('偏好已更新','success')});
+    r.addEventListener('change',function(){showToast('Preferences have been updated','success')});
   });
 });
 
-// === 数据项开关管理 ===
+// === Data Item Switch Management ===
 function updateItemSummary(){
   var all=document.querySelectorAll('[data-panel="datasource"] .toggle-switch input[data-item]');
   var on=0; all.forEach(function(cb){if(cb.checked)on++;});
   var el=document.getElementById('dsItemSummary');
-  if(el) el.textContent='已启用 '+on+' / '+all.length+' 项';
+  if(el) el.textContent='Enabled '+on+' / '+all.length+' item';
 }
 
-// 数据项开关切换
+// Data item toggle switch
 document.querySelectorAll('[data-panel="datasource"] .toggle-switch input[data-item]').forEach(function(cb){
   cb.addEventListener('change',function(){
     var item=this.getAttribute('data-item');
     var name=this.closest('tr').querySelector('td:nth-child(2)').textContent;
     if(this.checked){
-      showToast('已启用「'+name+'」，下次同步将自动包含该数据项','success');
+      showToast('"Enabled "'+name+', the next synchronization will automatically include this data item','success');
     } else {
-      showToast('已关闭「'+name+'」，该数据项将不再自动同步，已有数据不受影响','warning');
+      showToast('Closed "'+name+'This data item will no longer sync automatically, and existing data will not be affected.','warning');
     }
     updateItemSummary();
   });
 });
 
-// 批量启用/禁用
+// Enable/Disable in batch
 function toggleAllItems(source, enabled){
   var rows=document.querySelectorAll('tr[data-source="'+source+'"]');
   rows.forEach(function(row){
@@ -388,7 +388,7 @@ function toggleAllItems(source, enabled){
     if(cb) cb.checked=enabled;
   });
   var label=source==='tushare'?'Tushare':'AkShare';
-  showToast(label+' 所有数据项已'+(enabled?'启用':'禁用'), enabled?'success':'warning');
+  showToast(label+' All data items are completed'+(enabled?'Enable':'Disable'), enabled?'success':'warning');
   updateItemSummary();
 }
 

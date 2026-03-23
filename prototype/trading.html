@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>QuantMate — 交易执行</title>
+  <title>QuantMate - Trade Execution</title>
   <link rel="stylesheet" href="shared.css">
   <script src="https://cdn.tailwindcss.com?v=3.4"></script>
 </head>
@@ -14,35 +14,35 @@
     <div class="page-header">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
         <div>
-          <h1 class="page-title">交易执行</h1>
-          <p class="page-subtitle">委托管理 · 实时成交 · 交易记录</p>
+          <h1 class="page-title">Trade Execution</h1>
+          <p class="page-subtitle">Order management | Real-time fills | Trade records</p>
         </div>
         <div style="display:flex;gap:8px">
-          <button class="btn btn-secondary" onclick="showToast('交易记录导出中…','info')">导出记录</button>
-          <button class="btn btn-primary" onclick="openModal('orderModal')">+ 手动下单</button>
+          <button class="btn btn-secondary" onclick="showToast('Exporting transaction records...','info')">Export Records</button>
+          <button class="btn btn-primary" onclick="openModal('orderModal')">Manual order</button>
         </div>
       </div>
     </div>
 
     <div class="tabs" data-group="tr">
-      <button class="tab-btn active" data-tab="pending">当日委托</button>
-      <button class="tab-btn" data-tab="filled">成交记录</button>
-      <button class="tab-btn" data-tab="history">历史交易</button>
-      <button class="tab-btn" data-tab="algo">算法交易</button>
+      <button class="tab-btn active" data-tab="pending">Same-day order</button>
+      <button class="tab-btn" data-tab="filled">Transaction Record</button>
+      <button class="tab-btn" data-tab="history">Historical Transactions</button>
+      <button class="tab-btn" data-tab="algo">Algorithmic trading</button>
     </div>
 
     <!-- Tab: Pending Orders -->
     <div class="tab-panel active" data-group="tr" data-panel="pending">
       <div class="stat-grid cols-4">
-        <div class="stat-card"><div class="stat-label">今日委托</div><div class="stat-value">5</div></div>
-        <div class="stat-card"><div class="stat-label">已成交</div><div class="stat-value text-success">3</div></div>
-        <div class="stat-card"><div class="stat-label">待成交</div><div class="stat-value text-warning">1</div></div>
-        <div class="stat-card"><div class="stat-label">已撤单</div><div class="stat-value text-muted">1</div></div>
+        <div class="stat-card"><div class="stat-label">Today's Commission</div><div class="stat-value">5</div></div>
+        <div class="stat-card"><div class="stat-label">Sold</div><div class="stat-value text-success">3</div></div>
+        <div class="stat-card"><div class="stat-label">Pending Transaction</div><div class="stat-value text-warning">1</div></div>
+        <div class="stat-card"><div class="stat-label">Order Cancelled</div><div class="stat-value text-muted">1</div></div>
       </div>
 
       <div class="table-wrap">
         <table>
-          <thead><tr><th>委托编号</th><th>时间</th><th>代码</th><th>方向</th><th>类型</th><th>委托价</th><th>委托量</th><th>成交量</th><th>状态</th><th>操作</th></tr></thead>
+          <thead><tr><th>Commission Number</th><th>Time</th><th>Code</th><th>Direction</th><th>Type</th><th>Entrust Price</th><th>Order quantity</th><th>Trading volume</th><th>State</th><th>Operation</th></tr></thead>
           <tbody id="pendingTable"></tbody>
         </table>
       </div>
@@ -51,16 +51,16 @@
     <!-- Tab: Filled -->
     <div class="tab-panel" data-group="tr" data-panel="filled">
       <div class="filter-bar">
-        <input type="text" class="form-input" placeholder="🔍 搜索代码..." style="max-width:200px">
-        <select class="form-select" style="max-width:120px"><option>全部方向</option><option>买入</option><option>卖出</option></select>
+        <input type="text" class="form-input" placeholder="?? Search symbol..." style="max-width:200px">
+        <select class="form-select" style="max-width:120px"><option>All directions</option><option>Buy</option><option>Sell</option></select>
       </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>成交编号</th><th>时间</th><th>代码</th><th>名称</th><th>方向</th><th>成交价</th><th>成交量</th><th>成交额</th><th>手续费</th></tr></thead>
+          <thead><tr><th>Transaction Number</th><th>Time</th><th>Code</th><th>Name</th><th>Direction</th><th>Transaction Price</th><th>Trading volume</th><th>Turnover</th><th>Handling fee</th></tr></thead>
           <tbody>
-            <tr><td class="font-mono">T-001</td><td>09:31:02</td><td class="font-mono">600519.SH</td><td>贵州茅台</td><td><span class="badge badge-success">买入</span></td><td>¥1,820.00</td><td>100</td><td>¥182,000</td><td>¥54.60</td></tr>
-            <tr><td class="font-mono">T-002</td><td>09:35:15</td><td class="font-mono">000858.SZ</td><td>五粮液</td><td><span class="badge badge-success">买入</span></td><td>¥148.50</td><td>500</td><td>¥74,250</td><td>¥22.28</td></tr>
-            <tr><td class="font-mono">T-003</td><td>10:02:30</td><td class="font-mono">601012.SH</td><td>隆基绿能</td><td><span class="badge badge-success">买入</span></td><td>¥24.60</td><td>1000</td><td>¥24,600</td><td>¥7.38</td></tr>
+            <tr><td class="font-mono">T-001</td><td>09:31:02</td><td class="font-mono">600519.SH</td><td>Kweichow Moutai</td><td><span class="badge badge-success">Buy</span></td><td>CNY 1,820.00</td><td>100</td><td>CNY 182,000</td><td>CNY 54.60</td></tr>
+            <tr><td class="font-mono">T-002</td><td>09:35:15</td><td class="font-mono">000858.SZ</td><td>Wuliangye</td><td><span class="badge badge-success">Buy</span></td><td>CNY 148.50</td><td>500</td><td>CNY 74,250</td><td>CNY 22.28</td></tr>
+            <tr><td class="font-mono">T-003</td><td>10:02:30</td><td class="font-mono">601012.SH</td><td>LONGi Green Energy</td><td><span class="badge badge-success">Buy</span></td><td>CNY 24.60</td><td>1000</td><td>CNY 24,600</td><td>CNY 7.38</td></tr>
           </tbody>
         </table>
       </div>
@@ -70,20 +70,20 @@
     <div class="tab-panel" data-group="tr" data-panel="history">
       <div class="filter-bar">
         <input type="date" class="form-input" value="2026-03-01" style="max-width:160px">
-        <span class="text-muted" style="line-height:38px">至</span>
+        <span class="text-muted" style="line-height:38px">to</span>
         <input type="date" class="form-input" value="2026-03-14" style="max-width:160px">
-        <select class="form-select" style="max-width:160px"><option>全部策略</option><option>DualMA_Cross</option><option>RSI_Reversal</option><option>MyAlpha01</option></select>
-        <button class="btn btn-primary btn-sm" onclick="showToast('查询完成，已显示历史数据','success')">查询</button>
+        <select class="form-select" style="max-width:160px"><option>All strategies</option><option>DualMA_Cross</option><option>RSI_Reversal</option><option>MyAlpha01</option></select>
+        <button class="btn btn-primary btn-sm" onclick="showToast('Query completed, historical data has been displayed','success')">Query</button>
       </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>日期</th><th>策略</th><th>代码</th><th>名称</th><th>方向</th><th>价格</th><th>数量</th><th>总额</th><th>盈亏</th></tr></thead>
+          <thead><tr><th>Date</th><th>Strategy</th><th>Code</th><th>Name</th><th>Direction</th><th>Price</th><th>Quantity</th><th>Total amount</th><th>Profit and loss</th></tr></thead>
           <tbody>
-            <tr><td>2026-03-13</td><td>DualMA_Cross</td><td class="font-mono">600519.SH</td><td>贵州茅台</td><td><span class="badge badge-success">买入</span></td><td>¥1,820.00</td><td>100</td><td>¥182,000</td><td>-</td></tr>
-            <tr><td>2026-03-12</td><td>RSI_Reversal</td><td class="font-mono">000858.SZ</td><td>五粮液</td><td><span class="badge badge-success">买入</span></td><td>¥148.50</td><td>500</td><td>¥74,250</td><td>-</td></tr>
-            <tr><td>2026-03-10</td><td>DualMA_Cross</td><td class="font-mono">002415.SZ</td><td>海康威视</td><td><span class="badge badge-destructive">卖出</span></td><td>¥35.20</td><td>200</td><td>¥7,040</td><td class="text-success">+¥640</td></tr>
-            <tr><td>2026-03-08</td><td>DualMA_Cross</td><td class="font-mono">002415.SZ</td><td>海康威视</td><td><span class="badge badge-success">买入</span></td><td>¥32.00</td><td>200</td><td>¥6,400</td><td>-</td></tr>
-            <tr><td>2026-03-05</td><td>MyAlpha01</td><td class="font-mono">601012.SH</td><td>隆基绿能</td><td><span class="badge badge-success">买入</span></td><td>¥24.60</td><td>1000</td><td>¥24,600</td><td>-</td></tr>
+            <tr><td>2026-03-13</td><td>DualMA_Cross</td><td class="font-mono">600519.SH</td><td>Kweichow Moutai</td><td><span class="badge badge-success">Buy</span></td><td>CNY 1,820.00</td><td>100</td><td>CNY 182,000</td><td>-</td></tr>
+            <tr><td>2026-03-12</td><td>RSI_Reversal</td><td class="font-mono">000858.SZ</td><td>Wuliangye</td><td><span class="badge badge-success">Buy</span></td><td>CNY 148.50</td><td>500</td><td>CNY 74,250</td><td>-</td></tr>
+            <tr><td>2026-03-10</td><td>DualMA_Cross</td><td class="font-mono">002415.SZ</td><td>Hikvision</td><td><span class="badge badge-destructive">Sell</span></td><td>CNY 35.20</td><td>200</td><td>CNY 7,040</td><td class="text-success">+CNY 640</td></tr>
+            <tr><td>2026-03-08</td><td>DualMA_Cross</td><td class="font-mono">002415.SZ</td><td>Hikvision</td><td><span class="badge badge-success">Buy</span></td><td>CNY 32.00</td><td>200</td><td>CNY 6,400</td><td>-</td></tr>
+            <tr><td>2026-03-05</td><td>MyAlpha01</td><td class="font-mono">601012.SH</td><td>LONGi Green Energy</td><td><span class="badge badge-success">Buy</span></td><td>CNY 24.60</td><td>1000</td><td>CNY 24,600</td><td>-</td></tr>
           </tbody>
         </table>
       </div>
@@ -92,29 +92,29 @@
     <!-- Tab: Algo Trading -->
     <div class="tab-panel" data-group="tr" data-panel="algo">
       <div class="card">
-        <div class="card-header"><h3 class="card-title">算法交易</h3><button class="btn btn-primary btn-sm" onclick="showToast('请配置算法参数后提交','info')">+ 新建算法单</button></div>
-        <p class="text-muted" style="margin-bottom:16px">使用算法执行大单，减少市场冲击</p>
+        <div class="card-header"><h3 class="card-title">Algorithmic Trading</h3><button class="btn btn-primary btn-sm" onclick="showToast('Please configure the algorithm parameters before submitting','info')">New Algorithm Order</button></div>
+        <p class="text-muted" style="margin-bottom:16px">Use algorithms to execute large orders, reducing market impact</p>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>算法</th><th>标的</th><th>方向</th><th>目标量</th><th>已成交</th><th>进度</th><th>状态</th><th>操作</th></tr></thead>
+            <thead><tr><th>Algorithm</th><th>Target</th><th>Direction</th><th>Target quantity</th><th>Completed</th><th>Progress</th><th>State</th><th>Operation</th></tr></thead>
             <tbody>
               <tr>
                 <td><span class="badge badge-primary">TWAP</span></td>
                 <td class="font-mono">600519.SH</td>
-                <td><span class="badge badge-success">买入</span></td>
+                <td><span class="badge badge-success">Buy</span></td>
                 <td>500</td><td>320</td>
                 <td><div class="progress-bar" style="width:120px;display:inline-block"><div class="progress-fill" style="width:64%"></div></div> 64%</td>
-                <td><span class="badge badge-primary">执行中</span></td>
-                <td><button class="btn btn-ghost btn-sm" onclick="showConfirm('确认暂停该算法单？',()=>showToast('算法单已暂停','warning'))">暂停</button><button class="btn btn-ghost btn-sm" onclick="showConfirm('确认取消该算法单？',()=>showToast('算法单已取消','error'))">取消</button></td>
+                <td><span class="badge badge-primary">In progress</span></td>
+                <td><button class="btn btn-ghost btn-sm" onclick="showConfirm('Confirm to pause this algorithm order?', () => showToast('Algorithm order has been paused', 'warning'))"> Pause</button><button class="btn btn-ghost btn-sm" onclick="showConfirm('Confirm canceling this algorithm order?', () => showToast('Algorithm order has been canceled', 'error'))">Cancel</button></td>
               </tr>
               <tr>
                 <td><span class="badge badge-primary">VWAP</span></td>
                 <td class="font-mono">000858.SZ</td>
-                <td><span class="badge badge-destructive">卖出</span></td>
+                <td><span class="badge badge-destructive">Sell</span></td>
                 <td>1000</td><td>1000</td>
                 <td><div class="progress-bar" style="width:120px;display:inline-block"><div class="progress-fill" style="width:100%;background:var(--success)"></div></div> 100%</td>
-                <td><span class="badge badge-success">已完成</span></td>
-                <td><button class="btn btn-ghost btn-sm" onclick="showToast('算法单 VWAP 执行详情已加载','info')">详情</button></td>
+                <td><span class="badge badge-success">Completed</span></td>
+                <td><button class="btn btn-ghost btn-sm" onclick="showToast('VWAP execution details loaded','info')">Details</button></td>
               </tr>
             </tbody>
           </table>
@@ -123,19 +123,19 @@
 
       <div class="grid-2">
         <div class="card">
-          <div class="card-header"><h3 class="card-title">TWAP 配置</h3></div>
+          <div class="card-header"><h3 class="card-title">TWAP Configuration</h3></div>
           <div style="display:flex;flex-direction:column;gap:12px">
-            <div><label class="form-label">时间窗口</label><div style="display:flex;gap:8px"><input type="time" class="form-input" value="09:30"><span style="line-height:38px">~</span><input type="time" class="form-input" value="15:00"></div></div>
-            <div><label class="form-label">分片间隔 (秒)</label><input type="number" class="form-input" value="60"></div>
-            <div><label class="form-label">价格保护 (%)</label><input type="number" class="form-input" value="0.5" step="0.1"></div>
+            <div><label class="form-label">Time Window</label><div style="display:flex;gap:8px"><input type="time" class="form-input" value="09:30"><span style="line-height:38px">~</span><input type="time" class="form-input" value="15:00"></div></div>
+            <div><label class="form-label">Chunk Interval (Seconds)</label><input type="number" class="form-input" value="60"></div>
+            <div><label class="form-label">Price Protection (%)</label><input type="number" class="form-input" value="0.5" step="0.1"></div>
           </div>
         </div>
         <div class="card">
-          <div class="card-header"><h3 class="card-title">VWAP 配置</h3></div>
+          <div class="card-header"><h3 class="card-title">VWAP Configuration</h3></div>
           <div style="display:flex;flex-direction:column;gap:12px">
-            <div><label class="form-label">参与率 (%)</label><input type="number" class="form-input" value="10"></div>
-            <div><label class="form-label">最大偏差 (%)</label><input type="number" class="form-input" value="1.0" step="0.1"></div>
-            <div><label class="form-label">最小下单量</label><input type="number" class="form-input" value="100"></div>
+            <div><label class="form-label">Participation Rate (%)</label><input type="number" class="form-input" value="10"></div>
+            <div><label class="form-label">Maximum Deviation (%)</label><input type="number" class="form-input" value="1.0" step="0.1"></div>
+            <div><label class="form-label">Minimum Order Quantity</label><input type="number" class="form-input" value="100"></div>
           </div>
         </div>
       </div>
@@ -147,20 +147,20 @@
 <!-- Manual Order Modal -->
 <div class="modal-overlay" id="orderModal">
   <div class="modal" style="max-width:520px">
-    <div class="modal-header"><h3 class="modal-title">手动下单</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('orderModal')">✕</button></div>
+    <div class="modal-header"><h3 class="modal-title">Manual Order</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('orderModal')">✕</button></div>
     <div class="modal-body">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-        <div style="grid-column:span 2"><label class="form-label">股票代码</label><input type="text" class="form-input" placeholder="例如: 600519.SH"></div>
-        <div><label class="form-label">方向</label><select class="form-select"><option>买入</option><option>卖出</option></select></div>
-        <div><label class="form-label">委托类型</label><select class="form-select"><option>限价</option><option>市价</option><option>止损</option><option>止盈</option></select></div>
-        <div><label class="form-label">委托价格</label><input type="number" class="form-input" placeholder="0.00" step="0.01"></div>
-        <div><label class="form-label">数量</label><input type="number" class="form-input" placeholder="100" step="100"></div>
-        <div style="grid-column:span 2"><label class="form-label">关联策略 (可选)</label><select class="form-select"><option>无</option><option>DualMA_Cross</option><option>RSI_Reversal</option></select></div>
+        <div style="grid-column:span 2"><label class="form-label">Stock Code</label><input type="text" class="form-input" placeholder="For example: 600519.SH"></div>
+        <div><label class="form-label">Direction</label><select class="form-select"><option>Buy</option><option>Sell</option></select></div>
+        <div><label class="form-label">Commission Type</label><select class="form-select"><option>Price limit</option><option>Market price</option><option>Stop loss</option><option>Take profit</option></select></div>
+        <div><label class="form-label">Entrusted Price</label><input type="number" class="form-input" placeholder="0.00" step="0.01"></div>
+        <div><label class="form-label">Quantity</label><input type="number" class="form-input" placeholder="100" step="100"></div>
+        <div style="grid-column:span 2"><label class="form-label">Association Strategy (Optional)</label><select class="form-select"><option>None</option><option>DualMA_Cross</option><option>RSI_Reversal</option></select></div>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal('orderModal')">取消</button>
-      <button class="btn btn-primary" onclick="submitModal('orderModal','委托已提交，等待成交','success')">提交委托</button>
+      <button class="btn btn-secondary" onclick="closeModal('orderModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitModal('orderModal', 'Order submitted and waiting to be filled', 'success')">Submit Order</button>
     </div>
   </div>
 </div>
@@ -171,10 +171,10 @@ const tbody = document.getElementById('pendingTable');
 MOCK.orders.forEach(o => {
   tbody.innerHTML += `<tr>
     <td class="font-mono">${o.id}</td><td>${o.time}</td><td class="font-mono">${o.symbol}</td>
-    <td><span class="badge ${o.dir==='买入'?'badge-success':'badge-destructive'}">${o.dir}</span></td>
-    <td>${o.type}</td><td>¥${o.price.toFixed(2)}</td><td>${o.qty}</td><td>${o.filled}</td>
+    <td><span class="badge ${o.dir==='Buy'?'badge-success':'badge-destructive'}">${o.dir}</span></td>
+    <td>${o.type}</td><td>CNY ${o.price.toFixed(2)}</td><td>${o.qty}</td><td>${o.filled}</td>
     <td>${statusBadge(o.status)}</td>
-    <td>${o.status==='待成交'?'<button class="btn btn-ghost btn-sm" onclick="showConfirm(\'确认撤单 '+o.id+'？\',()=>showToast(\''+o.id+' 已撤单\',\'warning\'))">撤单</button>':'<button class="btn btn-ghost btn-sm" onclick="showToast(\'委托 '+o.id+' 详情已加载\',\'info\')">详情</button>'}</td>
+    <td>${o.status==="pending" ? "<button class=\"btn btn-ghost btn-sm\" onclick=\"showConfirm('Confirm cancel order " + o.id + "?', () => showToast('" + o.id + " has been canceled', 'warning'))\">Cancel Order</button>" : "<button class=\"btn btn-ghost btn-sm\" onclick=\"showToast('Order details for " + o.id + " loaded', 'info')\">Details</button>"}</td>
   </tr>`;
 });
 </script>

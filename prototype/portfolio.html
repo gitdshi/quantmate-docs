@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>QuantMate — 组合管理</title>
+  <title>QuantMate - Portfolio Management</title>
   <link rel="stylesheet" href="shared.css">
   <script src="https://cdn.tailwindcss.com?v=3.4"></script>
 </head>
@@ -14,59 +14,59 @@
     <div class="page-header">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
         <div>
-          <h1 class="page-title">组合管理</h1>
-          <p class="page-subtitle">持仓监控 · 风险控制 · 资产配置</p>
+          <h1 class="page-title">Portfolio Management</h1>
+          <p class="page-subtitle">Position Monitoring · Risk Control · Asset Allocation</p>
         </div>
         <div style="display:flex;gap:8px">
-          <button class="btn btn-secondary" onclick="openModal('riskModal')">风控设置</button>
-          <button class="btn btn-primary" onclick="openModal('rebalanceModal')">再平衡</button>
+          <button class="btn btn-secondary" onclick="openModal('riskModal')">Risk control settings</button>
+          <button class="btn btn-primary" onclick="openModal('rebalanceModal')">Rebalance</button>
         </div>
       </div>
     </div>
 
     <div class="tabs" data-group="pf">
-      <button class="tab-btn active" data-tab="overview">组合概览</button>
-      <button class="tab-btn" data-tab="positions">持仓明细</button>
-      <button class="tab-btn" data-tab="risk">风险分析</button>
-      <button class="tab-btn" data-tab="allocation">资产配置</button>
+      <button class="tab-btn active" data-tab="overview">Portfolio Overview</button>
+      <button class="tab-btn" data-tab="positions">Position Details</button>
+      <button class="tab-btn" data-tab="risk">Risk Analysis</button>
+      <button class="tab-btn" data-tab="allocation">Asset Allocation</button>
     </div>
 
     <!-- Tab: Overview -->
     <div class="tab-panel active" data-group="pf" data-panel="overview">
       <div class="stat-grid cols-4">
-        <div class="stat-card"><div class="stat-label">总市值</div><div class="stat-value">¥ 1,256,800</div></div>
-        <div class="stat-card"><div class="stat-label">持仓市值</div><div class="stat-value">¥ 285,930</div></div>
-        <div class="stat-card"><div class="stat-label">可用资金</div><div class="stat-value">¥ 970,870</div></div>
-        <div class="stat-card"><div class="stat-label">仓位比例</div><div class="stat-value">22.7%</div></div>
+        <div class="stat-card"><div class="stat-label">Total Market Value</div><div class="stat-value">¥ 1,256,800</div></div>
+        <div class="stat-card"><div class="stat-label">Position Market Value</div><div class="stat-value">¥ 285,930</div></div>
+        <div class="stat-card"><div class="stat-label">Available funds</div><div class="stat-value">¥ 970,870</div></div>
+        <div class="stat-card"><div class="stat-label">Position Ratio</div><div class="stat-value">22.7%</div></div>
       </div>
 
       <div class="stat-grid cols-4" style="margin-top:12px">
-        <div class="stat-card"><div class="stat-label">总盈亏</div><div class="stat-value text-success">+¥ 5,080</div></div>
-        <div class="stat-card"><div class="stat-label">今日盈亏</div><div class="stat-value text-success">+¥ 28,960</div></div>
-        <div class="stat-card"><div class="stat-label">最大回撤</div><div class="stat-value text-destructive">-8.2%</div></div>
+        <div class="stat-card"><div class="stat-label">Total Profit and Loss</div><div class="stat-value text-success">+¥ 5,080</div></div>
+        <div class="stat-card"><div class="stat-label">Today's Profit and Loss</div><div class="stat-value text-success">+¥ 28,960</div></div>
+        <div class="stat-card"><div class="stat-label">Maximum Drawdown</div><div class="stat-value text-destructive">-8.2%</div></div>
         <div class="stat-card"><div class="stat-label">Sharpe(30d)</div><div class="stat-value">1.35</div></div>
       </div>
 
       <div class="grid-2">
         <div class="card">
-          <div class="card-header"><h3 class="card-title">净值走势</h3></div>
+          <div class="card-header"><h3 class="card-title">Net Value Trend</h3></div>
           <div class="chart-placeholder" style="height:220px">
             <canvas id="pfNavCanvas"></canvas>
           </div>
         </div>
         <div class="card">
-          <div class="card-header"><h3 class="card-title">持仓分布</h3></div>
+          <div class="card-header"><h3 class="card-title">Position Distribution</h3></div>
           <div style="display:flex;flex-direction:column;gap:12px;padding-top:8px">
             <div>
-              <div style="display:flex;justify-content:space-between;font-size:13px"><span>贵州茅台</span><span>64.9%</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:13px"><span>Guizhou Moutai</span><span>64.9%</span></div>
               <div class="progress-bar"><div class="progress-fill" style="width:64.9%;background:var(--primary)"></div></div>
             </div>
             <div>
-              <div style="display:flex;justify-content:space-between;font-size:13px"><span>五粮液</span><span>27.3%</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:13px"><span>Wuliangye</span><span>27.3%</span></div>
               <div class="progress-bar"><div class="progress-fill" style="width:27.3%;background:var(--success)"></div></div>
             </div>
             <div>
-              <div style="display:flex;justify-content:space-between;font-size:13px"><span>隆基绿能</span><span>7.8%</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:13px"><span>LONGi Green Energy</span><span>7.8%</span></div>
               <div class="progress-bar"><div class="progress-fill" style="width:7.8%;background:var(--destructive)"></div></div>
             </div>
           </div>
@@ -77,13 +77,13 @@
     <!-- Tab: Positions -->
     <div class="tab-panel" data-group="pf" data-panel="positions">
       <div class="filter-bar">
-        <input type="text" class="form-input" placeholder="🔍 搜索持仓..." style="max-width:240px">
-        <select class="form-select" style="max-width:140px"><option>全部策略</option><option>DualMA_Cross</option><option>RSI_Reversal</option><option>MyAlpha01</option></select>
-        <select class="form-select" style="max-width:120px"><option>全部方向</option><option>多</option><option>空</option></select>
+        <input type="text" class="form-input" placeholder="🔍 Searching positions..." style="max-width:240px">
+        <select class="form-select" style="max-width:140px"><option>All strategies</option><option>DualMA_Cross</option><option>RSI_Reversal</option><option>MyAlpha01</option></select>
+        <select class="form-select" style="max-width:120px"><option>All directions</option><option>many</option><option>empty</option></select>
       </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>代码</th><th>名称</th><th>策略</th><th>方向</th><th>数量</th><th>成本价</th><th>现价</th><th>市值</th><th>盈亏</th><th>盈亏%</th><th>操作</th></tr></thead>
+          <thead><tr><th>Code</th><th>Name</th><th>Strategy</th><th>Direction</th><th>Quantity</th><th>Cost price</th><th>Current price</th><th>Market value</th><th>Profit and loss</th><th>Profit and Loss %</th><th>Operation</th></tr></thead>
           <tbody id="posDetailTable"></tbody>
         </table>
       </div>
@@ -93,47 +93,47 @@
     <div class="tab-panel" data-group="pf" data-panel="risk">
       <div class="stat-grid cols-3">
         <div class="stat-card">
-          <div class="stat-label">VaR (95%, 1天)</div>
+          <div class="stat-label">VaR (95%, 1 day)</div>
           <div class="stat-value text-warning">¥ 18,520</div>
-          <div class="text-muted" style="font-size:12px">占总资产 1.47%</div>
+          <div class="text-muted" style="font-size:12px">Accounts for 1.47% of total assets</div>
         </div>
         <div class="stat-card">
           <div class="stat-label">CVaR (95%)</div>
           <div class="stat-value text-destructive">¥ 25,140</div>
-          <div class="text-muted" style="font-size:12px">极端损失预期</div>
+          <div class="text-muted" style="font-size:12px">Expected Extreme Loss</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Beta (vs 沪深300)</div>
+          <div class="stat-label">Beta (vs CSI 300)</div>
           <div class="stat-value">0.82</div>
-          <div class="text-muted" style="font-size:12px">低于市场风险</div>
+          <div class="text-muted" style="font-size:12px">Below market risk</div>
         </div>
       </div>
 
       <div class="card">
-        <div class="card-header"><h3 class="card-title">风控规则</h3></div>
+        <div class="card-header"><h3 class="card-title">Risk control rules</h3></div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>规则</th><th>阈值</th><th>当前值</th><th>状态</th></tr></thead>
+            <thead><tr><th>Rules</th><th>Threshold</th><th>Current Value</th><th>State</th></tr></thead>
             <tbody>
-              <tr><td>单股最大仓位</td><td>≤ 20%</td><td>14.8%</td><td><span class="badge badge-success">正常</span></td></tr>
-              <tr><td>总仓位上限</td><td>≤ 80%</td><td>22.7%</td><td><span class="badge badge-success">正常</span></td></tr>
-              <tr><td>单日最大亏损</td><td>≤ 3%</td><td>0.5%</td><td><span class="badge badge-success">正常</span></td></tr>
-              <tr><td>最大回撤限制</td><td>≤ 15%</td><td>8.2%</td><td><span class="badge badge-warning">关注</span></td></tr>
-              <tr><td>行业集中度</td><td>≤ 30%</td><td>64.9%</td><td><span class="badge badge-destructive">超限</span></td></tr>
+              <tr><td>Maximum position per single stock</td><td>≤ 20%</td><td>14.8%</td><td><span class="badge badge-success">Normal</span></td></tr>
+              <tr><td>Total Position Limit</td><td>≤ 80%</td><td>22.7%</td><td><span class="badge badge-success">Normal</span></td></tr>
+              <tr><td>Single-day maximum loss</td><td>≤ 3%</td><td>0.5%</td><td><span class="badge badge-success">Normal</span></td></tr>
+              <tr><td>Maximum drawdown limit</td><td>≤ 15%</td><td>8.2%</td><td><span class="badge badge-warning">Follow</span></td></tr>
+              <tr><td>Industry concentration</td><td>≤ 30%</td><td>64.9%</td><td><span class="badge badge-destructive">Excessive</span></td></tr>
             </tbody>
           </table>
         </div>
       </div>
 
       <div class="card">
-        <div class="card-header"><h3 class="card-title">相关性矩阵</h3></div>
+        <div class="card-header"><h3 class="card-title">Correlation Matrix</h3></div>
         <div style="overflow-x:auto">
           <table style="font-size:12px;text-align:center;min-width:400px">
-            <thead><tr><th></th><th>贵州茅台</th><th>五粮液</th><th>隆基绿能</th></tr></thead>
+            <thead><tr><th></th><th>Guizhou Moutai</th><th>Wuliangye</th><th>LONGi Green Energy</th></tr></thead>
             <tbody>
-              <tr><td style="font-weight:600">贵州茅台</td><td class="heatmap-cell positive">1.00</td><td class="heatmap-cell positive">0.85</td><td class="heatmap-cell neutral">0.12</td></tr>
-              <tr><td style="font-weight:600">五粮液</td><td class="heatmap-cell positive">0.85</td><td class="heatmap-cell positive">1.00</td><td class="heatmap-cell neutral">0.08</td></tr>
-              <tr><td style="font-weight:600">隆基绿能</td><td class="heatmap-cell neutral">0.12</td><td class="heatmap-cell neutral">0.08</td><td class="heatmap-cell positive">1.00</td></tr>
+              <tr><td style="font-weight:600">Guizhou Moutai</td><td class="heatmap-cell positive">1.00</td><td class="heatmap-cell positive">0.85</td><td class="heatmap-cell neutral">0.12</td></tr>
+              <tr><td style="font-weight:600">Wuliangye</td><td class="heatmap-cell positive">0.85</td><td class="heatmap-cell positive">1.00</td><td class="heatmap-cell neutral">0.08</td></tr>
+              <tr><td style="font-weight:600">LONGi Green Energy</td><td class="heatmap-cell neutral">0.12</td><td class="heatmap-cell neutral">0.08</td><td class="heatmap-cell positive">1.00</td></tr>
             </tbody>
           </table>
         </div>
@@ -144,21 +144,21 @@
     <div class="tab-panel" data-group="pf" data-panel="allocation">
       <div class="grid-2">
         <div class="card">
-          <div class="card-header"><h3 class="card-title">当前配置</h3></div>
+          <div class="card-header"><h3 class="card-title">Current Configuration</h3></div>
           <div style="display:flex;flex-direction:column;gap:10px">
-            <div><div style="display:flex;justify-content:space-between;font-size:13px"><span>白酒行业</span><span>92.2%</span></div><div class="progress-bar"><div class="progress-fill" style="width:92%;background:var(--primary)"></div></div></div>
-            <div><div style="display:flex;justify-content:space-between;font-size:13px"><span>光伏行业</span><span>7.8%</span></div><div class="progress-bar"><div class="progress-fill" style="width:7.8%;background:var(--success)"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:13px"> <span>liquor industry</span> <span>92.2%</span></div> <div class="progress-bar"><div class="progress-fill" style="width:92%;background:var(--primary)"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:13px"> <span>photovoltaic industry</span> <span>7.8%</span></div> <div class="progress-bar"><div class="progress-fill" style="width:7.8%;background:var(--success)"></div></div></div>
           </div>
         </div>
         <div class="card">
-          <div class="card-header"><h3 class="card-title">目标配置</h3></div>
+          <div class="card-header"><h3 class="card-title">Target Configuration</h3></div>
           <div style="display:flex;flex-direction:column;gap:10px">
-            <div><div style="display:flex;justify-content:space-between;font-size:13px"><span>白酒行业</span><span>目标 30%</span></div><div class="progress-bar"><div class="progress-fill" style="width:30%;background:var(--primary)"></div></div></div>
-            <div><div style="display:flex;justify-content:space-between;font-size:13px"><span>银行行业</span><span>目标 25%</span></div><div class="progress-bar"><div class="progress-fill" style="width:25%;background:var(--success)"></div></div></div>
-            <div><div style="display:flex;justify-content:space-between;font-size:13px"><span>光伏行业</span><span>目标 20%</span></div><div class="progress-bar"><div class="progress-fill" style="width:20%;background:var(--warning)"></div></div></div>
-            <div><div style="display:flex;justify-content:space-between;font-size:13px"><span>科技行业</span><span>目标 25%</span></div><div class="progress-bar"><div class="progress-fill" style="width:25%;background:var(--destructive)"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:13px"> <span>liquor industry</span> <span>target 30%</span></div> <div class="progress-bar"><div class="progress-fill" style="width:30%;background:var(--primary)"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:13px"><span>Banking Industry</span><span>Target 25%</span></div><div class="progress-bar"><div class="progress-fill" style="width:25%;background:var(--success)"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:13px"><span>Photovoltaic Industry</span><span>Target 20%</span></div><div class="progress-bar"><div class="progress-fill" style="width:20%;background:var(--warning)"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:13px"><span>Technology Industry</span><span>Target 25%</span></div><div class="progress-bar"><div class="progress-fill" style="width:25%;background:var(--destructive)"></div></div></div>
           </div>
-          <button class="btn btn-primary btn-sm" style="margin-top:12px" onclick="showToast('目标配置已应用','success')">应用目标配置</button>
+          <button class="btn btn-primary btn-sm" style="margin-top:12px" onclick="showToast('Target configuration has been applied','success')">Application Target Configuration</button>
         </div>
       </div>
     </div>
@@ -169,39 +169,39 @@
 <!-- Risk Settings Modal -->
 <div class="modal-overlay" id="riskModal">
   <div class="modal" style="max-width:520px">
-    <div class="modal-header"><h3 class="modal-title">风控设置</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('riskModal')">✕</button></div>
+    <div class="modal-header"><h3 class="modal-title">Risk Control Settings</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('riskModal')">✕</button></div>
     <div class="modal-body">
       <div style="display:flex;flex-direction:column;gap:16px">
-        <div><label class="form-label">单股最大仓位 (%)</label><input type="number" class="form-input" value="20"></div>
-        <div><label class="form-label">总仓位上限 (%)</label><input type="number" class="form-input" value="80"></div>
-        <div><label class="form-label">单日最大亏损 (%)</label><input type="number" class="form-input" value="3"></div>
-        <div><label class="form-label">最大回撤限制 (%)</label><input type="number" class="form-input" value="15"></div>
-        <div><label class="form-label">行业集中度上限 (%)</label><input type="number" class="form-input" value="30"></div>
+        <div><label class="form-label">Maximum Position per Single Stock (%)</label><input type="number" class="form-input" value="20"></div>
+        <div><label class="form-label">Total Position Limit (%)</label><input type="number" class="form-input" value="80"></div>
+        <div><label class="form-label">Maximum Daily Loss (%)</label><input type="number" class="form-input" value="3"></div>
+        <div><label class="form-label">Maximum Drawdown Limit (%)</label><input type="number" class="form-input" value="15"></div>
+        <div><label class="form-label">Industry Concentration Limit (%)</label><input type="number" class="form-input" value="30"></div>
       </div>
     </div>
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('riskModal')">取消</button><button class="btn btn-primary" onclick="submitModal('riskModal','风控设置已保存')">保存</button></div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('riskModal')>Cancel</button><button class="btn btn-primary" onclick="submitModal('riskModal', 'Risk control settings have been saved')">Save</button></div>
   </div>
 </div>
 
 <!-- Rebalance Modal -->
 <div class="modal-overlay" id="rebalanceModal">
   <div class="modal" style="max-width:480px">
-    <div class="modal-header"><h3 class="modal-title">组合再平衡</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('rebalanceModal')">✕</button></div>
+    <div class="modal-header"><h3 class="modal-title">Portfolio Rebalancing</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('rebalanceModal')">✕</button></div>
     <div class="modal-body">
-      <p class="text-muted" style="margin-bottom:16px">系统将根据目标配置权重，自动生成调仓建议。</p>
+      <p class="text-muted" style="margin-bottom:16px">The system will automatically generate portfolio adjustment recommendations based on the target configuration weights.</p>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>调整项</th><th>操作</th><th>目标</th></tr></thead>
+          <thead><tr><th>Adjustment item</th><th>Operation</th><th>Target</th></tr></thead>
           <tbody>
-            <tr><td>贵州茅台</td><td class="text-destructive">减持 62.2%</td><td>30%</td></tr>
-            <tr><td>银行 ETF</td><td class="text-success">买入 25%</td><td>25%</td></tr>
-            <tr><td>光伏 ETF</td><td class="text-success">增持 12.2%</td><td>20%</td></tr>
-            <tr><td>科技 ETF</td><td class="text-success">买入 25%</td><td>25%</td></tr>
+            <tr><td>Guizhou Moutai</td><td class="text-destructive">Reduced holdings by 62.2%</td><td>30%</td></tr>
+            <tr><td>Bank ETF</td><td class="text-success">Buy 25%</td><td>25%</td></tr>
+            <tr><td>Photovoltaic ETF</td><td class="text-success">Increase holdings by 12.2%</td><td>20%</td></tr>
+            <tr><td>Technology ETF</td><td class="text-success">Buy 25%</td><td>25%</td></tr>
           </tbody>
         </table>
       </div>
     </div>
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('rebalanceModal')">取消</button><button class="btn btn-primary" onclick="submitModal('rebalanceModal','再平衡指令已发送，请稍候...')">执行再平衡</button></div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('rebalanceModal')>Cancel</button><button class="btn btn-primary" onclick="submitModal('rebalanceModal', 'The rebalance command has been sent, please wait...')">Perform rebalancing</button></div>
   </div>
 </div>
 
@@ -217,7 +217,7 @@ MOCK.positions.forEach(p => {
     <td>¥${mv.toLocaleString()}</td>
     <td class="${pnlColor(p.pnl)}">${pnlSign(p.pnl)}¥${Math.abs(p.pnl).toLocaleString()}</td>
     <td class="${pnlColor(p.pnlPct)}">${pnlSign(p.pnlPct)}${p.pnlPct.toFixed(2)}%</td>
-    <td><button class="btn btn-ghost btn-sm" onclick="showConfirm('确定平仓 ${p.name} (${p.symbol})？',function(){showToast('平仓指令已发送','success')})">平仓</button><button class="btn btn-ghost btn-sm" onclick="showToast('查看 ${p.name} 持仓详情','info')">详情</button></td>
+    <td><button class="btn btn-ghost btn-sm" onclick="showConfirm('Are you sure you want to close ${p.name} (${p.symbol})?', function(){showToast('Close order has been sent','success')})"> close</button><button class="btn btn-ghost btn-sm" onclick="showToast('View ${p.name} position details','info')">Details</button></td>
   </tr>`;
 });
 

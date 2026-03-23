@@ -1,64 +1,127 @@
 # QuantMate Frontend
 
-React 18 + Vite + TypeScript frontend for QuantMate trading platform.
+React 19 + Vite 7 + TypeScript 5.9 frontend for QuantMate trading platform.
 
 ## Tech Stack
 
-- **React 18.3** - UI framework
-- **TypeScript** - Type safety
-- **Vite 7.3** - Build tool and dev server
-- **TailwindCSS 3.x** - Utility-first CSS framework
-- **React Router v6** - Client-side routing
-- **Zustand** - State management
-- **TanStack React Query** - Server state management
-- **Axios** - HTTP client
-- **Lucide React** - Icon library
+- **React 19** — UI framework
+- **TypeScript 5.9** — Type safety
+- **Vite 7** — Build tool and dev server
+- **TailwindCSS 3.4** — Utility-first CSS (HSL CSS variables for theming)
+- **React Router v6** — Client-side routing
+- **Zustand 5** — Client state management
+- **TanStack React Query 5** — Server state / data fetching
+- **ECharts 5.6 + echarts-for-react** — Charting library
+- **Axios** — HTTP client
+- **Lucide React** — Icon library
+- **i18next** — Internationalization (zh / en)
 
 ## Project Structure
 
 ```
 src/
-├── components/           # Reusable UI components
-│   └── Layout.tsx       # Main layout with sidebar navigation
-├── pages/               # Page components
+├── components/
+│   ├── Layout.tsx                # Sidebar navigation + Outlet
+│   ├── ui/                       # Shared UI components
+│   │   ├── StatCard.tsx          # KPI metric card
+│   │   ├── TabPanel.tsx          # Tabbed layout with icons
+│   │   ├── DataTable.tsx         # Sortable data table
+│   │   ├── FilterBar.tsx         # Search + select filters
+│   │   ├── Modal.tsx             # Dialog overlay
+│   │   ├── Badge.tsx             # Status badges
+│   │   ├── ProgressBar.tsx       # Usage / percent bars
+│   │   ├── ToggleSwitch.tsx      # On/off toggle
+│   │   └── Toast.tsx             # Toast + confirm dialogs
+│   └── charts/                   # ECharts wrappers
+│       ├── EChartWrapper.tsx     # Base echarts-for-react wrapper
+│       ├── LineChart.tsx
+│       ├── CandlestickChart.tsx
+│       ├── PieChart.tsx
+│       ├── BarChart.tsx
+│       ├── HeatmapChart.tsx
+│       └── GaugeChart.tsx
+├── pages/
 │   ├── auth/
-│   │   ├── Login.tsx    # Login page
-│   │   └── Register.tsx # Registration page
-│   │   └── ChangePassword.tsx # Forced password change
-│   ├── Dashboard.tsx    # Dashboard with queue stats
-│   ├── Strategies.tsx   # Strategy management (placeholder)
-│   ├── Backtest.tsx     # Backtest interface (placeholder)
-│   └── MarketData.tsx   # Market data viewer (placeholder)
+│   │   ├── Login.tsx
+│   │   ├── Register.tsx
+│   │   └── ChangePassword.tsx
+│   ├── Dashboard.tsx             # KPI cards, NAV chart, allocation, positions
+│   ├── Strategies.tsx            # Strategy CRUD and deployment
+│   ├── Trading.tsx               # Orders, fills, algo trading
+│   ├── Positions.tsx             # Real-time positions + close
+│   ├── Portfolio.tsx             # Portfolio overview + allocation
+│   ├── MarketData.tsx            # Market data + candlestick charts
+│   ├── Backtest.tsx              # Backtest config and results
+│   ├── Analytics.tsx             # Factor exposure, correlation
+│   ├── VisualExplorer.tsx        # Redirects to /analytics
+│   ├── Reports.tsx               # Performance, review, attribution
+│   ├── PaperTrading.tsx          # Paper deployments, orders, perf
+│   ├── Monitoring.tsx            # Alerts, rules, notification channels
+│   ├── AIAssistant.tsx           # Chat, codegen, insights, suggestions
+│   ├── FactorLab.tsx             # Factor library, IC/IR, backtest
+│   ├── Marketplace.tsx           # Strategy template marketplace
+│   ├── TeamSpace.tsx             # Workspace management, members
+│   ├── Settings.tsx              # 6-tab system settings
+│   └── AccountSecurity.tsx       # Profile, 2FA, API keys, billing
 ├── lib/
-│   └── api.ts          # Axios API client with interceptors
+│   └── api.ts                    # Axios client + all API modules
 ├── stores/
-│   └── auth.ts         # Zustand auth store
+│   └── auth.ts                   # Zustand auth store
 ├── types/
-│   └── index.ts        # TypeScript type definitions
-├── App.tsx             # Root component with routing
-├── main.tsx            # Application entry point
-└── index.css           # Global styles with TailwindCSS
+│   └── index.ts                  # Shared TypeScript interfaces
+├── i18n/                         # i18next config and namespaces
+├── App.tsx                       # Route definitions
+└── main.tsx                      # Entry point
 ```
 
-## Features
+## Pages Overview
 
-### Authentication
-- Login/Register pages with form validation
-- JWT token management with automatic refresh
-- Protected routes (PrivateRoute wrapper)
-- Persistent auth state in localStorage
-- Forced password change flow on first admin login
+All pages are **native React components** using TanStack Query for data fetching,
+shared UI components (StatCard, TabPanel, DataTable, etc.), and ECharts for
+visualization. Chinese UI text is used throughout; placeholder data is shown
+when backend APIs return empty results.
 
-### API Client
-- Axios instance with base URL configuration
-- Request interceptor for auth token injection
-- Response interceptor for 401 handling and token refresh
-- API modules:
-  - `authAPI` - Authentication endpoints
-  - `strategiesAPI` - Strategy CRUD operations
-  - `backtestAPI` - Backtest job submission and status
-  - `queueAPI` - Queue statistics and job management
-  - `marketDataAPI` - Market data retrieval
+| Route               | Page            | Key Features                                        |
+|---------------------|-----------------|-----------------------------------------------------|
+| `/`                 | Dashboard       | KPI cards, NAV line chart, PieChart allocation       |
+| `/strategies`       | Strategies      | Strategy CRUD, deploy to paper/live                  |
+| `/trading`          | Trading         | Orders, fills, history, algo trading                 |
+| `/positions`        | Positions       | Real-time positions, close button, P&L display       |
+| `/portfolio`        | Portfolio       | Holdings, sector allocation, performance             |
+| `/market-data`      | MarketData      | K-line candlestick, sector heatmap                   |
+| `/backtest`         | Backtest        | Config form, equity curve, trade log                 |
+| `/analytics`        | Analytics       | Factor exposure, correlation matrix                  |
+| `/visual-explorer`  | VisualExplorer  | Redirect → `/analytics`                              |
+| `/reports`          | Reports         | Performance stats, trade review, attribution         |
+| `/paper-trading`    | PaperTrading    | Paper deployments, orders, NAV chart                 |
+| `/monitoring`       | Monitoring      | Live alerts, rules, channels                         |
+| `/ai`               | AIAssistant     | AI chat, code generation, insights                   |
+| `/factor-lab`       | FactorLab       | Factor library, IC/IR analysis, factor backtest      |
+| `/marketplace`      | Marketplace     | Strategy templates, search, categories               |
+| `/team`             | TeamSpace       | Workspaces, members, invite                          |
+| `/settings`         | Settings        | General, datasource, trading, notification, UI, sys  |
+| `/account`          | AccountSecurity | Profile, security, API keys, sessions, billing       |
+
+## API Client
+
+All API modules are defined in `src/lib/api.ts`:
+
+- `authAPI` — Login, register, me, refresh, change-password
+- `analyticsAPI` — Dashboard analytics, factor exposure
+- `portfolioAPI` — Positions, holdings, close
+- `tradingAPI` — Orders, place, cancel
+- `alertsAPI` — Active alerts, rules, history, channels
+- `aiAPI` — Chat, code generation
+- `factorAPI` — Factor CRUD, evaluation
+- `templateAPI` — Marketplace templates
+- `paperTradingAPI` — Paper sessions, start, stop
+- `reportsAPI` — Report list, generate
+- `teamAPI` — Workspaces, members
+- `accountSecurityAPI` — API keys, sessions
+- `systemAPI` — Health check, system info
+- `marketDataAPI` — History, symbols, sectors
+- `strategiesAPI` — Strategy CRUD
+- `backtestAPI` — Submit, status, results
 
 ## Getting Started
 
@@ -69,36 +132,27 @@ src/
 ### Installation
 
 ```bash
-# Install dependencies
 npm install
-
-# Start development server
 npm run dev -- --host 0.0.0.0 --port 5173
-
-# Build for production
 npm run build
-
-# Preview production build
 npm run preview
 ```
 
-## Development
+## Testing
 
-The app runs on http://localhost:5173 by default.
-Dev proxy forwards `/api` to `http://localhost:8000` (see `vite.config.ts`).
+```bash
+npm test              # Run all unit tests
+npm run test:ui       # Interactive Vitest UI
+```
 
-### Routes
-- `/login` - Login page
-- `/register` - Registration page
-- `/change-password` - Change password (protected)
-- `/` - Dashboard (protected)
-- `/strategies` - Strategy management (protected)
-- `/backtest` - Backtest interface (protected)
-- `/market-data` - Market data viewer (protected)
+- **Vitest 4** — Test runner (jsdom environment)
+- **@testing-library/react** — Component testing
+- **jest-dom** — DOM matchers
+- Unit tests: `test/unit/pages/` (one per page)
+- Integration tests: `test/integration/` (routing + auth flow)
+- Test wrapper: QueryClientProvider + BrowserRouter (`test/support/utils.tsx`)
 
-## Next Steps (Phase 4+)
+## Routes
 
-1. **Strategy Management UI**
-2. **Backtest Interface**
-3. **Market Data Charts**
-4. **Advanced Features**
+- `/login`, `/register`, `/change-password` — Auth pages
+- All other routes are protected by `PrivateRoute` (JWT check)

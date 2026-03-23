@@ -37,8 +37,9 @@
   - [4.4 市场数据库 tushare](#44-市场数据库-tushare)
   - [4.5 辅助数据库 akshare](#45-辅助数据库-akshare)
   - [4.6 交易引擎库 vnpy](#46-交易引擎库-vnpy)
-  - [4.7 待建设表清单](#47-待建设表清单)
-  - [4.8 索引与优化策略](#48-索引与优化策略)
+  - [4.7 AI 模型库 qlib](#47-ai-模型库-qlib)
+  - [4.8 待建设表清单](#48-待建设表清单)
+  - [4.9 索引与优化策略](#49-索引与优化策略)
 - [5. 数据同步架构](#5-数据同步架构)
   - [5.1 DataSync Daemon 总体设计](#51-datasync-daemon-总体设计)
   - [5.2 数据源适配层](#52-数据源适配层)
@@ -81,6 +82,8 @@
   - [10.2 LLM 集成链路](#102-llm-集成链路)
   - [10.3 代码沙箱安全](#103-代码沙箱安全)
   - [10.4 模型管理](#104-模型管理)
+  - [10.5 Qlib 量化因子 & ML 集成](#105-qlib-量化因子--ml-集成)
+  - [10.6 VNPy 实盘交易架构](#106-vnpy-实盘交易架构)
 - [11. 监控与可观测性](#11-监控与可观测性)
   - [11.1 日志体系](#111-日志体系)
   - [11.2 健康检查端点](#112-健康检查端点)
@@ -102,7 +105,7 @@ QuantMate 采用 **三层服务 + 多库分离** 的架构设计，核心设计�
 |------|------|
 | **关注点分离** | 前端/API/Worker/DataSync 独立服务，各司其职 |
 | **领域驱动分层** | 后端按 API→Domain→DAO→Infrastructure 四层分离 |
-| **多库隔离** | 业务数据(quantmate)与市场数据(tushare/akshare)物理分离 |
+| **多库隔离** | 业务数据(quantmate)与市场数据(tushare/akshare)、交易(vnpy)、AI模型(qlib)物理分离 |
 | **异步解耦** | 耗时任务（回测/优化）通过 RQ 消息队列解耦 |
 | **配置外置** | 全部配置通过环境变量注入，不硬编码 |
 | **容器化部署** | Docker Compose 统一编排，dev/staging/prod 三环境 |
@@ -264,7 +267,12 @@ graph TB
 | ASGI 服务器 | Uvicorn | Latest | HTTP 服务 |
 | 数据库 ORM | SQLAlchemy | Latest | 数据库连接 & Raw SQL |
 | 数据处理 | Pandas / NumPy | Latest | 行情数据处理 |
-| 量化引擎 | VNPy | 4.3.0 | CTA 回测引擎 |
+| 量化引擎 | VNPy | 4.3.0 | CTA 回测 + 实盘交易引擎 |
+| CTA 策略 | vnpy_ctastrategy | Latest | CTA 策略回测与自动化执行 |
+| 期货网关 | vnpy_ctp | Latest | CTP 期货接口（CFFEX/SHFE/DCE/CZCE/INE） |
+| 股票网关 | vnpy_xtp | Latest | XTP 股票接口（SSE/SZSE） |
+| AI 模型 | pyqlib (Microsoft Qlib) | ≥0.9.0 | 量化因子研究 + 模型训练/预测 |
+| 科学计算 | scipy | ≥1.10.0 | Qlib 模型依赖 |
 | 辅助引擎 | BackTrader | Latest | 回测辅助 |
 | 技术指标 | TA-Lib | Latest | 技术指标计算 |
 | 优化算法 | DEAP | Latest | 遗传算法参数优化 |
@@ -297,7 +305,7 @@ graph TB
 
 | 类别 | 技术 | 版本 | 用途 |
 |------|------|------|------|
-| 关系数据库 | MySQL | 8.0 | 持久化存储（4 库） |
+| 关系数据库 | MySQL | 8.0 | 持久化存储（5 库：quantmate/tushare/akshare/vnpy/qlib） |
 | 内存数据库 | Redis | 7 | 任务队列 + 元数据缓存 |
 
 #### 部署技术栈
@@ -318,7 +326,7 @@ graph TB
 | **API Server** | `api` | 8000 | FastAPI 应用，处理所有 HTTP 请求 | — |
 | **RQ Worker** | `worker` | — | 执行回测/优化等耗时任务 | 1GB RAM |
 | **DataSync Daemon** | `datasync` | — | 定时数据同步（Tushare + AkShare） | — |
-| **MySQL** | `mysql` | 3306 | 持久化存储（4 个逻辑数据库） | — |
+| **MySQL** | `mysql` | 3306 | 持久化存储（5 个逻辑数据库） | — |
 | **Redis** | `redis` | 6379 | 任务队列 + 任务元数据缓存 | — |
 | **Portal** | `portal` | 80 | React 前端（Nginx 托管静态文件） | — |
 | **Nginx** | `nginx` | 80/443 | 反向代理，统一入口 | — |
@@ -548,6 +556,8 @@ app.include_router(code_router,       prefix="/api")  # → /api/strategy-code/*
 | `queue.py` | `/api/queue` | 6 | 队列统计/任务列表/取消/删除 |
 | `system.py` | `/api/system` | 1+ | 同步状态/健康检查 |
 | `strategy_code.py` | `/api/strategy-code` | 2 | 代码 Lint/解析 |
+| `trading.py` | `/api/v1/trade` | 11+ | 实盘交易（订单/网关/CTA 策略） |
+| `paper_trading.py` | `/api/v1/paper-trade` | 8 | 模拟交易（部署/订单/持仓/绩效） |
 
 #### 2.2.3 API Service 层
 
@@ -573,6 +583,10 @@ Domain 层是**业务逻辑的核心**，每个领域（Domain）封装独立的
 | **market** | `MarketService` | `resolve_symbol_name()`, `market_overview()` | `MarketDao` |
 | **jobs** | `JobsService` | `list_jobs()`, `delete_job_and_results()` | `JobsDao` |
 | **extdata** | `SyncStatusService` | `get_sync_status()` | `SyncLogDao` |
+| **trading** | `VnpyTradingService` | `connect_gateway()`, `disconnect_gateway()`, `submit_order()`, `list_gateways()` | Direct vnpy `MainEngine` |
+| **trading** | `CtaStrategyRunner` | `start_strategy()`, `stop_strategy()`, `list_strategies()` | Direct vnpy `CtaEngine` |
+| **paper_trading** | `PaperTradingService` | `deploy()`, `list_deployments()`, `stop_deployment()`, `get_positions()`, `get_performance()` | `paper_deployments` + `orders` (mode=paper) |
+| **ai** | `QlibModelService` | `train_model()`, `get_predictions()`, `list_training_runs()` | qlib DB (via `get_qlib_connection()`) |
 
 ### 2.4 DAO 层
 
@@ -652,9 +666,18 @@ class Settings:
 - `quantmate_engine` — 核心业务库
 - `tushare_engine` — Tushare 数据库
 - `akshare_engine` — AkShare 数据库
+- `qlib_engine` — Qlib AI 模型库（`get_qlib_engine()` 工厂方法）
 - 连接池配置：`pool_size=5`, `max_overflow=10`, `pool_recycle=3600`
+- `connection(db_name)` 上下文管理器支持：quantmate / tushare / akshare / qlib
 
-#### 2.5.3 日志 — `infrastructure/logging/logging_setup.py`
+#### 2.5.3 Qlib 集成 — `infrastructure/qlib/`
+
+| 模块 | 用途 |
+|------|------|
+| `qlib_config.py` | Qlib 初始化、模型/因子集/策略注册表、`is_qlib_available()` 可用性检测 |
+| `data_converter.py` | tushare/akshare MySQL → Qlib 二进制格式转换，支持增量追加 |
+
+#### 2.5.4 日志 — `infrastructure/logging/logging_setup.py`
 
 统一日志配置，支持 DEBUG/INFO/WARNING/ERROR 分级，输出到控制台与 `logs/` 目录。
 
@@ -704,15 +727,39 @@ class Settings:
 ├── /change-password      → ChangePassword [私有路由，强制改密流程]
 │
 └── / (PrivateRoute 包裹)                  [需要认证]
-    ├── /dashboard        → Dashboard      [首页仪表盘]
-    ├── /strategies       → Strategies     [策略管理]
-    ├── /backtest         → Backtest       [回测提交与结果]
-    ├── /market-data      → MarketData     [行情数据]
-    ├── /analytics        → Analytics      [分析面板]
-    └── /portfolio        → Portfolio      [组合管理]
+    │
+    ├── 概览
+    │   └── /dashboard        → Dashboard      [首页仪表盘]
+    │
+    ├── 策略开发
+    │   ├── /strategies       → Strategies     [策略研究]
+    │   ├── /backtest         → Backtest       [回测评估]
+    │   └── /paper-trading    → PaperTrading   [模拟交易]
+    │
+    ├── 实盘交易
+    │   ├── /market-data      → MarketData     [行情数据]
+    │   ├── /trading          → Trading        [交易执行（Live-Only）]
+    │   ├── /positions        → Positions      [持仓管理]
+    │   ├── /portfolio        → Portfolio      [组合管理]
+    │   ├── /analytics        → Analytics      [分析中心]
+    │   ├── /monitoring       → Monitoring     [监控告警]
+    │   └── /reports          → Reports        [报告复盘]
+    │
+    ├── 研究 & AI
+    │   ├── /factor-lab       → FactorLab      [因子研究]
+    │   ├── /ai               → AI             [AI 助手]
+    │   └── /visual-explorer  → VisualExplorer [可视化探索]
+    │
+    ├── 社区
+    │   ├── /marketplace      → Marketplace    [模板市场]
+    │   └── /sharing          → TeamSpace      [团队空间]
+    │
+    └── 系统管理
+        ├── /account          → Account        [账户安全]
+        └── /settings         → Settings       [系统设置]
 ```
 
-> **注**：以上为 React SPA 已实现的路由。HTML 原型（`prototype/`）中规划了更多导航项（因子研究、交易执行、监控告警、报告复盘、AI 助手、模板市场、团队空间、系统设置等），将在后续阶段逐步实现。
+> **注**：以上为重构后的导航分组结构。侧边栏分 6 组：概览、策略开发（策略研究/回测评估/模拟交易）、实盘交易（行情数据/交易执行/持仓管理/组合管理/分析中心/监控告警/报告复盘）、研究&AI（因子研究/AI助手/可视化探索）、社区（模板市场/团队空间）、系统管理（账户安全/系统设置）。
 
 **路由守卫机制**（`PrivateRoute` 组件）：
 
@@ -866,6 +913,24 @@ App (BrowserRouter + QueryClientProvider)
     │   ├── MarketDataView       # 历史数据表格+图
     │   └── TechnicalIndicators  # 技术指标
     │
+    ├── PaperTrading             # 模拟交易 (独立模块)
+    │   ├── DeployForm           # 策略部署到模拟 (strategy_id 预填)
+    │   ├── PaperOrderForm       # 手动模拟订单提交
+    │   ├── DeploymentsTab       # 部署列表 (running/stopped)
+    │   ├── OrdersTab            # 模拟订单列表
+    │   ├── PositionsTab         # 聚合模拟持仓
+    │   └── PerformanceTab       # 模拟绩效指标
+    │
+    ├── Trading                  # 实盘交易 (Live-Only)
+    │   ├── GatewaySelector      # 网关下拉选择
+    │   ├── LiveOrderForm        # 实盘订单表单
+    │   └── OrdersTable          # 实盘订单列表
+    │
+    ├── Positions                # 持仓管理 (从 Portfolio 拆分)
+    │   ├── GatewaySelector      # 网关选择器
+    │   ├── AccountSummary       # 账户资金概览
+    │   └── PositionsTable       # 实时持仓表格
+    │
     ├── Analytics                # 分析面板
     │   ├── AnalyticsDashboard   # 绩效概览
     │   ├── PerformanceComparison# 策略对比
@@ -878,7 +943,7 @@ App (BrowserRouter + QueryClientProvider)
         └── RiskMetrics          # 复用风险指标
 ```
 
-**组件统计**：7 个页面 + 25+ 可复用组件
+**组件统计**：10 个页面 + 35+ 可复用组件
 
 ### 3.6 数据流模式
 
@@ -916,7 +981,7 @@ sequenceDiagram
 
 ### 4.1 分库策略
 
-系统采用 **4 个逻辑数据库**，物理部署在同一 MySQL 8.0 实例中：
+系统采用 **5 个逻辑数据库**，物理部署在同一 MySQL 8.0 实例中：
 
 ```mermaid
 graph LR
@@ -925,21 +990,28 @@ graph LR
         TS["tushare<br/>Tushare 数据库"]
         AK["akshare<br/>AkShare 数据库"]
         VP["vnpy<br/>VNPy 引擎库"]
+        QL["qlib<br/>AI 模型库"]
     end
     
     API["API Server"] --> QM
     API --> TS
     API --> AK
+    API --> QL
     Worker["Worker"] --> QM
     Worker --> TS
+    Worker --> QL
     DS["DataSync"] --> TS
     DS --> AK
     DS --> QM
+    VNPy["VNPy Engine"] --> VP
+    Converter["Data Converter"] --> TS
+    Converter --> AK
     
     style QM fill:#4f46e5,color:#fff
     style TS fill:#10b981,color:#fff
     style AK fill:#059669,color:#fff
     style VP fill:#6b7280,color:#fff
+    style QL fill:#7c3aed,color:#fff
 ```
 
 **分库依据**：
@@ -950,6 +1022,7 @@ graph LR
 | `tushare` | Tushare 行情 | 大量写入(同步)，高频读取(查询) | 4 | 14 |
 | `akshare` | AkShare 辅助 | 低频写入，中频读取 | 2 | 5 |
 | `vnpy` | VNPy 引擎 | VNPy 框架内部格式 | 0 | 2 |
+| `qlib` | AI 模型 | 因子/训练/预测数据，中频写入 | 6 | 0 |
 
 **分库优势**：
 1. **隔离性** — 市场数据同步不影响业务库性能
@@ -1395,6 +1468,8 @@ erDiagram
 
 ### 4.6 交易引擎库 vnpy
 
+VNPy 引擎库用于存储实盘交易相关的 K 线和 Tick 数据，供 VNPy MainEngine 和 CTA 策略引擎直接使用。此数据库与 tushare/akshare 完全隔离。
+
 当前无活跃表，待建：
 
 | 表名 | 用途 | 优先级 |
@@ -1402,7 +1477,86 @@ erDiagram
 | `dbbardata` | VNPy 标准 K 线存储 | P2 |
 | `dbtickdata` | VNPy Tick 数据存储 | P3 |
 
-### 4.7 待建设表清单
+### 4.7 AI 模型库 qlib
+
+Qlib 数据库存储因子研究、模型训练和预测结果。数据源来自 tushare/akshare（非 vnpy），经 `data_converter.py` 转换后写入 Qlib 二进制格式供模型训练使用，训练结果和预测分数存入本库。
+
+#### 4.7.1 因子存储
+
+| 表名 | 用途 | 活跃行估算 | 说明 |
+|------|------|-----------|------|
+| `alpha_factor_values` | 计算后的因子值 | 百万级 | 每 instrument×日期×因子集×因子名 一行 |
+| `alpha_factor_sets` | 因子集定义 | 预置 2 行 | Alpha158(158 因子), Alpha360(360 因子) |
+
+**alpha_factor_values 结构**：
+
+```sql
+instrument   VARCHAR(20)   -- e.g. SH600000 (Qlib 格式)
+trade_date   DATE
+factor_set   VARCHAR(30)   -- Alpha158, Alpha360, custom
+factor_name  VARCHAR(100)
+factor_value DOUBLE
+UNIQUE KEY (instrument, trade_date, factor_set, factor_name)
+```
+
+#### 4.7.2 模型训练与预测
+
+| 表名 | 用途 | 说明 |
+|------|------|------|
+| `model_training_runs` | 训练任务记录 | 支持 8 种模型：LightGBM, Linear, LSTM, GRU, Transformer, ALSTM, TabNet, HIST |
+| `model_predictions` | 预测信号分数 | 每训练运行×instrument×日期，包含 score 和 rank_pct |
+
+**model_training_runs 关键字段**：
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `model_type` | VARCHAR(50) | LightGBM / LSTM / Transformer / HIST 等 |
+| `factor_set` | VARCHAR(30) | Alpha158 / Alpha360 |
+| `universe` | VARCHAR(50) | csi300 / csi500 / all_a |
+| `train_start/end` | DATE | 训练区间 |
+| `valid_start/end` | DATE | 验证区间 |
+| `test_start/end` | DATE | 测试区间 |
+| `hyperparams` | JSON | 模型超参数 |
+| `metrics` | JSON | 训练结果指标（IC, ICIR, Rank IC 等） |
+| `status` | ENUM | queued → running → completed / failed |
+| `model_path` | VARCHAR(500) | 模型文件保存路径 |
+
+#### 4.7.3 Qlib 回测结果
+
+| 表名 | 用途 | 说明 |
+|------|------|------|
+| `qlib_backtest_results` | 基于信号的组合回测 | 支持 TopkDropout / WeightedAvg 策略 |
+
+**qlib_backtest_results 关键字段**：
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `training_run_id` | INT | 关联的模型训练运行 |
+| `strategy_type` | VARCHAR(50) | TopkDropout / WeightedAvg |
+| `topk` | INT | 持仓股票数（默认 50） |
+| `n_drop` | INT | 每期调仓数（默认 5） |
+| `statistics` | JSON | 年化收益、最大回撤、夏普比等 |
+| `portfolio_analysis` | JSON | 多空分析、换手率、IC 分析 |
+
+#### 4.7.4 数据转换日志
+
+| 表名 | 用途 | 说明 |
+|------|------|------|
+| `data_conversion_log` | 数据转换追踪 | 记录 tushare/akshare → Qlib 二进制格式的转换状态 |
+
+#### 4.7.5 数据流关系
+
+```mermaid
+graph LR
+    TS["tushare DB<br/>(stock_daily)"] -->|data_converter.py| QB["Qlib 二进制文件<br/>(~/.qlib/cn_data)"]
+    AK["akshare DB<br/>(supplement)"] -->|data_converter.py| QB
+    QB -->|Qlib DataHandler| Model["模型训练<br/>(LightGBM/LSTM/...)"]
+    Model -->|predictions| QDB["qlib DB<br/>(model_predictions)"]
+    QDB -->|signal scores| BT["Qlib 回测<br/>(TopkDropout)"]
+    BT -->|results| QDB2["qlib DB<br/>(qlib_backtest_results)"]
+```
+
+### 4.8 待建设表清单
 
 #### quantmate 库（31 表）
 
@@ -1422,8 +1576,9 @@ erDiagram
 | `portfolio_transactions` | 组合交易流水 | 组合 | P1 |
 | `portfolio_snapshots` | 组合净值快照 | 组合 | P1 |
 | `risk_rules` | 风控规则配置 | 风险 | P2 |
-| `orders` | 订单表 | 交易 | P2 |
+| `orders` | 订单表（mode 字段区分实盘/模拟） | 交易 | P2 |
 | `trades` | 成交记录 | 交易 | P2 |
+| `paper_deployments` | 模拟交易策略部署记录 | 模拟交易 | P2 |
 | `broker_configs` | 券商配置 | 交易 | P2 |
 | `alert_rules` | 告警规则 | 监控 | P2 |
 | `alert_history` | 告警历史 | 监控 | P2 |
@@ -1466,7 +1621,7 @@ erDiagram
 | `bond_zh_daily` | 债券日线 | P3 |
 | `news_sentiment` | 新闻情绪 | P3 |
 
-### 4.8 索引与优化策略
+### 4.9 索引与优化策略
 
 #### 已实施索引
 
@@ -1904,6 +2059,102 @@ graph LR
 |------|------|------|------|
 | `/system/sync-status` | GET | 是 | 数据同步状态 |
 
+#### 6.2.7 实盘交易模块 `/api/v1/trade`（Live-Only）
+
+> **注**：Paper trading 已拆分至独立模块 `/api/v1/paper-trade`（见 §6.2.9）。
+> `/trade/orders POST` 提交 `mode: "paper"` 会返回 400 错误并提示使用 paper-trade 端点。
+
+**手动交易**：
+
+| 端点 | 方法 | 认证 | 说明 |
+|------|------|------|------|
+| `/trade/orders` | POST | 是 | 提交实盘订单（必须指定 `gateway_name`） |
+| `/trade/orders` | GET | 是 | 查询实盘订单列表 |
+| `/trade/orders/{order_id}` | GET | 是 | 订单详情 |
+| `/trade/orders/{order_id}/cancel` | POST | 是 | 撤单 |
+
+**算法交易**：
+
+| 端点 | 方法 | 认证 | 说明 |
+|------|------|------|------|
+| `/trade/algo/twap` | POST | 是 | TWAP 分时委托 |
+| `/trade/algo/vwap` | POST | 是 | VWAP 量价加权委托 |
+| `/trade/algo/iceberg` | POST | 是 | 冰山委托 |
+
+**网关管理**：
+
+| 端点 | 方法 | 认证 | 说明 |
+|------|------|------|------|
+| `/trade/gateway/connect` | POST | 是 | 连接 CTP/XTP/SIM 网关 |
+| `/trade/gateway/disconnect` | POST | 是 | 断开网关 |
+| `/trade/gateways` | GET | 是 | 已连接网关列表 |
+| `/trade/gateway/positions` | GET | 是 | 指定网关持仓查询 |
+| `/trade/gateway/account` | GET | 是 | 指定网关账户资金 |
+
+**CTA 自动化策略**：
+
+| 端点 | 方法 | 认证 | 说明 |
+|------|------|------|------|
+| `/trade/auto-strategy/start` | POST | 是 | 启动 CTA 策略（编译并执行） |
+| `/trade/auto-strategy/stop` | POST | 是 | 停止运行中策略 |
+| `/trade/auto-strategy/status` | GET | 是 | 运行中策略列表 |
+
+#### 6.2.9 模拟交易模块 `/api/v1/paper-trade`
+
+**策略部署**：
+
+| 端点 | 方法 | 认证 | 说明 |
+|------|------|------|------|
+| `/paper-trade/deploy` | POST | 是 | 部署策略到模拟交易 |
+| `/paper-trade/deployments` | GET | 是 | 部署列表 |
+| `/paper-trade/deployments/{id}/stop` | POST | 是 | 停止模拟部署 |
+
+**模拟订单**：
+
+| 端点 | 方法 | 认证 | 说明 |
+|------|------|------|------|
+| `/paper-trade/orders` | POST | 是 | 提交模拟订单（market 类型自动成交） |
+| `/paper-trade/orders` | GET | 是 | 查询模拟订单（自动过滤 mode=paper） |
+| `/paper-trade/orders/{id}/cancel` | POST | 是 | 撤销模拟订单 |
+
+**持仓与绩效**：
+
+| 端点 | 方法 | 认证 | 说明 |
+|------|------|------|------|
+| `/paper-trade/positions` | GET | 是 | 聚合模拟持仓（从已成交订单计算） |
+| `/paper-trade/performance` | GET | 是 | 模拟交易绩效（P&L/权益曲线/最大回撤） |
+
+#### 6.2.8 AI 模型模块 `/api/ai/qlib`
+
+| 端点 | 方法 | 认证 | 说明 |
+|------|------|------|------|
+| `/ai/qlib/status` | GET | 是 | Qlib 可用性检查 |
+| `/ai/qlib/supported-models` | GET | 是 | 支持的 8 种模型列表 |
+| `/ai/qlib/supported-datasets` | GET | 是 | 支持的因子集（Alpha158/Alpha360） |
+| `/ai/qlib/train` | POST | 是 | 提交模型训练任务（异步执行） |
+| `/ai/qlib/training-runs` | GET | 是 | 用户训练运行列表（支持分页 + status 过滤） |
+| `/ai/qlib/training-runs/{run_id}` | GET | 是 | 训练运行详情 |
+| `/ai/qlib/training-runs/{run_id}/predictions` | GET | 是 | 预测信号分数（支持 trade_date + top_n） |
+| `/ai/qlib/data/convert` | POST | 是 | tushare/akshare → Qlib 格式转换（异步执行） |
+
+#### 6.2.9 因子研究模块 `/api/factors`
+
+**基础因子 CRUD**（已有）：
+
+| 端点 | 方法 | 认证 | 说明 |
+|------|------|------|------|
+| `/factors` | GET | 是 | 因子列表 |
+| `/factors` | POST | 是 | 创建因子 |
+| `/factors/{factor_id}` | GET / PUT / DELETE | 是 | 因子详情/更新/删除 |
+| `/factors/{factor_id}/evaluations` | GET / POST / DELETE | 是 | 因子评估 CRUD |
+
+**Qlib 因子计算**：
+
+| 端点 | 方法 | 认证 | 说明 |
+|------|------|------|------|
+| `/factors/qlib/factor-sets` | GET | 是 | Qlib 因子集列表（从 `alpha_factor_sets` 表） |
+| `/factors/qlib/compute` | POST | 是 | 计算指定因子集的因子值 |
+
 ### 6.3 Pydantic 请求/响应模型
 
 #### 6.3.1 认证模型
@@ -1968,6 +2219,53 @@ class BatchBacktestRequest(BaseModel):
     strategy_id: int
     symbols: List[str]     # 多标的列表
     # ... 其余与 BacktestRequest 相同
+    engine_type: str = "vnpy"  # "vnpy" 或 "qlib"
+    # Qlib 专用（engine_type="qlib" 时）
+    model_type: Optional[str]       # LightGBM / LSTM / Transformer 等
+    factor_set: Optional[str]       # Alpha158 / Alpha360
+    universe: Optional[str]         # csi300 / csi500 / all_a
+    strategy_type: Optional[str]    # TopkDropout / WeightedAvg
+    topk: Optional[int]             # 持仓数（默认 50）
+    n_drop: Optional[int]           # 每期调仓数（默认 5）
+    hyperparams: Optional[Dict]     # 模型超参数
+```
+
+#### 6.3.4 Qlib 训练模型
+
+```python
+class TrainModelRequest(BaseModel):
+    model_type: str = "LightGBM"       # 8 种支持模型之一
+    factor_set: str = "Alpha158"       # Alpha158 / Alpha360
+    universe: str = "csi300"           # csi300 / csi500 / all_a
+    train_start: str = "2018-01-01"
+    train_end: str = "2022-12-31"
+    valid_start: str = "2023-01-01"
+    valid_end: str = "2023-06-30"
+    test_start: str = "2023-07-01"
+    test_end: str = "2024-12-31"
+    hyperparams: Optional[Dict] = None
+
+class DataConvertRequest(BaseModel):
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
+    use_akshare_supplement: bool = False
+```
+
+#### 6.3.5 交易模型
+
+```python
+class GatewayConnectRequest(BaseModel):
+    gateway_name: str              # 网关名称
+    gateway_type: str              # "ctp" / "xtp" / "sim"
+    settings: Dict[str, Any] = {}  # CTP: userid, password, brokerid, ...
+
+class AutoStrategyStartRequest(BaseModel):
+    strategy_class_name: str       # CTA 策略类名
+    vt_symbol: str                 # VNPy 格式标的（如 rb2501.SHFE）
+    parameters: Dict[str, Any] = {}
+    strategy_code: Optional[str]   # 策略源码（编译后加载）
+    strategy_id: Optional[int]     # 或从 DB 加载
+    gateway_name: Optional[str]    # 指定网关
 ```
 
 ### 6.4 待建设接口
@@ -1988,9 +2286,10 @@ class BatchBacktestRequest(BaseModel):
 | **组合** | `GET /api/portfolio/{id}/snapshots` | P1 | 净值快照 |
 | **风控** | `GET /api/risk/rules` | P2 | 风控规则 |
 | **风控** | `POST /api/risk/rules` | P2 | 创建规则 |
-| **交易** | `POST /api/trade/orders` | P2 | 下单 |
-| **交易** | `GET /api/trade/orders` | P2 | 订单列表 |
+| **交易** | ~~`POST /api/trade/orders`~~ | ~~P2~~ | ✅ 已实现（见 §6.2.7） |
+| **交易** | ~~`GET /api/trade/orders`~~ | ~~P2~~ | ✅ 已实现（见 §6.2.7） |
 | **报告** | `GET /api/reports/generate` | P2 | 生成报表 |
+| **AI** | ~~Qlib 模型训练/预测~~ | ~~P1~~ | ✅ 已实现（见 §6.2.8） |
 | **AI** | `POST /api/ai/strategy/generate` | P3 | AI 生成策略 |
 | **AI** | `POST /api/ai/query` | P3 | 自然语言查询 |
 | **告警** | `GET /api/alerts/rules` | P2 | 告警规则列表 |
@@ -2609,6 +2908,11 @@ graph LR
 
 | 场景 | 描述 | 优先级 | 状态 |
 |------|------|--------|------|
+| **Qlib 因子研究** | Alpha158/Alpha360 因子计算与自定义因子 | P1 | ✅ 已实现 |
+| **Qlib 模型训练** | 8 种 ML 模型训练/评估/预测（LightGBM/LSTM/Transformer 等） | P1 | ✅ 已实现 |
+| **Qlib 信号回测** | 基于预测信号的 TopkDropout/WeightedAvg 回测 | P1 | ✅ 已实现 |
+| **VNPy 实盘交易** | CTP/XTP 网关连接，手动/自动化 CTA 策略执行 | P1 | ✅ 已实现 |
+| **模拟交易** | 独立 Paper Trading 模块：策略部署、模拟订单、持仓聚合、绩效分析 | P1 | ✅ 已实现 |
 | **策略代码生成** | 根据自然语言描述生成 Python 策略代码 | P3 | 待建设 |
 | **选股推荐** | 基于基本面 + 技术面的 AI 选股 | P3 | 待建设 |
 | **自然语言查询** | "帮我查一下茅台最近30天的表现" | P3 | 待建设 |
@@ -2691,6 +2995,188 @@ AI 生成的策略代码经过两层安全检查：
 | **对话历史** | `ai_conversations` 表存储多轮对话上下文 |
 | **Token 计费** | 按模型和用户统计 Token 消耗 |
 | **降级策略** | 主模型不可用时自动切换备用模型 |
+
+### 10.5 Qlib 量化因子 & ML 集成
+
+> **已实现** — 基于 Microsoft Qlib（pyqlib ≥0.9.0）的因子研究与模型训练/预测/回测集成。
+
+#### 10.5.1 整体架构
+
+```mermaid
+graph TB
+    subgraph "数据层"
+        TS["tushare DB<br/>(stock_daily)"]
+        AK["akshare DB<br/>(supplement)"]
+        Conv["data_converter.py"]
+        QBin["Qlib 二进制数据<br/>(~/.qlib/cn_data)"]
+    end
+    
+    subgraph "模型层"
+        Config["qlib_config.py<br/>8 模型 × 2 因子集"]
+        Service["QlibModelService<br/>训练/预测/查询"]
+        Tasks["qlib_tasks.py<br/>RQ 异步任务"]
+    end
+    
+    subgraph "API 层"
+        Routes["ai_model.py<br/>/api/ai/qlib/*"]
+        FactorRoutes["factors.py<br/>/api/factors/qlib/*"]
+    end
+    
+    subgraph "存储"
+        QDB["qlib DB<br/>(MySQL)"]
+    end
+    
+    TS --> Conv
+    AK --> Conv
+    Conv --> QBin
+    QBin --> Service
+    Config --> Service
+    Service --> Tasks
+    Routes --> Tasks
+    Routes --> Service
+    FactorRoutes --> Service
+    Service --> QDB
+    Tasks --> QDB
+```
+
+#### 10.5.2 支持模型
+
+| 模型 | Qlib 类路径 | 类型 | 适用场景 |
+|------|------------|------|---------|
+| **LightGBM** | `qlib.contrib.model.gbdt.LGBModel` | 树模型 | 快速训练、基准模型 |
+| **Linear** | `qlib.contrib.model.linear.LinearModel` | 线性 | 因子暴露分析 |
+| **LSTM** | `qlib.contrib.model.pytorch_lstm.LSTM` | RNN | 时序特征捕获 |
+| **GRU** | `qlib.contrib.model.pytorch_gru.GRU` | RNN | 轻量时序模型 |
+| **Transformer** | `qlib.contrib.model.pytorch_transformer.Transformer` | Attention | 长序列依赖 |
+| **ALSTM** | `qlib.contrib.model.pytorch_alstm.ALSTM` | Attention+LSTM | 自适应时序 |
+| **TabNet** | `qlib.contrib.model.pytorch_tabnet.TabNet` | 表格 DL | 因子重要性可解释 |
+| **HIST** | `qlib.contrib.model.pytorch_hist.HIST` | 图 + Attention | 股票间关系建模 |
+
+#### 10.5.3 因子集
+
+| 因子集 | 因子数 | 覆盖领域 |
+|--------|--------|---------|
+| **Alpha158** | 158 个 | 价格/成交量/波动率/趋势因子 |
+| **Alpha360** | 360 个 | Alpha158 扩展 + 高阶交叉特征 |
+
+#### 10.5.4 数据桥接
+
+```
+tushare.stock_daily (ts_code: 000001.SZ)
+        ↓ data_converter.py
+    _ts_code_to_qlib_instrument() → SZ000001
+        ↓ fetch_tushare_daily() → DataFrame
+        ↓ convert_to_qlib_format()
+    Qlib binary format (~/.qlib/qlib_data/cn_data)
+```
+
+**数据隔离原则**：
+- tushare/akshare 数据用于 Qlib 训练（只读）
+- vnpy DB 仅供 VNPy 引擎内部使用，不参与 Qlib 流水线
+- 转换日志写入 `qlib.data_conversion_log`
+
+#### 10.5.5 回测引擎选择
+
+系统支持 **双回测引擎**，通过 `engine_type` 参数在 `/api/queue/backtest` 选择：
+
+| 引擎 | 场景 | 优势 |
+|------|------|------|
+| **vnpy**（默认） | CTA 策略回测 | 精确撮合模拟、支持手续费/滑点/合约乘数 |
+| **qlib** | 因子选股回测 | TopkDropout/WeightedAvg 策略、IC/ICIR 分析、多因子组合 |
+
+### 10.6 VNPy 实盘交易架构
+
+> **已实现** — 通过 VNPy MainEngine 连接期货/股票网关，支持手动下单和 CTA 自动化策略。
+> 模拟交易（Paper Trading）已拆分为独立模块 `/api/v1/paper-trade`，拥有独立的路由、服务和页面（见 §6.2.9）。
+> 实盘交易路由 `/api/v1/trade` 现在仅处理 Live 模式订单，提交 `mode: "paper"` 会返回 400。
+
+#### 10.6.1 整体架构
+
+```mermaid
+graph TB
+    subgraph "API 层"
+        OrderRoute["/api/trade/orders"]
+        GwRoute["/api/trade/gateway/*"]
+        AutoRoute["/api/trade/auto-strategy/*"]
+        PaperRoute["/api/paper-trade/*"]
+    end
+    
+    subgraph "服务层"
+        TradingSvc["VnpyTradingService<br/>(Singleton)"]
+        CtaRunner["CtaStrategyRunner<br/>(Singleton)"]
+    end
+    
+    subgraph "VNPy 引擎"
+        MainEngine["MainEngine"]
+        CtaEngine["CtaEngine"]
+        CTP["CTP Gateway<br/>(期货)"]
+        XTP["XTP Gateway<br/>(股票)"]
+        SIM["Simulated Gateway<br/>(测试)"]
+    end
+    
+    subgraph "事件"
+        Events["EventEngine<br/>on_order / on_trade"]
+    end
+    
+    OrderRoute --> TradingSvc
+    GwRoute --> TradingSvc
+    AutoRoute --> CtaRunner
+    TradingSvc --> MainEngine
+    CtaRunner --> CtaEngine
+    MainEngine --> CTP
+    MainEngine --> XTP
+    MainEngine --> SIM
+    MainEngine --> Events
+    CtaEngine --> MainEngine
+```
+
+#### 10.6.2 VnpyTradingService
+
+**单例模式**，管理 VNPy MainEngine 的完整生命周期：
+
+| 方法 | 说明 |
+|------|------|
+| `connect_gateway(name, type, settings)` | 启动并连接 CTP/XTP/SIM 网关 |
+| `disconnect_gateway(name)` | 断开并销毁网关 |
+| `submit_order(symbol, direction, volume, price, gateway_name)` | 通过指定网关提交订单 |
+| `list_gateways()` | 列出所有已连接网关及状态 |
+| `get_positions(gateway_name)` | 查询指定网关持仓 |
+| `get_account(gateway_name)` | 查询账户资金 |
+| `query_orders(gateway_name)` | 查询历史订单 |
+| `query_trades(gateway_name)` | 查询成交记录 |
+
+**网关类型**：
+
+| 类型 | 枚举值 | 适用市场 |
+|------|--------|---------|
+| CTP | `ctp` | 期货（中金所/上期/大商/郑商/能源中心） |
+| XTP | `xtp` | 股票（上证/深证） |
+| SIM | `sim` | 模拟网关（开发/测试） |
+
+#### 10.6.3 CtaStrategyRunner
+
+**单例模式**，管理 CTA 策略的自动化执行：
+
+| 方法 | 说明 |
+|------|------|
+| `start_strategy(class_name, vt_symbol, parameters, code)` | 编译并启动 CTA 策略 |
+| `stop_strategy(strategy_name)` | 停止运行中的策略 |
+| `list_strategies()` | 列出所有运行中策略及状态 |
+
+**策略加载流程**：
+1. 接收策略类名 + 可选代码字符串
+2. `_load_strategy_class()` 动态编译或从 DB 加载策略类
+3. 注册到 vnpy CtaEngine
+4. 调用 `init_strategy()` + `start_strategy()`
+
+#### 10.6.4 事件处理
+
+VNPy 事件引擎异步推送订单/成交回报：
+
+| 事件 | 数据类 | 触发时机 |
+|------|--------|---------|
+| `OrderEvent` | order_id, symbol, direction, status, filled_quantity, avg_fill_price | 订单状态变更 |
+| `TradeEvent` | trade_id, order_id, symbol, price, volume, fee | 成交确认 |
 
 ---
 

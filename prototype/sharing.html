@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>QuantMate — 分享中心</title>
+  <title>QuantMate - Sharing Center</title>
   <link rel="stylesheet" href="shared.css">
   <script src="https://cdn.tailwindcss.com?v=3.4"></script>
 </head>
@@ -14,17 +14,17 @@
     <div class="page-header">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
         <div>
-          <h1 class="page-title">分享中心</h1>
-          <p class="page-subtitle">策略分享 · 协作交流 · 社区互动</p>
+          <h1 class="page-title">Sharing Center</h1>
+          <p class="page-subtitle">Strategy sharing | Collaboration | Community activity</p>
         </div>
-        <button class="btn btn-primary" onclick="openModal('shareNew')">+ 分享策略</button>
+        <button class="btn btn-primary" onclick="openModal('shareNew')">Share strategy</button>
       </div>
     </div>
 
     <div class="tabs" data-group="sh">
-      <button class="tab-btn active" data-tab="myshares">我分享的</button>
-      <button class="tab-btn" data-tab="received">收到的分享</button>
-      <button class="tab-btn" data-tab="public">公开策略</button>
+      <button class="tab-btn active" data-tab="myshares">My Shares</button>
+      <button class="tab-btn" data-tab="received">Received shares</button>
+      <button class="tab-btn" data-tab="public">Public Strategies</button>
     </div>
 
     <!-- My Shares -->
@@ -34,56 +34,56 @@
         <div class="card">
           <div style="display:flex;justify-content:space-between;align-items:start">
             <h3 style="font-weight:600">DualMA_Cross v3</h3>
-            <span class="badge badge-success">公开</span>
+            <span class="badge badge-success">Public</span>
           </div>
-          <p class="text-muted" style="font-size:13px;margin:4px 0">双均线交叉策略 · 日频 · A股</p>
+          <p class="text-muted" style="font-size:13px;margin:4px 0">Double moving average crossover | Daily frequency | A-shares</p>
           <div style="display:flex;gap:12px;margin:12px 0;font-size:13px">
-            <span>⭐ 4.5</span><span>📥 128 次克隆</span><span>❤️ 45 收藏</span>
+            <span>⭐ 4.5</span><span>📥 128 clones</span><span>❤️ 45 Favorites</span>
           </div>
           <div style="font-size:12px;color:var(--muted-foreground);margin-bottom:12px">
-            分享于 2026-02-15 · 3 条评论
+            Shared on 2026-02-15 | 3 comments
           </div>
           <div style="display:flex;gap:8px">
-            <button class="btn btn-ghost btn-sm" onclick="showToast('已打开分享编辑','info')">编辑</button>
-            <button class="btn btn-ghost btn-sm" onclick="showToast('分享链接: quantmate.io/s/dual-ma-xxx','info')">查看链接</button>
-            <button class="btn btn-ghost btn-sm" style="color:var(--destructive)" onclick="showConfirm('确认取消分享 DualMA_Cross v3？',()=>showToast('已取消分享','warning'))">取消分享</button>
+            <button class="btn btn-ghost btn-sm" onclick="showToast('Share editing opened', 'info')">Edit</button>
+            <button class="btn btn-ghost btn-sm" onclick="showToast('Share link: quantmate.io/s/dual-ma-xxx','info')">View link</button>
+            <button class="btn btn-ghost btn-sm" style="color:var(--destructive)" onclick="showConfirm('Confirm cancel sharing DualMA_Cross v3?', ()=>showToast('Sharing canceled','warning'))">Cancel Share</button>
           </div>
         </div>
 
         <div class="card">
           <div style="display:flex;justify-content:space-between;align-items:start">
             <h3 style="font-weight:600">RSI_Reversal</h3>
-            <span class="badge badge-warning">仅链接</span>
+            <span class="badge badge-warning">Link only</span>
           </div>
-          <p class="text-muted" style="font-size:13px;margin:4px 0">RSI反转策略 · 日频 · A股</p>
+          <p class="text-muted" style="font-size:13px;margin:4px 0">RSI reversal | Daily frequency | A-shares</p>
           <div style="display:flex;gap:12px;margin:12px 0;font-size:13px">
-            <span>⭐ —</span><span>📥 12 次访问</span><span>❤️ 3 收藏</span>
+            <span>⭐ —</span><span>📥 12 visits</span><span>❤️ 3 Favorites</span>
           </div>
           <div style="font-size:12px;color:var(--muted-foreground);margin-bottom:12px">
-            分享于 2026-03-01 · 1 条评论
+            Shared on 2026-03-01 | 1 comment
           </div>
           <div style="display:flex;gap:8px">
-            <button class="btn btn-ghost btn-sm" onclick="showToast('已打开分享编辑','info')">编辑</button>
-            <button class="btn btn-ghost btn-sm" onclick="openModal('shareLink')">复制链接</button>
-            <button class="btn btn-ghost btn-sm" style="color:var(--destructive)" onclick="showConfirm('确认取消分享 RSI_Reversal？',()=>showToast('已取消分享','warning'))">取消分享</button>
+            <button class="btn btn-ghost btn-sm" onclick="showToast('Share editing opened', 'info')">Edit</button>
+            <button class="btn btn-ghost btn-sm" onclick="openModal('shareLink')">Copy link</button>
+            <button class="btn btn-ghost btn-sm" style="color:var(--destructive)" onclick="showConfirm('Confirm cancel sharing RSI_Reversal?', ()=>showToast('Sharing canceled','warning'))">Cancel Share</button>
           </div>
         </div>
 
         <div class="card">
           <div style="display:flex;justify-content:space-between;align-items:start">
             <h3 style="font-weight:600">BollingerBand_Breakout</h3>
-            <span class="badge badge-muted">指定成员</span>
+            <span class="badge badge-muted">Specific members</span>
           </div>
-          <p class="text-muted" style="font-size:13px;margin:4px 0">布林带突破策略 · 15分钟 · A股</p>
+          <p class="text-muted" style="font-size:13px;margin:4px 0">Bollinger band breakout | 15-minute | A-shares</p>
           <div style="display:flex;gap:12px;margin:12px 0;font-size:13px">
-            <span>👥 3 位接收者</span><span>📥 5 次查看</span>
+            <span>👥 3 recipients</span><span>📥 5 views</span>
           </div>
           <div style="font-size:12px;color:var(--muted-foreground);margin-bottom:12px">
-            分享于 2026-03-05 · 2 位已查看
+            Shared on 2026-03-05 | 2 viewed
           </div>
           <div style="display:flex;gap:8px">
-            <button class="btn btn-ghost btn-sm" onclick="showToast('打开权限管理','info')">管理权限</button>
-            <button class="btn btn-ghost btn-sm" style="color:var(--destructive)" onclick="showConfirm('确认取消分享 BollingerBand_Breakout？',()=>showToast('已取消分享','warning'))">取消分享</button>
+            <button class="btn btn-ghost btn-sm" onclick="showToast('Permission manager opened','info')">Manage access</button>
+            <button class="btn btn-ghost btn-sm" style="color:var(--destructive)" onclick="showConfirm('Confirm cancel sharing BollingerBand_Breakout?', ()=>showToast('Sharing canceled','warning'))">Cancel Share</button>
           </div>
         </div>
       </div>
@@ -92,34 +92,34 @@
     <!-- Received -->
     <div class="tab-panel" data-group="sh" data-panel="received">
       <div class="card">
-        <div class="card-header"><h3 class="card-title">收到的分享</h3></div>
+        <div class="card-header"><h3 class="card-title">Received shares</h3></div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>策略名称</th><th>分享者</th><th>权限</th><th>时间</th><th>状态</th><th>操作</th></tr></thead>
+            <thead><tr><th>Strategy Name</th><th>Sharer</th><th>Permission</th><th>Time</th><th>Status</th><th>Actions</th></tr></thead>
             <tbody>
               <tr>
-                <td><b>MultiFactorAlpha_v2</b><br><span class="text-muted" style="font-size:12px">多因子选股 · Sharpe 2.10</span></td>
+                <td><b>MultiFactorAlpha_v2</b><br><span class="text-muted" style="font-size:12px">Multi-factor stock selection | Sharpe 2.10</span></td>
                 <td>alice_quant</td>
-                <td><span class="badge badge-primary">可编辑</span></td>
+                <td><span class="badge badge-primary">Editable</span></td>
                 <td>2026-03-10</td>
-                <td><span class="badge badge-success">已接受</span></td>
-                <td><button class="btn btn-primary btn-sm" onclick="showToast('已打开 MultiFactorAlpha_v2','success')">打开</button></td>
+                <td><span class="badge badge-success">Accepted</span></td>
+                <td><button class="btn btn-primary btn-sm" onclick="showToast('MultiFactorAlpha_v2 has been opened','success')">Open</button></td>
               </tr>
               <tr>
-                <td><b>Pairs_Trading</b><br><span class="text-muted" style="font-size:12px">配对交易 · 统计套利</span></td>
+                <td><b>Pairs_Trading</b><br><span class="text-muted" style="font-size:12px">Pairs trading | Statistical arbitrage</span></td>
                 <td>bob_dev</td>
-                <td><span class="badge badge-muted">仅查看</span></td>
+                <td><span class="badge badge-muted">View only</span></td>
                 <td>2026-03-08</td>
-                <td><span class="badge badge-success">已接受</span></td>
-                <td><button class="btn btn-primary btn-sm" onclick="showToast('已打开 Pairs_Trading','success')">打开</button></td>
+                <td><span class="badge badge-success">Accepted</span></td>
+                <td><button class="btn btn-primary btn-sm" onclick="showToast('Pairs_Trading has been opened','success')">Open</button></td>
               </tr>
               <tr>
-                <td><b>EventDriven_Earnings</b><br><span class="text-muted" style="font-size:12px">事件驱动 · 财报发布</span></td>
+                <td><b>EventDriven_Earnings</b><br><span class="text-muted" style="font-size:12px">Event-driven | Earnings release</span></td>
                 <td>charlie_analyst</td>
-                <td><span class="badge badge-warning">可评论</span></td>
+                <td><span class="badge badge-warning">Commentable</span></td>
                 <td>2026-03-12</td>
-                <td><span class="badge badge-warning">待接受</span></td>
-                <td><button class="btn btn-primary btn-sm" onclick="showToast('已接受分享','success')">接受</button><button class="btn btn-ghost btn-sm" onclick="showConfirm('确认拒绝该分享？',()=>showToast('已拒绝分享','warning'))">拒绝</button></td>
+                <td><span class="badge badge-warning">Pending acceptance</span></td>
+                <td><button class="btn btn-primary btn-sm" onclick="showToast('Share accepted','success')">Accept</button><button class="btn btn-ghost btn-sm" onclick="showConfirm('Decline this share?',()=>showToast('Share declined','warning'))">Decline</button></td>
               </tr>
             </tbody>
           </table>
@@ -130,99 +130,99 @@
     <!-- Public Strategies -->
     <div class="tab-panel" data-group="sh" data-panel="public">
       <div class="filter-bar" style="margin-bottom:16px">
-        <input type="text" class="form-input" style="width:240px" placeholder="搜索公开策略...">
-        <select class="form-select" style="width:140px"><option>所有类别</option><option>趋势跟踪</option><option>均值回复</option><option>多因子</option><option>套利</option></select>
-        <select class="form-select" style="width:120px"><option>按热度排序</option><option>按评分排序</option><option>按最新排序</option></select>
+        <input type="text" class="form-input" style="width:240px" placeholder="Searching public strategies...">
+        <select class="form-select" style="width:140px"><option>All categories</option><option>Trend Following</option><option>Mean reversion</option><option>Multi-factor</option><option>Arbitrage</option></select>
+        <select class="form-select" style="width:120px"><option>Sort by popularity</option><option>Sort by rating</option><option>Sort by latest</option></select>
       </div>
 
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px">
         <div class="card">
           <div style="display:flex;justify-content:space-between;align-items:start">
-            <h3 style="font-weight:600;font-size:15px">CTA趋势跟踪 v3</h3>
+            <h3 style="font-weight:600;font-size:15px">CTA Trend Following v3</h3>
             <span style="font-size:14px">⭐ 4.8</span>
           </div>
-          <p class="text-muted" style="font-size:13px;margin:4px 0">by quant_master · 期货CTA</p>
-          <div style="font-size:13px;margin:8px 0">年化: <b style="color:var(--success)">+38.5%</b> · Sharpe: <b>1.82</b> · MaxDD: <b>12.3%</b></div>
+          <p class="text-muted" style="font-size:13px;margin:4px 0">by quant_master · Futures CTA</p>
+          <div style="font-size:13px;margin:8px 0">Annualized: <b style="color:var(--success)">+38.5%</b> · Sharpe: <b>1.82</b> · MaxDD: <b>12.3%</b></div>
           <div style="display:flex;gap:8px;font-size:12px;color:var(--muted-foreground)">
-            <span>📥 342 克隆</span><span>❤️ 128</span><span>💬 23</span>
+            <span>?? 342 clones</span><span>?? 128</span><span>?? 23</span>
           </div>
           <div style="display:flex;gap:8px;margin-top:12px">
-            <button class="btn btn-primary btn-sm">克隆</button><button class="btn btn-ghost btn-sm">详情</button>
+            <button class="btn btn-primary btn-sm">Clone</button><button class="btn btn-ghost btn-sm">Details</button>
           </div>
         </div>
 
         <div class="card">
           <div style="display:flex;justify-content:space-between;align-items:start">
-            <h3 style="font-weight:600;font-size:15px">IC加权多因子 v2</h3>
+            <h3 style="font-weight:600;font-size:15px">IC Weighted Multi-Factor v2</h3>
             <span style="font-size:14px">⭐ 4.6</span>
           </div>
-          <p class="text-muted" style="font-size:13px;margin:4px 0">by alpha_lab · 多因子选股</p>
-          <div style="font-size:13px;margin:8px 0">年化: <b style="color:var(--success)">+28.1%</b> · Sharpe: <b>2.10</b> · MaxDD: <b>15.8%</b></div>
+          <p class="text-muted" style="font-size:13px;margin:4px 0">by alpha_lab · Multi-factor Stock Selection</p>
+          <div style="font-size:13px;margin:8px 0">Annualized: <b style="color:var(--success)">+28.1%</b> · Sharpe: <b>2.10</b> · MaxDD: <b>15.8%</b></div>
           <div style="display:flex;gap:8px;font-size:12px;color:var(--muted-foreground)">
-            <span>📥 256 克隆</span><span>❤️ 95</span><span>💬 18</span>
+            <span>?? 256 clones</span><span>?? 95</span><span>?? 18</span>
           </div>
           <div style="display:flex;gap:8px;margin-top:12px">
-            <button class="btn btn-primary btn-sm">克隆</button><button class="btn btn-ghost btn-sm">详情</button>
+            <button class="btn btn-primary btn-sm">Clone</button><button class="btn btn-ghost btn-sm">Details</button>
           </div>
         </div>
 
         <div class="card">
           <div style="display:flex;justify-content:space-between;align-items:start">
-            <h3 style="font-weight:600;font-size:15px">统计套利Beta中性</h3>
+            <h3 style="font-weight:600;font-size:15px">Statistical Arbitrage Beta Neutral</h3>
             <span style="font-size:14px">⭐ 4.4</span>
           </div>
-          <p class="text-muted" style="font-size:13px;margin:4px 0">by pair_trader · 配对套利</p>
-          <div style="font-size:13px;margin:8px 0">年化: <b style="color:var(--success)">+16.2%</b> · Sharpe: <b>2.45</b> · MaxDD: <b>5.1%</b></div>
+          <p class="text-muted" style="font-size:13px;margin:4px 0">by pair_trader · Pair Arbitrage</p>
+          <div style="font-size:13px;margin:8px 0">Annualized: <b style="color:var(--success)">+16.2%</b> · Sharpe: <b>2.45</b> · MaxDD: <b>5.1%</b></div>
           <div style="display:flex;gap:8px;font-size:12px;color:var(--muted-foreground)">
-            <span>📥 189 克隆</span><span>❤️ 72</span><span>💬 12</span>
+            <span>?? 189 clones</span><span>?? 72</span><span>?? 12</span>
           </div>
           <div style="display:flex;gap:8px;margin-top:12px">
-            <button class="btn btn-primary btn-sm">克隆</button><button class="btn btn-ghost btn-sm">详情</button>
+            <button class="btn btn-primary btn-sm">Clone</button><button class="btn btn-ghost btn-sm">Details</button>
           </div>
         </div>
 
         <div class="card">
           <div style="display:flex;justify-content:space-between;align-items:start">
-            <h3 style="font-weight:600;font-size:15px">龙虎榜跟踪</h3>
+            <h3 style="font-weight:600;font-size:15px">Dragon and Tiger List Tracking</h3>
             <span style="font-size:14px">⭐ 4.2</span>
           </div>
-          <p class="text-muted" style="font-size:13px;margin:4px 0">by data_miner · 事件驱动</p>
-          <div style="font-size:13px;margin:8px 0">年化: <b style="color:var(--success)">+22.7%</b> · Sharpe: <b>1.35</b> · MaxDD: <b>18.9%</b></div>
+          <p class="text-muted" style="font-size:13px;margin:4px 0">by data_miner · Event-driven</p>
+          <div style="font-size:13px;margin:8px 0">Annualized: <b style="color:var(--success)">+22.7%</b> · Sharpe: <b>1.35</b> · MaxDD: <b>18.9%</b></div>
           <div style="display:flex;gap:8px;font-size:12px;color:var(--muted-foreground)">
-            <span>📥 156 克隆</span><span>❤️ 58</span><span>💬 9</span>
+            <span>?? 156 clones</span><span>?? 58</span><span>?? 9</span>
           </div>
           <div style="display:flex;gap:8px;margin-top:12px">
-            <button class="btn btn-primary btn-sm">克隆</button><button class="btn btn-ghost btn-sm">详情</button>
+            <button class="btn btn-primary btn-sm">Clone</button><button class="btn btn-ghost btn-sm">Details</button>
           </div>
         </div>
 
         <div class="card">
           <div style="display:flex;justify-content:space-between;align-items:start">
-            <h3 style="font-weight:600;font-size:15px">可转债轮动</h3>
+            <h3 style="font-weight:600;font-size:15px">Convertible Bond Rotation</h3>
             <span style="font-size:14px">⭐ 4.1</span>
           </div>
-          <p class="text-muted" style="font-size:13px;margin:4px 0">by bond_quant · 可转债</p>
-          <div style="font-size:13px;margin:8px 0">年化: <b style="color:var(--success)">+18.5%</b> · Sharpe: <b>1.68</b> · MaxDD: <b>8.7%</b></div>
+          <p class="text-muted" style="font-size:13px;margin:4px 0">by bond_quant ? Convertible bond</p>
+          <div style="font-size:13px;margin:8px 0">Annualized: <b style="color:var(--success)">+18.5%</b> · Sharpe: <b>1.68</b> · MaxDD: <b>8.7%</b></div>
           <div style="display:flex;gap:8px;font-size:12px;color:var(--muted-foreground)">
-            <span>📥 98 克隆</span><span>❤️ 41</span><span>💬 7</span>
+            <span>?? 98 clones</span><span>?? 41</span><span>?? 7</span>
           </div>
           <div style="display:flex;gap:8px;margin-top:12px">
-            <button class="btn btn-primary btn-sm">克隆</button><button class="btn btn-ghost btn-sm">详情</button>
+            <button class="btn btn-primary btn-sm">Clone</button><button class="btn btn-ghost btn-sm">Details</button>
           </div>
         </div>
 
         <div class="card">
           <div style="display:flex;justify-content:space-between;align-items:start">
-            <h3 style="font-weight:600;font-size:15px">机器学习涨跌预测</h3>
+            <h3 style="font-weight:600;font-size:15px">Machine Learning Price Prediction</h3>
             <span style="font-size:14px">⭐ 3.9</span>
           </div>
-          <p class="text-muted" style="font-size:13px;margin:4px 0">by ml_trader · AI量化</p>
-          <div style="font-size:13px;margin:8px 0">年化: <b style="color:var(--success)">+24.3%</b> · Sharpe: <b>1.15</b> · MaxDD: <b>22.6%</b></div>
+          <p class="text-muted" style="font-size:13px;margin:4px 0">by ml_trader ? AI quant</p>
+          <div style="font-size:13px;margin:8px 0">Annualized: <b style="color:var(--success)">+24.3%</b> · Sharpe: <b>1.15</b> · MaxDD: <b>22.6%</b></div>
           <div style="display:flex;gap:8px;font-size:12px;color:var(--muted-foreground)">
-            <span>📥 215 克隆</span><span>❤️ 67</span><span>💬 31</span>
+            <span>?? 215 clones</span><span>?? 67</span><span>?? 31</span>
           </div>
           <div style="display:flex;gap:8px;margin-top:12px">
-            <button class="btn btn-primary btn-sm">克隆</button><button class="btn btn-ghost btn-sm">详情</button>
+            <button class="btn btn-primary btn-sm">Clone</button><button class="btn btn-ghost btn-sm">Details</button>
           </div>
         </div>
       </div>
@@ -234,38 +234,38 @@
 <!-- Share Strategy Modal -->
 <div class="modal-overlay" id="shareNew">
   <div class="modal" style="max-width:520px">
-    <div class="modal-header"><h3 class="modal-title">分享策略</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('shareNew')">✕</button></div>
+    <div class="modal-header"><h3 class="modal-title">Share Strategy</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('shareNew')">✕</button></div>
     <div class="modal-body">
       <div style="display:flex;flex-direction:column;gap:16px">
-        <div><label class="form-label">选择策略</label><select class="form-select"><option>DualMA_Cross v3</option><option>RSI_Reversal v1</option><option>BollingerBand_Breakout v2</option><option>MomentumAlpha_v1</option></select></div>
-        <div><label class="form-label">分享方式</label>
+        <div><label class="form-label">Choose Strategy</label><select class="form-select"><option>DualMA_Cross v3</option><option>RSI_Reversal v1</option><option>BollingerBand_Breakout v2</option><option>MomentumAlpha_v1</option></select></div>
+        <div><label class="form-label">Sharing method</label>
           <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
-            <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="radio" name="shareMode" checked> 公开 — 所有人可见和克隆</label>
-            <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="radio" name="shareMode"> 仅链接 — 拥有链接的人可查看</label>
-            <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="radio" name="shareMode"> 指定成员 — 添加特定用户</label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="radio" name="shareMode" checked> Public - visible and cloneable by everyone</label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="radio" name="shareMode"> Link only - people who have the link can view</label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="radio" name="shareMode"> Specific members - choose individual users</label>
           </div>
         </div>
-        <div><label class="form-label">权限控制</label><select class="form-select"><option>仅查看 — 只能浏览策略代码和回测结果</option><option>可评论 — 可查看并添加评论</option><option>可编辑 — 可修改策略参数</option><option>完全权限 — 可修改策略代码</option></select></div>
-        <div><label class="form-label">描述说明</label><textarea class="form-textarea" rows="3" placeholder="添加分享说明（可选）..."></textarea></div>
+        <div><label class="form-label">Permission Control</label><select class="form-select"><option>View only - Can browse strategy code and backtest results</option><option>Comment - Can view and add comments</option><option>Edit - Can modify strategy parameters</option><option>Full access - Can modify strategy code</option></select></div>
+        <div><label class="form-label">Description</label><textarea class="form-textarea" rows="3" placeholder="Add sharing description (optional)..."></textarea></div>
       </div>
     </div>
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('shareNew')">取消</button><button class="btn btn-primary" onclick="submitModal('shareNew','策略已分享成功','success')">分享</button></div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('shareNew')">Cancel</button><button class="btn btn-primary" onclick="submitModal('shareNew', 'The strategy has been shared successfully', 'success')">Share</button></div>
   </div>
 </div>
 
 <!-- Share Link Modal -->
 <div class="modal-overlay" id="shareLink">
   <div class="modal" style="max-width:420px">
-    <div class="modal-header"><h3 class="modal-title">分享链接</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('shareLink')">✕</button></div>
+    <div class="modal-header"><h3 class="modal-title">Share Link</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('shareLink')">✕</button></div>
     <div class="modal-body">
-      <p style="margin-bottom:12px;font-size:14px">复制以下链接发送给其他用户:</p>
+      <p style="margin-bottom:12px;font-size:14px">Copy the following link to send to other users:</p>
       <div style="display:flex;gap:8px">
         <input type="text" class="form-input" value="https://quantmate.io/s/rsi-reversal-abc123" readonly style="flex:1">
-        <button class="btn btn-primary" onclick="showToast('链接已复制到剪贴板','success')">复制</button>
+        <button class="btn btn-primary" onclick="showToast('The link has been copied to the clipboard','success')">Copy</button>
       </div>
-      <p class="text-muted" style="font-size:12px;margin-top:8px">此链接有效期 30 天，已有 12 人通过此链接访问</p>
+      <p class="text-muted" style="font-size:12px;margin-top:8px">This link is valid for 30 days, and 12 people have already accessed it through this link.</p>
     </div>
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('shareLink')">关闭</button></div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('shareLink')">Close</button></div>
   </div>
 </div>
 
@@ -276,8 +276,8 @@ document.querySelectorAll('[data-panel="public"] .card').forEach(card=>{
   const title=(card.querySelector('h3')||{}).textContent||'';
   card.querySelectorAll('.btn-sm').forEach(btn=>{
     const t=btn.textContent.trim();
-    if(t==='克隆') btn.onclick=()=>showToast('已克隆「'+title+'」到我的策略','success');
-    else if(t==='详情') btn.onclick=()=>showToast('加载「'+title+'」详情…','info');
+    if(t==='Clone') btn.onclick=()=>showToast('Cloned "' + title + '" to my strategies','success');
+    else if(t==='Details') btn.onclick=()=>showToast('Loading details for "' + title + '"','info');
   });
 });
 </script>
