@@ -6,17 +6,23 @@
   <link rel="stylesheet" href="shared.css">
   <script src="https://cdn.tailwindcss.com?v=3.4"></script>
   <style>
-    .cat-btn {
+    /* ── Filter Pills ── */
+    .cat-btn, .type-btn {
       padding: 6px 16px; border-radius: 9999px; font-size: 0.8rem; font-weight: 500;
       border: 1px solid hsl(var(--border)); background: transparent;
       color: hsl(var(--muted-foreground)); cursor: pointer;
       transition: background 0.15s, color 0.15s, border-color 0.15s;
     }
-    .cat-btn:hover { background: hsl(var(--accent)); color: hsl(var(--foreground)); }
+    .cat-btn:hover, .type-btn:hover { background: hsl(var(--accent)); color: hsl(var(--foreground)); }
     .cat-btn.active {
       background: hsl(var(--primary)); color: hsl(var(--primary-foreground));
       border-color: hsl(var(--primary));
     }
+    .type-btn.active {
+      background: hsl(var(--primary)); color: hsl(var(--primary-foreground));
+      border-color: hsl(var(--primary));
+    }
+    /* ── Grid ── */
     .tmpl-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
     .tmpl-card { display: flex; flex-direction: column; }
     .tmpl-card .tmpl-desc {
@@ -28,6 +34,22 @@
       padding: 2px 8px; border-radius: 4px; font-size: 0.7rem;
       background: hsl(var(--muted)); color: hsl(var(--muted-foreground));
     }
+    /* ── Type Badges ── */
+    .badge-standalone { background: hsl(221 83% 92%); color: hsl(221 83% 40%); font-size: 11px; }
+    .badge-component { font-size: 11px; }
+    .badge-composite { background: linear-gradient(135deg, hsl(221 83% 92%), hsl(262 83% 92%)); color: hsl(262 60% 40%); font-size: 11px; }
+    .dark .badge-standalone { background: hsl(221 40% 22%); color: hsl(221 83% 75%); }
+    .dark .badge-composite { background: linear-gradient(135deg, hsl(221 40% 22%), hsl(262 40% 22%)); color: hsl(262 60% 75%); }
+    .badge-universe { background: hsl(260 60% 92%); color: hsl(260 60% 40%); }
+    .badge-trading { background: hsl(210 80% 92%); color: hsl(210 80% 35%); }
+    .badge-risk { background: hsl(0 70% 92%); color: hsl(0 70% 40%); }
+    .dark .badge-universe { background: hsl(260 40% 22%); color: hsl(260 60% 75%); }
+    .dark .badge-trading { background: hsl(210 40% 22%); color: hsl(210 80% 75%); }
+    .dark .badge-risk { background: hsl(0 40% 22%); color: hsl(0 70% 75%); }
+    /* ── Pipeline Mini ── */
+    .pipeline-mini { display: flex; align-items: center; gap: 4px; font-size: 11px; flex-wrap: wrap; margin: 6px 0; }
+    .pipeline-mini .arrow { color: hsl(var(--muted-foreground)); font-weight: 700; }
+    /* ── Pagination ── */
     .pagination { display: flex; justify-content: center; gap: 4px; margin-top: 24px; }
     .page-btn {
       min-width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center;
@@ -39,6 +61,8 @@
     .page-btn:hover { background: hsl(var(--accent)); }
     .page-btn.active { background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); border-color: hsl(var(--primary)); }
     .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    /* ── Stats Row ── */
+    .stats-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px; }
     @media (max-width: 1024px) { .tmpl-grid { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 640px) { .tmpl-grid { grid-template-columns: 1fr; } }
   </style>
@@ -50,12 +74,23 @@
 
     <div class="page-header">
       <h1 class="page-title">Strategy Marketplace</h1>
-      <p class="page-subtitle">Discover high-quality strategy templates and deploy in one click</p>
+      <p class="page-subtitle">Discover high-quality strategy templates — import to your workspace and start trading</p>
     </div>
 
-    <!-- Search + Category Filters -->
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-label">Total Templates</div><div class="stat-value">32</div></div>
+      <div class="stat-card"><div class="stat-label">Standalone</div><div class="stat-value">5</div></div>
+      <div class="stat-card"><div class="stat-label">Components</div><div class="stat-value">23</div></div>
+      <div class="stat-card"><div class="stat-label">Composites</div><div class="stat-value">4</div></div>
+    </div>
+
+    <!-- Search + Filters -->
     <div class="filter-bar" style="flex-direction:column;align-items:stretch;gap:12px">
       <input type="text" class="form-input" id="searchInput" placeholder="Search strategy templates..." style="max-width:400px">
+      <!-- Template Type Filter -->
+      <div id="typeBar" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+      <!-- Category Filter -->
       <div id="catBar" style="display:flex;flex-wrap:wrap;gap:8px"></div>
     </div>
 
@@ -71,106 +106,202 @@
   </main>
 </div>
 
+<!-- Import Confirmation Modal -->
+<div class="modal-overlay" id="importConfirmModal">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header"><h3 class="modal-title">Import Template</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('importConfirmModal')">&#10005;</button></div>
+    <div class="modal-body">
+      <p style="font-size:14px;margin:0 0 12px">Import <strong id="importTmplName"></strong> as a private copy?</p>
+      <div id="importTmplInfo" style="padding:12px;border:1px solid hsl(var(--border));border-radius:8px;background:hsl(var(--muted)/.2);margin-bottom:12px;font-size:13px"></div>
+      <p class="text-muted" style="font-size:12px;margin:0">The template will be cloned to your workspace. You can edit and customize it freely.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('importConfirmModal')">Cancel</button>
+      <button class="btn btn-primary" id="importConfirmBtn" onclick="confirmImport()">Import</button>
+    </div>
+  </div>
+</div>
+
 <script src="shared.js"></script>
 <script>
-var CATEGORIES = ['All', 'Trend Following', 'Mean Reversion', 'Multi-Factor', 'Arbitrage', 'High Frequency', 'Machine Learning'];
+/* ── Template Types ── */
+var TYPES = ['All', 'Standalone', 'Component', 'Composite'];
+var CATEGORIES = ['All', 'CTA', 'Alpha', 'Grid', 'Arbitrage', 'AI/ML'];
 
+/* ── Template Data (32 templates) ── */
 var TEMPLATES = [
-  {
-    name: 'Dual MA Crossover',
-    category: 'Trend Following',
-    rating: 4.8,
-    downloads: 2340,
-    author: 'quant_master',
-    desc: 'Classic dual moving average crossover strategy with optimized entry/exit signals. Supports multiple timeframes and adaptive period tuning.',
-    tags: ['Moving Average', 'Trend', 'Beginner Friendly'],
-    featured: true
-  },
-  {
-    name: 'RSI Mean Reversion',
-    category: 'Mean Reversion',
-    rating: 4.5,
-    downloads: 1856,
-    author: 'alpha_seeker',
-    desc: 'RSI-based mean reversion strategy with dynamic overbought/oversold thresholds. Includes volume confirmation filter.',
-    tags: ['RSI', 'Mean Reversion', 'Volume']
-  },
-  {
-    name: 'Multi-Factor Alpha',
-    category: 'Multi-Factor',
-    rating: 4.7,
-    downloads: 1425,
-    author: 'factor_lab',
-    desc: 'Combines momentum, value, quality and size factors with IC-weighted dynamic allocation. Backtested annualized return of 28.5%.',
-    tags: ['Multi-Factor', 'Alpha', 'Stock Selection']
-  },
-  {
-    name: 'Statistical Arbitrage',
-    category: 'Arbitrage',
-    rating: 4.3,
-    downloads: 980,
-    author: 'pair_trader',
-    desc: 'Cointegration-based statistical arbitrage for correlated pairs. Automatic pair detection and spread z-score trading.',
-    tags: ['Pairs Trading', 'Cointegration', 'Market Neutral']
-  },
-  {
-    name: 'LSTM Price Predictor',
-    category: 'Machine Learning',
-    rating: 4.6,
-    downloads: 1120,
-    author: 'ml_quant',
-    desc: 'LSTM neural network for short-term price prediction. Integrates technical indicators and sentiment features as input.',
-    tags: ['LSTM', 'Deep Learning', 'Prediction']
-  },
-  {
-    name: 'Grid Trading Bot',
-    category: 'High Frequency',
-    rating: 4.2,
-    downloads: 760,
-    author: 'grid_master',
-    desc: 'Dynamic grid trading strategy for range-bound markets. Auto-adjusts grid spacing based on realized volatility.',
-    tags: ['Grid', 'Market Making', 'Volatility']
-  },
-  {
-    name: 'Bollinger Breakout',
-    category: 'Trend Following',
-    rating: 4.1,
-    downloads: 1530,
-    author: 'breakout_pro',
-    desc: 'Bollinger Band breakout strategy with ATR-based stop loss and trailing take profit. Optimized for intraday trading.',
-    tags: ['Bollinger', 'Breakout', 'ATR']
-  },
-  {
-    name: 'XGBoost Ranker',
-    category: 'Machine Learning',
-    rating: 4.4,
-    downloads: 890,
-    author: 'ml_quant',
-    desc: 'XGBoost-based cross-sectional stock ranking model. Features engineered from 60+ technical and fundamental factors.',
-    tags: ['XGBoost', 'Ranking', 'Feature Engineering']
-  }
+  /* ─── Standalone (5) — VNPy CtaTemplate ─── */
+  { name: 'MACD Crossover', templateType: 'standalone', category: 'CTA', rating: 4.8, downloads: 2340, author: 'quant_master',
+    desc: 'MACD histogram crossover strategy with optimized entry/exit signals. VNPy CtaTemplate compatible.',
+    tags: ['MACD', 'Trend', 'VNPy'], featured: true },
+  { name: 'Triple MA System', templateType: 'standalone', category: 'CTA', rating: 4.5, downloads: 1856, author: 'trend_follower',
+    desc: 'Three moving average system (short/mid/long) with trend confirmation filters.',
+    tags: ['Moving Average', 'Trend', 'Multi-TF'] },
+  { name: 'Turtle Trading', templateType: 'standalone', category: 'CTA', rating: 4.7, downloads: 1425, author: 'turtle_master',
+    desc: 'Classic Turtle Trading system with Donchian channel breakout and ATR-based position sizing.',
+    tags: ['Donchian', 'Breakout', 'Classic'] },
+  { name: 'Bollinger Breakout', templateType: 'standalone', category: 'CTA', rating: 4.1, downloads: 1530, author: 'breakout_pro',
+    desc: 'Bollinger Band breakout strategy with ATR-based stop loss and trailing take profit.',
+    tags: ['Bollinger', 'Breakout', 'ATR'] },
+  { name: 'ATR Channel', templateType: 'standalone', category: 'CTA', rating: 4.3, downloads: 980, author: 'channel_trader',
+    desc: 'ATR channel trend-following strategy with dynamic channel width and momentum filter.',
+    tags: ['ATR', 'Channel', 'Trend'] },
+
+  /* ─── Component: Universe (6) ─── */
+  { name: 'Market Cap Filter', templateType: 'component', layer: 'universe', subType: 'filter', category: 'Alpha', rating: 4.6, downloads: 890, author: 'factor_lab',
+    desc: 'Filter stocks by market capitalization range. Supports large/mid/small cap thresholds.',
+    tags: ['Market Cap', 'Filter', 'Universe'] },
+  { name: 'Liquidity Filter', templateType: 'component', layer: 'universe', subType: 'filter', category: 'Alpha', rating: 4.4, downloads: 760, author: 'factor_lab',
+    desc: 'Filter by average daily volume and turnover rate to ensure tradability.',
+    tags: ['Liquidity', 'Volume', 'Filter'] },
+  { name: 'Sector Rotation', templateType: 'component', layer: 'universe', subType: 'rotation', category: 'Alpha', rating: 4.5, downloads: 1120, author: 'sector_trader',
+    desc: 'Sector momentum rotation — select top-performing industry sectors based on relative strength.',
+    tags: ['Sector', 'Rotation', 'Momentum'] },
+  { name: 'Index Constituents', templateType: 'component', layer: 'universe', subType: 'index', category: 'Alpha', rating: 4.2, downloads: 650, author: 'index_quant',
+    desc: 'Select universe from major index constituents (CSI 300, CSI 500, S&P 500).',
+    tags: ['Index', 'Constituents', 'Blue Chip'] },
+  { name: 'Fundamental Screen', templateType: 'component', layer: 'universe', subType: 'fundamental', category: 'Alpha', rating: 4.3, downloads: 720, author: 'value_investor',
+    desc: 'Screen stocks by PE, PB, ROE, revenue growth and other fundamental metrics.',
+    tags: ['Fundamental', 'Value', 'Growth'] },
+  { name: 'ST/Halt Filter', templateType: 'component', layer: 'universe', subType: 'compliance', category: 'Alpha', rating: 4.8, downloads: 1560, author: 'risk_mgr',
+    desc: 'Exclude ST-flagged, suspended, and newly-listed stocks. Essential for A-share compliance.',
+    tags: ['ST', 'Compliance', 'A-Share'] },
+
+  /* ─── Component: Trading (11) ─── */
+  { name: 'Dual MA Signal', templateType: 'component', layer: 'trading', subType: 'trend', category: 'CTA', rating: 4.6, downloads: 1200, author: 'signal_master',
+    desc: 'Dual moving average crossover signal generator. Configurable short/long periods.',
+    tags: ['MA', 'Crossover', 'Signal'] },
+  { name: 'Donchian Breakout', templateType: 'component', layer: 'trading', subType: 'trend', category: 'CTA', rating: 4.4, downloads: 890, author: 'breakout_pro',
+    desc: 'Donchian channel breakout signals with configurable lookback window.',
+    tags: ['Donchian', 'Breakout', 'Channel'] },
+  { name: 'MACD Signal', templateType: 'component', layer: 'trading', subType: 'trend', category: 'CTA', rating: 4.5, downloads: 1050, author: 'signal_master',
+    desc: 'MACD histogram zero-cross and divergence signal generator.',
+    tags: ['MACD', 'Histogram', 'Divergence'] },
+  { name: 'Bollinger Mean Reversion', templateType: 'component', layer: 'trading', subType: 'mean_reversion', category: 'CTA', rating: 4.3, downloads: 780, author: 'revert_quant',
+    desc: 'Bollinger Band mean reversion — enter on band touch, exit on mean revert.',
+    tags: ['Bollinger', 'Mean Reversion', 'Bands'] },
+  { name: 'Multi-Factor Alpha', templateType: 'component', layer: 'trading', subType: 'factor', category: 'Alpha', rating: 4.7, downloads: 1340, author: 'factor_lab',
+    desc: 'IC-weighted multi-factor composite scoring for cross-sectional stock selection.',
+    tags: ['Multi-Factor', 'IC', 'Scoring'] },
+  { name: 'Momentum Signal', templateType: 'component', layer: 'trading', subType: 'momentum', category: 'Alpha', rating: 4.4, downloads: 920, author: 'momentum_trader',
+    desc: 'Price and volume momentum signals with lookback and holding period configuration.',
+    tags: ['Momentum', 'Return', 'Volume'] },
+  { name: 'Mean Reversion Alpha', templateType: 'component', layer: 'trading', subType: 'mean_reversion', category: 'Alpha', rating: 4.2, downloads: 680, author: 'revert_quant',
+    desc: 'Z-score based mean reversion for cross-sectional stock selection.',
+    tags: ['Z-Score', 'Reversion', 'Alpha'] },
+  { name: 'Fixed Grid', templateType: 'component', layer: 'trading', subType: 'grid', category: 'Grid', rating: 4.1, downloads: 560, author: 'grid_master',
+    desc: 'Fixed-interval grid trading signal generator with configurable grid levels and spacing.',
+    tags: ['Grid', 'Fixed', 'Range'] },
+  { name: 'Dynamic Grid', templateType: 'component', layer: 'trading', subType: 'grid', category: 'Grid', rating: 4.3, downloads: 620, author: 'grid_master',
+    desc: 'Volatility-adaptive dynamic grid that adjusts spacing based on ATR.',
+    tags: ['Grid', 'Dynamic', 'ATR'] },
+  { name: 'Pair Trading Signal', templateType: 'component', layer: 'trading', subType: 'pairs', category: 'Arbitrage', rating: 4.5, downloads: 870, author: 'pair_trader',
+    desc: 'Cointegration-based pair spread z-score entry/exit signal generator.',
+    tags: ['Pairs', 'Cointegration', 'Spread'] },
+  { name: 'ETF Arbitrage', templateType: 'component', layer: 'trading', subType: 'arbitrage', category: 'Arbitrage', rating: 4.2, downloads: 540, author: 'arb_quant',
+    desc: 'ETF vs. basket arbitrage signal based on premium/discount threshold.',
+    tags: ['ETF', 'Arbitrage', 'Premium'] },
+
+  /* ─── Component: Risk (6) ─── */
+  { name: 'Equal Weight Allocation', templateType: 'component', layer: 'risk', subType: 'allocation', category: 'Alpha', rating: 4.4, downloads: 980, author: 'risk_mgr',
+    desc: 'Equal weight position allocation across all selected stocks.',
+    tags: ['Equal Weight', 'Allocation', 'Simple'] },
+  { name: 'Volatility Parity', templateType: 'component', layer: 'risk', subType: 'allocation', category: 'Alpha', rating: 4.6, downloads: 1100, author: 'risk_mgr',
+    desc: 'Risk parity allocation — weight inversely proportional to realized volatility.',
+    tags: ['Risk Parity', 'Volatility', 'Allocation'] },
+  { name: 'Fixed Stop Loss', templateType: 'component', layer: 'risk', subType: 'stop_loss', category: 'CTA', rating: 4.3, downloads: 1250, author: 'risk_mgr',
+    desc: 'Fixed percentage stop loss with configurable threshold per position.',
+    tags: ['Stop Loss', 'Fixed', 'Protection'] },
+  { name: 'Trailing Stop', templateType: 'component', layer: 'risk', subType: 'stop_loss', category: 'CTA', rating: 4.5, downloads: 1380, author: 'risk_mgr',
+    desc: 'ATR-based trailing stop loss that locks in profits as price moves favorably.',
+    tags: ['Trailing Stop', 'ATR', 'Dynamic'] },
+  { name: 'Drawdown Control', templateType: 'component', layer: 'risk', subType: 'drawdown', category: 'Alpha', rating: 4.7, downloads: 1460, author: 'risk_mgr',
+    desc: 'Maximum drawdown control — reduce exposure when portfolio drawdown exceeds threshold.',
+    tags: ['Drawdown', 'Control', 'Protection'] },
+  { name: 'Position Limits', templateType: 'component', layer: 'risk', subType: 'compliance', category: 'Alpha', rating: 4.5, downloads: 1180, author: 'risk_mgr',
+    desc: 'Position size limits per stock, sector, and total portfolio. Enforces T+1/lot size rules.',
+    tags: ['Position', 'Limits', 'Compliance'] },
+
+  /* ─── Composite (4) ─── */
+  { name: 'CTA Trend Following', templateType: 'composite', category: 'CTA', rating: 4.8, downloads: 2100, author: 'quant_master',
+    desc: 'Complete CTA trend pipeline: ST/Halt Filter → Dual MA Signal → Trailing Stop.',
+    tags: ['CTA', 'Trend', 'Pipeline'],
+    pipeline: { universe: 'ST/Halt Filter', trading: 'Dual MA Signal', risk: 'Trailing Stop' }, featured: true },
+  { name: 'Alpha Multi-Factor', templateType: 'composite', category: 'Alpha', rating: 4.7, downloads: 1850, author: 'factor_lab',
+    desc: 'Full alpha pipeline: Market Cap Filter → Multi-Factor Alpha → Drawdown Control.',
+    tags: ['Alpha', 'Multi-Factor', 'Pipeline'],
+    pipeline: { universe: 'Market Cap Filter', trading: 'Multi-Factor Alpha', risk: 'Drawdown Control' } },
+  { name: 'Grid Oscillation', templateType: 'composite', category: 'Grid', rating: 4.3, downloads: 920, author: 'grid_master',
+    desc: 'Grid pipeline for range-bound markets: Liquidity Filter → Dynamic Grid → Position Limits.',
+    tags: ['Grid', 'Range', 'Pipeline'],
+    pipeline: { universe: 'Liquidity Filter', trading: 'Dynamic Grid', risk: 'Position Limits' } },
+  { name: 'Statistical Arbitrage', templateType: 'composite', category: 'Arbitrage', rating: 4.5, downloads: 1340, author: 'pair_trader',
+    desc: 'Stat-arb pipeline: Index Constituents → Pair Trading Signal → Equal Weight Allocation.',
+    tags: ['StatArb', 'Pairs', 'Pipeline'],
+    pipeline: { universe: 'Index Constituents', trading: 'Pair Trading Signal', risk: 'Equal Weight Allocation' } }
 ];
 
-var ITEMS_PER_PAGE = 6;
+var ITEMS_PER_PAGE = 9;
+var currentType = 'All';
 var currentCategory = 'All';
 var currentSearch = '';
 var currentPage = 1;
+var pendingImport = null;
 
+/* ── Filtering ── */
 function getFilteredTemplates() {
   var results = [];
   for (var i = 0; i < TEMPLATES.length; i++) {
     var t = TEMPLATES[i];
+    var matchType = currentType === 'All' || t.templateType === currentType.toLowerCase();
     var matchCat = currentCategory === 'All' || t.category === currentCategory;
-    var matchSearch = !currentSearch || t.name.toLowerCase().indexOf(currentSearch) !== -1 || t.desc.toLowerCase().indexOf(currentSearch) !== -1 || t.category.toLowerCase().indexOf(currentSearch) !== -1;
-    if (matchCat && matchSearch) results.push(t);
+    var matchSearch = !currentSearch || t.name.toLowerCase().indexOf(currentSearch) !== -1
+      || t.desc.toLowerCase().indexOf(currentSearch) !== -1
+      || t.category.toLowerCase().indexOf(currentSearch) !== -1;
+    if (matchType && matchCat && matchSearch) results.push(t);
   }
   return results;
 }
 
-function renderStars(rating) {
-  return icon('star', '') + ' ' + rating.toFixed(1);
+/* ── Type Badge ── */
+function typeBadge(t) {
+  if (t.templateType === 'standalone') return '<span class="badge badge-standalone">Standalone</span>';
+  if (t.templateType === 'composite') return '<span class="badge badge-composite">Composite</span>';
+  if (t.templateType === 'component') {
+    var cls = 'badge-' + t.layer;
+    var label = t.layer.charAt(0).toUpperCase() + t.layer.slice(1);
+    return '<span class="badge badge-component ' + cls + '">' + label + '</span>';
+  }
+  return '';
 }
 
+/* ── Category Badge ── */
+function catBadgeClass(category) {
+  var map = { 'CTA': 'badge-primary', 'Alpha': 'badge-success', 'Grid': 'badge-warning', 'Arbitrage': 'badge-destructive', 'AI/ML': 'badge-muted' };
+  return map[category] || 'badge-muted';
+}
+
+/* ── Render: Type Filter Bar ── */
+function renderTypeBar() {
+  var html = '';
+  for (var i = 0; i < TYPES.length; i++) {
+    var t = TYPES[i];
+    var cls = t === currentType ? 'type-btn active' : 'type-btn';
+    var count = t === 'All' ? TEMPLATES.length : TEMPLATES.filter(function(x) { return x.templateType === t.toLowerCase(); }).length;
+    html += '<button class="' + cls + '" data-type="' + t + '">' + t + ' <span style="opacity:.6;font-size:11px">(' + count + ')</span></button>';
+  }
+  document.getElementById('typeBar').innerHTML = html;
+  var btns = document.getElementById('typeBar').querySelectorAll('.type-btn');
+  for (var j = 0; j < btns.length; j++) {
+    btns[j].addEventListener('click', function() {
+      currentType = this.getAttribute('data-type');
+      currentPage = 1;
+      render();
+    });
+  }
+}
+
+/* ── Render: Category Filter Bar ── */
 function renderCategoryBar() {
   var html = '';
   for (var i = 0; i < CATEGORIES.length; i++) {
@@ -179,7 +310,6 @@ function renderCategoryBar() {
     html += '<button class="' + cls + '" data-cat="' + cat + '">' + cat + '</button>';
   }
   document.getElementById('catBar').innerHTML = html;
-
   var btns = document.getElementById('catBar').querySelectorAll('.cat-btn');
   for (var j = 0; j < btns.length; j++) {
     btns[j].addEventListener('click', function() {
@@ -190,47 +320,44 @@ function renderCategoryBar() {
   }
 }
 
+/* ── Render: Featured Banner ── */
 function renderFeatured() {
   var el = document.getElementById('featuredBanner');
-  if (currentCategory !== 'All' || currentSearch) {
+  if (currentCategory !== 'All' || currentSearch || (currentType !== 'All' && currentType !== 'Composite')) {
     el.innerHTML = '';
     return;
   }
   var ft = null;
   for (var i = 0; i < TEMPLATES.length; i++) {
-    if (TEMPLATES[i].featured) { ft = TEMPLATES[i]; break; }
+    if (TEMPLATES[i].featured && TEMPLATES[i].templateType === 'composite') { ft = TEMPLATES[i]; break; }
   }
   if (!ft) { el.innerHTML = ''; return; }
+
+  var pipeHtml = '<span class="badge badge-universe">' + ft.pipeline.universe + '</span>'
+    + '<span class="arrow"> &rarr; </span>'
+    + '<span class="badge badge-trading">' + ft.pipeline.trading + '</span>'
+    + '<span class="arrow"> &rarr; </span>'
+    + '<span class="badge badge-risk">' + ft.pipeline.risk + '</span>';
 
   el.innerHTML = '<div class="card" style="background:linear-gradient(135deg,hsl(221 83% 53% / 0.08),hsl(262 83% 58% / 0.08));border:1px solid hsl(221 83% 53% / 0.25);margin-bottom:20px">'
     + '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px">'
     + '<div style="flex:1;min-width:240px">'
-    + '<span class="badge badge-primary" style="margin-bottom:8px">' + icon('star') + ' Featured</span>'
-    + '<h3 style="font-weight:700;font-size:1.125rem;margin:8px 0 4px">' + ft.name + '</h3>'
+    + '<div style="display:flex;gap:8px;margin-bottom:8px"><span class="badge badge-primary">' + icon('star') + ' Featured</span><span class="badge badge-composite">Composite</span></div>'
+    + '<h3 style="font-weight:700;font-size:1.125rem;margin:4px 0">' + ft.name + '</h3>'
     + '<p class="text-muted" style="font-size:0.8rem;margin:4px 0 8px">' + ft.desc + '</p>'
+    + '<div class="pipeline-mini" style="margin:8px 0">' + pipeHtml + '</div>'
     + '<div style="display:flex;gap:16px;font-size:0.8rem;color:hsl(var(--muted-foreground))">'
     + '<span>' + icon('star') + ' ' + ft.rating.toFixed(1) + '</span>'
     + '<span>' + icon('download') + ' ' + ft.downloads.toLocaleString() + '</span>'
     + '<span>' + ft.author + '</span>'
     + '</div>'
     + '</div>'
-    + '<button class="btn btn-primary" onclick="showToast(\'' + ft.name + ' template added to your workspace\', \'success\')">Use Template</button>'
+    + '<button class="btn btn-primary" onclick="importTemplate(\'' + ft.name.replace(/'/g, "\\'") + '\')">Import to Workspace</button>'
     + '</div>'
     + '</div>';
 }
 
-function badgeClass(category) {
-  var map = {
-    'Trend Following': 'badge-primary',
-    'Mean Reversion': 'badge-success',
-    'Multi-Factor': 'badge-warning',
-    'Arbitrage': 'badge-destructive',
-    'High Frequency': 'badge-muted',
-    'Machine Learning': 'bg-purple'
-  };
-  return map[category] || 'badge-muted';
-}
-
+/* ── Render: Grid ── */
 function renderGrid() {
   var filtered = getFilteredTemplates();
   var totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE) || 1;
@@ -240,7 +367,7 @@ function renderGrid() {
 
   var html = '';
   if (pageItems.length === 0) {
-    html = '<div class="empty-state" style="grid-column:1/-1">' + icon('search') + '<p>No templates found matching your criteria</p></div>';
+    html = '<div class="empty-state" style="grid-column:1/-1;padding:40px;text-align:center">' + icon('search') + '<p>No templates found matching your criteria</p></div>';
   }
   for (var i = 0; i < pageItems.length; i++) {
     var t = pageItems[i];
@@ -248,26 +375,45 @@ function renderGrid() {
     for (var j = 0; j < t.tags.length; j++) {
       tagsHtml += '<span class="tmpl-tag">' + t.tags[j] + '</span>';
     }
+    /* Pipeline preview for composite */
+    var pipelineHtml = '';
+    if (t.templateType === 'composite' && t.pipeline) {
+      pipelineHtml = '<div class="pipeline-mini">'
+        + '<span class="badge badge-universe" style="padding:2px 6px">' + t.pipeline.universe + '</span>'
+        + '<span class="arrow">&rarr;</span>'
+        + '<span class="badge badge-trading" style="padding:2px 6px">' + t.pipeline.trading + '</span>'
+        + '<span class="arrow">&rarr;</span>'
+        + '<span class="badge badge-risk" style="padding:2px 6px">' + t.pipeline.risk + '</span>'
+        + '</div>';
+    }
+    /* Layer badge for component */
+    var layerHtml = '';
+    if (t.templateType === 'component' && t.subType) {
+      layerHtml = '<span class="tmpl-tag" style="font-size:10px;text-transform:uppercase">' + t.subType + '</span>';
+    }
+
     html += '<div class="card card-sm tmpl-card">'
       + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">'
-      + '<span class="badge ' + badgeClass(t.category) + '">' + t.category + '</span>'
+      + '<div style="display:flex;gap:6px;align-items:center">' + typeBadge(t) + '<span class="badge ' + catBadgeClass(t.category) + '">' + t.category + '</span></div>'
       + '<span style="font-size:0.75rem;color:hsl(var(--muted-foreground));display:flex;align-items:center;gap:4px">' + icon('star') + ' ' + t.rating.toFixed(1) + '</span>'
       + '</div>'
       + '<h4 style="font-weight:600;font-size:0.95rem;margin:4px 0">' + t.name + '</h4>'
       + '<p class="tmpl-desc">' + t.desc + '</p>'
-      + '<div class="tmpl-tags">' + tagsHtml + '</div>'
+      + pipelineHtml
+      + '<div class="tmpl-tags">' + tagsHtml + layerHtml + '</div>'
       + '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:8px;border-top:1px solid hsl(var(--border))">'
       + '<div style="font-size:0.75rem;color:hsl(var(--muted-foreground));display:flex;gap:12px">'
       + '<span>' + t.author + '</span>'
       + '<span>' + icon('download') + ' ' + t.downloads.toLocaleString() + '</span>'
       + '</div>'
-      + '<button class="btn btn-outline btn-sm" onclick="showToast(\'' + t.name + ' template added to your workspace\', \'success\')">Use Template</button>'
+      + '<button class="btn btn-outline btn-sm" onclick="importTemplate(\'' + t.name.replace(/'/g, "\\'") + '\')">Import</button>'
       + '</div>'
       + '</div>';
   }
   document.getElementById('tmplGrid').innerHTML = html;
 }
 
+/* ── Render: Pagination ── */
 function renderPagination() {
   var filtered = getFilteredTemplates();
   var totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE) || 1;
@@ -280,7 +426,6 @@ function renderPagination() {
   html += '<button class="page-btn"' + (currentPage >= totalPages ? ' disabled' : '') + ' data-page="next">' + icon('chevron-right') + '</button>';
 
   document.getElementById('pagination').innerHTML = html;
-
   var btns = document.getElementById('pagination').querySelectorAll('.page-btn');
   for (var j = 0; j < btns.length; j++) {
     btns[j].addEventListener('click', function() {
@@ -293,7 +438,38 @@ function renderPagination() {
   }
 }
 
+/* ── Import Flow ── */
+function importTemplate(name) {
+  var t = null;
+  for (var i = 0; i < TEMPLATES.length; i++) { if (TEMPLATES[i].name === name) { t = TEMPLATES[i]; break; } }
+  if (!t) return;
+  pendingImport = t;
+  document.getElementById('importTmplName').textContent = t.name;
+  var dest = 'Strategy Research → Workspace';
+  if (t.templateType === 'component') dest = 'Strategy Research → Components';
+  else if (t.templateType === 'composite') dest = 'Composite Strategies → My Composites';
+  document.getElementById('importTmplInfo').innerHTML =
+    '<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">'
+    + typeBadge(t) + '<span class="badge ' + catBadgeClass(t.category) + '">' + t.category + '</span>'
+    + '</div>'
+    + '<div><strong>Destination:</strong> ' + dest + '</div>';
+  openModal('importConfirmModal');
+}
+
+function confirmImport() {
+  closeModal('importConfirmModal');
+  if (!pendingImport) return;
+  var t = pendingImport;
+  var dest = 'Strategy Research → Workspace';
+  if (t.templateType === 'component') dest = 'Strategy Research → Components';
+  else if (t.templateType === 'composite') dest = 'Composite Strategies → My Composites';
+  showToast(t.name + ' imported! Go to ' + dest + ' to edit.', 'success');
+  pendingImport = null;
+}
+
+/* ── Main Render ── */
 function render() {
+  renderTypeBar();
   renderCategoryBar();
   renderFeatured();
   renderGrid();

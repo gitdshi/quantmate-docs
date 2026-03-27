@@ -144,9 +144,8 @@
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:16px">
         <div>
           <h2 style="font-size:18px;font-weight:600;margin:0">Strategy Components</h2>
-          <p class="text-muted" style="font-size:13px;margin:4px 0 0">Individual building blocks organized by layer</p>
+          <p class="text-muted" style="font-size:13px;margin:4px 0 0">Read-only view of your imported components. <a href="strategies.html" style="color:hsl(var(--primary));text-decoration:underline">Edit in Strategy Research →</a></p>
         </div>
-        <button class="btn btn-primary" onclick="openModal('newComponent')">+ New Component</button>
       </div>
 
       <!-- Universe -->
@@ -184,25 +183,6 @@
     </div>
 
   </main>
-</div>
-
-<!-- New Component Modal -->
-<div class="modal-overlay" id="newComponent">
-  <div class="modal" style="max-width:520px">
-    <div class="modal-header"><h3 class="modal-title">New Strategy Component</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('newComponent')">&#10005;</button></div>
-    <div class="modal-body">
-      <div style="display:flex;flex-direction:column;gap:16px">
-        <div><label class="form-label">Name</label><input type="text" class="form-input" placeholder="e.g. MomentumTopK"></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-          <div><label class="form-label">Layer</label><select class="form-select"><option>Universe</option><option>Trading</option><option>Risk</option></select></div>
-          <div><label class="form-label">Sub-type</label><select class="form-select"><option>Factor</option><option>Technical</option><option>Trend</option><option>Mean Reversion</option><option>Stop Loss</option><option>AI/ML</option></select></div>
-        </div>
-        <div><label class="form-label">Description</label><textarea class="form-textarea" rows="2" placeholder="Component description..."></textarea></div>
-        <div><label class="form-label">Code</label><textarea class="form-textarea" rows="6" style="font-family:monospace;font-size:13px" placeholder="# Python strategy component code..."></textarea></div>
-      </div>
-    </div>
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('newComponent')">Cancel</button><button class="btn btn-primary" onclick="submitModal('newComponent','Component created','success')">Create</button></div>
-  </div>
 </div>
 
 <script src="shared.js"></script>
@@ -390,8 +370,8 @@ function renderComponentTable(tableId, items) {
     html += '<td>' + item.desc + '</td>';
     html += '<td>v' + item.ver + '</td>';
     html += '<td>' + item.used + ' composites</td>';
-    html += '<td><button class="btn btn-ghost btn-sm" onclick="showToast(\'Editing ' + item.name + '\', \'info\')">' + icon('edit') + '</button>';
-    html += '<button class="btn btn-ghost btn-sm" onclick="showToast(\'Viewing code\', \'info\')">' + icon('file-code') + '</button></td>';
+    html += '<td><button class="btn btn-ghost btn-sm" onclick="showToast(\'Viewing code\', \'info\')">' + icon('eye') + '</button>';
+    html += '<a href="strategies.html" class="btn btn-ghost btn-sm" title="Edit in Strategy Research">' + icon('external-link') + '</a></td>';
     html += '</tr>';
   }
   tbody.innerHTML = html;
