@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>QuantMate - Analysis Center</title>
+  <title>QuantMate — Analytics Center</title>
   <link rel="stylesheet" href="shared.css">
   <script src="https://cdn.tailwindcss.com?v=3.4"></script>
 </head>
@@ -11,41 +11,59 @@
   <aside class="sidebar" id="sidebar"></aside>
   <main class="main-content" id="main">
 
+    <!-- Header -->
     <div class="page-header">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
         <div>
-          <h1 class="page-title">Analysis Center</h1>
-          <p class="page-subtitle">Technical Analysis · Fundamental Analysis · Quantitative Indicator Dashboard</p>
+          <h1 class="page-title">Analytics Center</h1>
+          <p class="page-subtitle">Technical analysis, fundamentals, and quantitative dashboards</p>
         </div>
-        <button class="btn btn-secondary" onclick="showToast('Report exporting...','info')">Export Report</button>
+        <button class="btn btn-secondary" onclick="showToast('Report exporting...','info')">${icon('download')} Export Report</button>
       </div>
     </div>
 
+    <!-- Tabs -->
     <div class="tabs" data-group="an">
-      <button class="tab-btn active" data-tab="tech">Technical Analysis</button>
-      <button class="tab-btn" data-tab="fundamental">Fundamentals</button>
-      <button class="tab-btn" data-tab="quant">Quantitative indicators</button>
-      <button class="tab-btn" data-tab="custom">Custom Dashboard</button>
+      <button class="tab-btn active" data-tab="tech">${icon('bar-chart-3')} Technical Analysis</button>
+      <button class="tab-btn" data-tab="fundamental">${icon('calculator')} Fundamentals</button>
+      <button class="tab-btn" data-tab="quant">${icon('eye')} Quant Metrics</button>
+      <button class="tab-btn" data-tab="custom">${icon('layout-grid')} Custom Dashboards</button>
     </div>
 
-    <!-- Tab: Technical -->
+    <!-- Tab: Technical Analysis -->
     <div class="tab-panel active" data-group="an" data-panel="tech">
       <div class="card">
         <div class="card-header">
           <div style="display:flex;align-items:center;gap:12px">
-            <select class="form-select" style="max-width:180px" onchange="showToast('Switched to ' + this.value, 'success')">
-              <option>600519.SH Kweichow Moutai</option>
-              <option>000858.SZ Wuliangye</option>
-              <option>601318.SH Ping An of China</option>
+            <select class="form-select" style="max-width:200px" onchange="showToast('Switched to ' + this.value, 'success')">
+              <option>AAPL — Apple</option>
+              <option>MSFT — Microsoft</option>
+              <option>NVDA — NVIDIA</option>
             </select>
           </div>
         </div>
 
         <div class="stat-grid cols-4">
-          <div class="stat-card"><div class="stat-label">RSI (14)</div><div class="stat-value">62.5</div><div class="text-muted" style="font-size:12px">More neutral</div></div>
-          <div class="stat-card"><div class="stat-label">MACD</div><div class="stat-value text-success">+2.35</div><div class="text-muted" style="font-size:12px">Golden cross confirmation</div></div>
-          <div class="stat-card"><div class="stat-label">KDJ-K</div><div class="stat-value">75.2</div><div class="text-muted" style="font-size:12px">Relatively high area</div></div>
-          <div class="stat-card"><div class="stat-label">Bollinger Position</div><div class="stat-value">Above the middle track</div><div class="text-muted" style="font-size:12px">Operating slightly stronger</div></div>
+          <div class="stat-card">
+            <div class="stat-label">RSI (14)</div>
+            <div class="stat-value">62.5</div>
+            <div class="text-muted" style="font-size:12px">Neutral range</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">MACD</div>
+            <div class="stat-value text-success">+2.35</div>
+            <div class="text-muted" style="font-size:12px">Golden cross confirmed</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">KDJ-K</div>
+            <div class="stat-value">75.2</div>
+            <div class="text-muted" style="font-size:12px">Overbought zone</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Bollinger Position</div>
+            <div class="stat-value">Above mid-band</div>
+            <div class="text-muted" style="font-size:12px">Slightly bullish</div>
+          </div>
         </div>
       </div>
 
@@ -54,30 +72,30 @@
           <div class="card-header"><h3 class="card-title">Moving Average System</h3></div>
           <div class="table-wrap">
             <table>
-              <thead><tr><th>Moving average</th><th>value</th><th>Position</th><th>Signal</th></tr></thead>
+              <thead><tr><th>Moving Average</th><th>Value</th><th>Position</th><th>Signal</th></tr></thead>
               <tbody>
-                <tr><td>MA5</td><td>¥1,862</td><td class="text-success">Above the price</td><td><span class="badge badge-success">bullish</span></td></tr>
-                <tr><td>MA10</td><td>¥1,845</td><td class="text-success">Above the price</td><td><span class="badge badge-success">bullish</span></td></tr>
-                <tr><td>MA20</td><td>¥1,830</td><td class="text-success">Above the price</td><td><span class="badge badge-success">bullish</span></td></tr>
-                <tr><td>MA60</td><td>¥1,795</td><td class="text-success">Above the price</td><td><span class="badge badge-success">bullish</span></td></tr>
-                <tr><td>MA120</td><td>¥1,820</td><td class="text-success">Above the price</td><td><span class="badge badge-success">bullish</span></td></tr>
+                <tr><td>MA5</td><td>$186.20</td><td class="text-success">Above price</td><td><span class="badge badge-success">Bullish</span></td></tr>
+                <tr><td>MA10</td><td>$184.50</td><td class="text-success">Above price</td><td><span class="badge badge-success">Bullish</span></td></tr>
+                <tr><td>MA20</td><td>$183.00</td><td class="text-success">Above price</td><td><span class="badge badge-success">Bullish</span></td></tr>
+                <tr><td>MA60</td><td>$179.50</td><td class="text-success">Above price</td><td><span class="badge badge-success">Bullish</span></td></tr>
+                <tr><td>MA120</td><td>$182.00</td><td class="text-success">Above price</td><td><span class="badge badge-success">Bullish</span></td></tr>
               </tbody>
             </table>
           </div>
         </div>
         <div class="card">
-          <div class="card-header"><h3 class="card-title">Support / Resistance level</h3></div>
+          <div class="card-header"><h3 class="card-title">Support / Resistance Levels</h3></div>
           <div class="table-wrap">
             <table>
-              <thead><tr><th>Type</th><th>Price range</th><th>Intensity</th></tr></thead>
+              <thead><tr><th>Type</th><th>Price Level</th><th>Strength</th></tr></thead>
               <tbody>
-                <tr><td class="text-destructive">Pressure 3</td><td>¥1,920</td><td><div class="progress-bar" style="width:100px;display:inline-block"><div class="progress-fill" style="width:90%;background:var(--destructive)"></div></div></td></tr>
-                <tr><td class="text-destructive">Pressure 2</td><td>¥1,895</td><td><div class="progress-bar" style="width:100px;display:inline-block"><div class="progress-fill" style="width:70%;background:var(--destructive)"></div></div></td></tr>
-                <tr><td class="text-destructive">Pressure 1</td><td>¥1,875</td><td><div class="progress-bar" style="width:100px;display:inline-block"><div class="progress-fill" style="width:50%;background:var(--warning)"></div></div></td></tr>
-                <tr><td style="font-weight:700">Current Price</td><td style="font-weight:700">¥1,856</td><td></td></tr>
-                <tr><td class="text-success">Support 1</td><td>¥1,840</td><td><div class="progress-bar" style="width:100px;display:inline-block"><div class="progress-fill" style="width:60%;background:var(--success)"></div></div></td></tr>
-                <tr><td class="text-success">Support 2</td><td>¥1,820</td><td><div class="progress-bar" style="width:100px;display:inline-block"><div class="progress-fill" style="width:80%;background:var(--success)"></div></div></td></tr>
-                <tr><td class="text-success">Support 3</td><td>¥1,795</td><td><div class="progress-bar" style="width:100px;display:inline-block"><div class="progress-fill" style="width:95%;background:var(--success)"></div></div></td></tr>
+                <tr><td class="text-destructive">Resistance 3</td><td>$192.00</td><td><div class="progress-bar" style="width:100px;display:inline-block"><div class="progress-fill" style="width:90%;background:var(--destructive)"></div></div></td></tr>
+                <tr><td class="text-destructive">Resistance 2</td><td>$189.50</td><td><div class="progress-bar" style="width:100px;display:inline-block"><div class="progress-fill" style="width:70%;background:var(--destructive)"></div></div></td></tr>
+                <tr><td class="text-destructive">Resistance 1</td><td>$187.50</td><td><div class="progress-bar" style="width:100px;display:inline-block"><div class="progress-fill" style="width:50%;background:var(--warning)"></div></div></td></tr>
+                <tr><td style="font-weight:700">Current Price</td><td style="font-weight:700">$185.60</td><td></td></tr>
+                <tr><td class="text-success">Support 1</td><td>$184.00</td><td><div class="progress-bar" style="width:100px;display:inline-block"><div class="progress-fill" style="width:60%;background:var(--success)"></div></div></td></tr>
+                <tr><td class="text-success">Support 2</td><td>$182.00</td><td><div class="progress-bar" style="width:100px;display:inline-block"><div class="progress-fill" style="width:80%;background:var(--success)"></div></div></td></tr>
+                <tr><td class="text-success">Support 3</td><td>$179.50</td><td><div class="progress-bar" style="width:100px;display:inline-block"><div class="progress-fill" style="width:95%;background:var(--success)"></div></div></td></tr>
               </tbody>
             </table>
           </div>
@@ -85,26 +103,38 @@
       </div>
 
       <div class="card">
-        <div class="card-header"><h3 class="card-title">Comprehensive Technical Score</h3></div>
+        <div class="card-header"><h3 class="card-title">Composite Technical Score</h3></div>
         <div style="display:flex;align-items:center;gap:24px;padding:16px 0">
           <div style="text-align:center">
             <div style="font-size:48px;font-weight:700;color:var(--success)">82</div>
             <div class="text-muted">Overall Score</div>
           </div>
           <div style="flex:1;display:flex;flex-direction:column;gap:8px">
-            <div><div style="display:flex;justify-content:space-between;font-size:13px"><span>Trend</span><span class="text-success">Strong</span></div><div="progress-bar"><div class="progress-fill" style="width:85%;background:var(--success)"></div></div></div>
-            <div><div style="display:flex;justify-content:space-between;font-size:13px"><span>Momentum</span><span class=""text-success">Slightly strong</span></div><div class="progress-bar"><div class="progress-fill" style="width:72%;background:var(--success)"></div></div></div>
-            <div><div style="display:flex;justify-content:space-between;font-size:13px"><span>Volatility</span><span class="text-warning">Medium</span></div><div class="progress-bar"><div class="progress-fill" style="width:55%;background:var(--warning)"></div></div></div>
-            <div><div style="display:flex;justify-content:space-between;font-size:13px"><span>Trading Volume</span><span class="text-success">Increased volume</span></div><div class="progress-bar"><div class="progress-fill" style="width:78%;background:var(--success)"></div></div></div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:13px"><span>Trend</span><span class="text-success">Strong</span></div>
+              <div class="progress-bar"><div class="progress-fill" style="width:85%;background:var(--success)"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:13px"><span>Momentum</span><span class="text-success">Slightly strong</span></div>
+              <div class="progress-bar"><div class="progress-fill" style="width:72%;background:var(--success)"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:13px"><span>Volatility</span><span class="text-warning">Medium</span></div>
+              <div class="progress-bar"><div class="progress-fill" style="width:55%;background:var(--warning)"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:13px"><span>Volume</span><span class="text-success">Increasing</span></div>
+              <div class="progress-bar"><div class="progress-fill" style="width:78%;background:var(--success)"></div></div>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Tab: Fundamental -->
+    <!-- Tab: Fundamentals -->
     <div class="tab-panel" data-group="an" data-panel="fundamental">
       <div class="card">
-        <div class="card-header"><h3 class="card-title">Financial Overview - Kweichow Moutai (600519.SH)</h3></div>
+        <div class="card-header"><h3 class="card-title">Financial Overview — Apple (AAPL)</h3></div>
         <div class="stat-grid cols-4">
           <div class="stat-card"><div class="stat-label">PE (TTM)</div><div class="stat-value">28.5</div></div>
           <div class="stat-card"><div class="stat-label">PB</div><div class="stat-value">9.2</div></div>
@@ -115,15 +145,15 @@
 
       <div class="grid-2">
         <div class="card">
-          <div class="card-header"><h3 class="card-title">Revenue and Profit (billion yuan)</h3></div>
+          <div class="card-header"><h3 class="card-title">Revenue &amp; Profit ($ billion)</h3></div>
           <div class="table-wrap">
             <table>
-              <thead><tr><th>quarter</th><th>Revenue</th><th>Net profit</th><th>year-on-year</th></tr></thead>
+              <thead><tr><th>Quarter</th><th>Revenue</th><th>Net Profit</th><th>YoY Change</th></tr></thead>
               <tbody>
-                <tr><td>2025Q4</td><td>382.5</td><td>185.2</td><td class="text-success">+18.2%</td></tr>
-                <tr><td>2025Q3</td><td>356.8</td><td>172.6</td><td class="text-success">+15.8%</td></tr>
-                <tr><td>2025Q2</td><td>345.2</td><td>165.3</td><td class="text-success">+14.5%</td></tr>
-                <tr><td>2025Q1</td><td>420.1</td><td>210.5</td><td class="text-success">+20.1%</td></tr>
+                <tr><td>2025 Q4</td><td>382.5</td><td>185.2</td><td class="text-success">+18.2%</td></tr>
+                <tr><td>2025 Q3</td><td>356.8</td><td>172.6</td><td class="text-success">+15.8%</td></tr>
+                <tr><td>2025 Q2</td><td>345.2</td><td>165.3</td><td class="text-success">+14.5%</td></tr>
+                <tr><td>2025 Q1</td><td>420.1</td><td>210.5</td><td class="text-success">+20.1%</td></tr>
               </tbody>
             </table>
           </div>
@@ -134,10 +164,10 @@
             <table>
               <thead><tr><th>Company</th><th>PE</th><th>PB</th><th>ROE</th></tr></thead>
               <tbody>
-                <tr><td><b>Guizhou Moutai</b></td><td>28.5</td><td>9.2</td><td>32.8%</td></tr>
-                <tr><td>Wuliangye</td><td>22.1</td><td>6.5</td><td>25.3%</td></tr>
-                <tr><td>Luzhou Laojiao</td><td>20.8</td><td>7.1</td><td>28.5%</td></tr>
-                <tr><td>Industry median</td><td>18.5</td><td>5.2</td><td>22.0%</td></tr>
+                <tr><td><b>Apple</b></td><td>28.5</td><td>9.2</td><td>32.8%</td></tr>
+                <tr><td>Microsoft</td><td>22.1</td><td>6.5</td><td>25.3%</td></tr>
+                <tr><td>Amazon</td><td>20.8</td><td>7.1</td><td>28.5%</td></tr>
+                <tr><td>Industry Median</td><td>18.5</td><td>5.2</td><td>22.0%</td></tr>
               </tbody>
             </table>
           </div>
@@ -145,27 +175,27 @@
       </div>
     </div>
 
-    <!-- Tab: Quant -->
+    <!-- Tab: Quant Metrics -->
     <div class="tab-panel" data-group="an" data-panel="quant">
       <div class="card">
         <div class="card-header"><h3 class="card-title">Quantitative Metrics Dashboard</h3></div>
         <div class="stat-grid cols-3">
           <div class="stat-card"><div class="stat-label">Information Ratio (IR)</div><div class="stat-value">1.23</div></div>
           <div class="stat-card"><div class="stat-label">Information Coefficient (IC)</div><div class="stat-value">0.052</div></div>
-          <div class="stat-card"><div class="stat-label">Turnover Rate (Monthly)</div><div class="stat-value">3.2x</div></div>
+          <div class="stat-card"><div class="stat-label">Monthly Turnover</div><div class="stat-value">3.2x</div></div>
         </div>
       </div>
 
       <div class="card">
-        <div class="card-header"><h3 class="card-title">Factor exposure</h3></div>
+        <div class="card-header"><h3 class="card-title">Factor Exposure</h3></div>
         <div class="table-wrap">
           <table>
             <thead><tr><th>Factor</th><th>Exposure</th><th>Contribution</th><th>Direction</th></tr></thead>
             <tbody>
-              <tr><td>Momentum</td><td>+1.25</td><td class="text-success">+3.2%</td><td><span class="badge badge-success">positive</span></td></tr>
+              <tr><td>Momentum</td><td>+1.25</td><td class="text-success">+3.2%</td><td><span class="badge badge-success">Positive</span></td></tr>
               <tr><td>Value</td><td>-0.45</td><td class="text-destructive">-1.1%</td><td><span class="badge badge-destructive">Negative</span></td></tr>
-              <tr><td>Quality</td><td>+0.82</td><td class="text-success">+2.5%</td><td><span class="badge badge-success">positive</span></td></tr>
-              <tr><td>Scale</td><td>+0.65</td><td class="text-success">+0.8%</td><td><span class="badge badge-success">positive</span></td></tr>
+              <tr><td>Quality</td><td>+0.82</td><td class="text-success">+2.5%</td><td><span class="badge badge-success">Positive</span></td></tr>
+              <tr><td>Size</td><td>+0.65</td><td class="text-success">+0.8%</td><td><span class="badge badge-success">Positive</span></td></tr>
               <tr><td>Volatility</td><td>-0.35</td><td class="text-success">+0.5%</td><td><span class="badge badge-muted">Neutral</span></td></tr>
             </tbody>
           </table>
@@ -173,29 +203,33 @@
       </div>
     </div>
 
-    <!-- Tab: Custom Dashboard -->
+    <!-- Tab: Custom Dashboards -->
     <div class="tab-panel" data-group="an" data-panel="custom">
       <div class="card">
-        <div class="card-header"><h3 class="card-title">Custom Dashboard</h3><button class="btn btn-primary btn-sm" onclick="showToast('Please drag components from the component library to the dashboard','info')">Add Component</button></div>
+        <div class="card-header">
+          <h3 class="card-title">Custom Dashboards</h3>
+          <button class="btn btn-primary btn-sm" onclick="showToast('Drag components from the library onto the dashboard','info')">${icon('plus')} Add Component</button>
+        </div>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px">
           <div class="card" style="border:2px dashed var(--border);text-align:center;padding:40px 20px;color:var(--muted-foreground)">
-            <p style="font-size:14px">Drag the component here</p>
-            <p style="font-size:12px;margin-top:4px">Support: Charts · Tables · KPI · Custom Metrics</p>
+            <div style="margin-bottom:8px">${icon('layout-grid')}</div>
+            <p style="font-size:14px;font-weight:500">Custom dashboard builder is in progress.</p>
+            <p style="font-size:12px;margin-top:4px">Supports charts, tables, KPIs, and custom indicators.</p>
           </div>
           <div class="card">
-            <div class="card-header"><h3 class="card-title" style="font-size:14px">Custom Stock Fluctuations</h3></div>
+            <div class="card-header"><h3 class="card-title" style="font-size:14px">Watchlist Price Changes</h3></div>
             <div style="font-size:13px;display:flex;flex-direction:column;gap:6px">
-              <div style="display:flex;justify-content:space-between"><span>Guizhou Moutai</span><span class="text-success">+2.35%</span></div>
-              <div style="display:flex;justify-content:space-between"><span>Wuliangye</span><span class="text-success">+1.85%</span></div>
-              <div style="display:flex;justify-content:space-between"><span>LONGi Green Energy</span><span class="text-destructive">-2.41%</span></div>
+              <div style="display:flex;justify-content:space-between"><span>AAPL — Apple</span><span class="text-success">+2.35%</span></div>
+              <div style="display:flex;justify-content:space-between"><span>AMZN — Amazon</span><span class="text-success">+1.85%</span></div>
+              <div style="display:flex;justify-content:space-between"><span>TSLA — Tesla</span><span class="text-destructive">-2.41%</span></div>
             </div>
           </div>
           <div class="card">
-            <div class="card-header"><h3 class="card-title" style="font-size:14px">Today's strategy signal</h3></div>
+            <div class="card-header"><h3 class="card-title" style="font-size:14px">Today's Strategy Signals</h3></div>
             <div style="font-size:13px;display:flex;flex-direction:column;gap:6px">
               <div style="display:flex;justify-content:space-between"><span>DualMA_Cross</span><span class="badge badge-success">Buy</span></div>
               <div style="display:flex;justify-content:space-between"><span>RSI_Reversal</span><span class="badge badge-muted">Hold</span></div>
-              <div style="display:flex;justify-content:space-between"><span>BollingerBand</span><span class="badge badge-warning">Wait and see</span></div>
+              <div style="display:flex;justify-content:space-between"><span>BollingerBand</span><span class="badge badge-warning">Wait</span></div>
             </div>
           </div>
         </div>

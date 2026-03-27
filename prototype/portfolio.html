@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>QuantMate - Portfolio Management</title>
+  <title>QuantMate - Portfolio</title>
   <link rel="stylesheet" href="shared.css">
   <script src="https://cdn.tailwindcss.com?v=3.4"></script>
 </head>
@@ -11,63 +11,100 @@
   <aside class="sidebar" id="sidebar"></aside>
   <main class="main-content" id="main">
 
+    <!-- Page Header -->
     <div class="page-header">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">
         <div>
-          <h1 class="page-title">Portfolio Management</h1>
-          <p class="page-subtitle">Position Monitoring · Risk Control · Asset Allocation</p>
+          <h1 class="page-title">Portfolio</h1>
+          <p class="page-subtitle">Position monitoring, risk control, and asset allocation</p>
         </div>
         <div style="display:flex;gap:8px">
-          <button class="btn btn-secondary" onclick="openModal('riskModal')">Risk control settings</button>
-          <button class="btn btn-primary" onclick="openModal('rebalanceModal')">Rebalance</button>
+          <button class="btn btn-secondary" onclick="openModal('riskModal')">${icon('shield')} Risk Settings</button>
+          <button class="btn btn-primary" onclick="openModal('rebalanceModal')">${icon('refresh-cw')} Rebalance</button>
         </div>
       </div>
     </div>
 
+    <!-- Tabs -->
     <div class="tabs" data-group="pf">
-      <button class="tab-btn active" data-tab="overview">Portfolio Overview</button>
-      <button class="tab-btn" data-tab="positions">Position Details</button>
-      <button class="tab-btn" data-tab="risk">Risk Analysis</button>
-      <button class="tab-btn" data-tab="allocation">Asset Allocation</button>
+      <button class="tab-btn active" data-tab="overview">Overview</button>
+      <button class="tab-btn" data-tab="positions">Positions</button>
+      <button class="tab-btn" data-tab="risk">Risk</button>
+      <button class="tab-btn" data-tab="allocation">Allocation</button>
     </div>
 
     <!-- Tab: Overview -->
     <div class="tab-panel active" data-group="pf" data-panel="overview">
       <div class="stat-grid cols-4">
-        <div class="stat-card"><div class="stat-label">Total Market Value</div><div class="stat-value">¥ 1,256,800</div></div>
-        <div class="stat-card"><div class="stat-label">Position Market Value</div><div class="stat-value">¥ 285,930</div></div>
-        <div class="stat-card"><div class="stat-label">Available funds</div><div class="stat-value">¥ 970,870</div></div>
-        <div class="stat-card"><div class="stat-label">Position Ratio</div><div class="stat-value">22.7%</div></div>
+        <div class="stat-card">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span class="stat-label">Total Value</span>
+            <span style="color:#3b82f6">${icon('wallet')}</span>
+          </div>
+          <div class="stat-value">¥ 1,256,800</div>
+        </div>
+        <div class="stat-card">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span class="stat-label">Position Value</span>
+            <span style="color:#22c55e">${icon('briefcase')}</span>
+          </div>
+          <div class="stat-value">¥ 285,930</div>
+        </div>
+        <div class="stat-card">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span class="stat-label">Available Cash</span>
+            <span style="color:#a855f7">${icon('bar-chart-3')}</span>
+          </div>
+          <div class="stat-value">¥ 970,870</div>
+        </div>
+        <div class="stat-card">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span class="stat-label">Position Ratio</span>
+            <span style="color:#eab308">${icon('pie-chart')}</span>
+          </div>
+          <div class="stat-value">22.7%</div>
+        </div>
       </div>
 
       <div class="stat-grid cols-4" style="margin-top:12px">
-        <div class="stat-card"><div class="stat-label">Total Profit and Loss</div><div class="stat-value text-success">+¥ 5,080</div></div>
-        <div class="stat-card"><div class="stat-label">Today's Profit and Loss</div><div class="stat-value text-success">+¥ 28,960</div></div>
-        <div class="stat-card"><div class="stat-label">Maximum Drawdown</div><div class="stat-value text-destructive">-8.2%</div></div>
-        <div class="stat-card"><div class="stat-label">Sharpe(30d)</div><div class="stat-value">1.35</div></div>
+        <div class="stat-card">
+          <div class="stat-label">Total P&amp;L</div>
+          <div class="stat-value text-success">+¥ 5,080</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Daily P&amp;L</div>
+          <div class="stat-value text-success">+¥ 28,960</div>
+          <div class="text-muted" style="font-size:12px">+2.30%</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Max Drawdown</div>
+          <div class="stat-value text-destructive">-8.2%</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Sharpe (30d)</div>
+          <div class="stat-value">1.35</div>
+        </div>
       </div>
 
       <div class="grid-2">
         <div class="card">
-          <div class="card-header"><h3 class="card-title">Net Value Trend</h3></div>
-          <div class="chart-placeholder" style="height:220px">
-            <canvas id="pfNavCanvas"></canvas>
-          </div>
+          <div class="card-header"><h3 class="card-title">NAV Trend</h3></div>
+          <div class="chart-placeholder" style="height:220px"><canvas id="pfNavCanvas"></canvas></div>
         </div>
         <div class="card">
-          <div class="card-header"><h3 class="card-title">Position Distribution</h3></div>
+          <div class="card-header"><h3 class="card-title">Holdings Distribution</h3></div>
           <div style="display:flex;flex-direction:column;gap:12px;padding-top:8px">
             <div>
-              <div style="display:flex;justify-content:space-between;font-size:13px"><span>Guizhou Moutai</span><span>64.9%</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:13px"><span>Kweichow Moutai</span><span>64.9%</span></div>
               <div class="progress-bar"><div class="progress-fill" style="width:64.9%;background:var(--primary)"></div></div>
             </div>
             <div>
               <div style="display:flex;justify-content:space-between;font-size:13px"><span>Wuliangye</span><span>27.3%</span></div>
-              <div class="progress-bar"><div class="progress-fill" style="width:27.3%;background:var(--success)"></div></div>
+              <div class="progress-bar"><div class="progress-fill" style="width:27.3%;background:#22c55e"></div></div>
             </div>
             <div>
               <div style="display:flex;justify-content:space-between;font-size:13px"><span>LONGi Green Energy</span><span>7.8%</span></div>
-              <div class="progress-bar"><div class="progress-fill" style="width:7.8%;background:var(--destructive)"></div></div>
+              <div class="progress-bar"><div class="progress-fill" style="width:7.8%;background:#eab308"></div></div>
             </div>
           </div>
         </div>
@@ -76,14 +113,23 @@
 
     <!-- Tab: Positions -->
     <div class="tab-panel" data-group="pf" data-panel="positions">
-      <div class="filter-bar">
-        <input type="text" class="form-input" placeholder="🔍 Searching positions..." style="max-width:240px">
-        <select class="form-select" style="max-width:140px"><option>All strategies</option><option>DualMA_Cross</option><option>RSI_Reversal</option><option>MyAlpha01</option></select>
-        <select class="form-select" style="max-width:120px"><option>All directions</option><option>many</option><option>empty</option></select>
+      <div class="filter-bar" style="margin-bottom:16px">
+        <div class="search-wrap"><span id="posSearchIcon"></span><input id="posSearch" type="text" class="form-input" placeholder="Search positions..."></div>
+        <select id="posStratFilter" class="form-select" style="width:180px;flex:0 0 180px">
+          <option value="all">All Strategies</option>
+          <option>DualMA_Cross</option>
+          <option>RSI_Reversal</option>
+          <option>MyAlpha01</option>
+        </select>
+        <select id="posDirFilter" class="form-select" style="width:160px;flex:0 0 160px">
+          <option value="all">All Directions</option>
+          <option value="Long">Long</option>
+          <option value="Short">Short</option>
+        </select>
       </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Code</th><th>Name</th><th>Strategy</th><th>Direction</th><th>Quantity</th><th>Cost price</th><th>Current price</th><th>Market value</th><th>Profit and loss</th><th>Profit and Loss %</th><th>Operation</th></tr></thead>
+          <thead><tr><th>Symbol</th><th>Name</th><th>Strategy</th><th>Direction</th><th>Quantity</th><th>Avg Cost</th><th>Market Price</th><th>Market Value</th><th>P&amp;L</th><th>P&amp;L %</th></tr></thead>
           <tbody id="posDetailTable"></tbody>
         </table>
       </div>
@@ -95,12 +141,11 @@
         <div class="stat-card">
           <div class="stat-label">VaR (95%, 1 day)</div>
           <div class="stat-value text-warning">¥ 18,520</div>
-          <div class="text-muted" style="font-size:12px">Accounts for 1.47% of total assets</div>
+          <div class="text-muted" style="font-size:12px">1.47% of total assets</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">CVaR (95%)</div>
-          <div class="stat-value text-destructive">¥ 25,140</div>
-          <div class="text-muted" style="font-size:12px">Expected Extreme Loss</div>
+          <div class="stat-label">Max Drawdown</div>
+          <div class="stat-value text-destructive">8.2%</div>
         </div>
         <div class="stat-card">
           <div class="stat-label">Beta (vs CSI 300)</div>
@@ -110,30 +155,16 @@
       </div>
 
       <div class="card">
-        <div class="card-header"><h3 class="card-title">Risk control rules</h3></div>
+        <div class="card-header"><h3 class="card-title">Risk Rules</h3></div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Rules</th><th>Threshold</th><th>Current Value</th><th>State</th></tr></thead>
+            <thead><tr><th>Rule</th><th>Threshold</th><th>Current</th><th>Status</th></tr></thead>
             <tbody>
-              <tr><td>Maximum position per single stock</td><td>≤ 20%</td><td>14.8%</td><td><span class="badge badge-success">Normal</span></td></tr>
+              <tr><td>Single Position Limit</td><td>≤ 20%</td><td>14.8%</td><td><span class="badge badge-success">Normal</span></td></tr>
               <tr><td>Total Position Limit</td><td>≤ 80%</td><td>22.7%</td><td><span class="badge badge-success">Normal</span></td></tr>
-              <tr><td>Single-day maximum loss</td><td>≤ 3%</td><td>0.5%</td><td><span class="badge badge-success">Normal</span></td></tr>
-              <tr><td>Maximum drawdown limit</td><td>≤ 15%</td><td>8.2%</td><td><span class="badge badge-warning">Follow</span></td></tr>
-              <tr><td>Industry concentration</td><td>≤ 30%</td><td>64.9%</td><td><span class="badge badge-destructive">Excessive</span></td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-header"><h3 class="card-title">Correlation Matrix</h3></div>
-        <div style="overflow-x:auto">
-          <table style="font-size:12px;text-align:center;min-width:400px">
-            <thead><tr><th></th><th>Guizhou Moutai</th><th>Wuliangye</th><th>LONGi Green Energy</th></tr></thead>
-            <tbody>
-              <tr><td style="font-weight:600">Guizhou Moutai</td><td class="heatmap-cell positive">1.00</td><td class="heatmap-cell positive">0.85</td><td class="heatmap-cell neutral">0.12</td></tr>
-              <tr><td style="font-weight:600">Wuliangye</td><td class="heatmap-cell positive">0.85</td><td class="heatmap-cell positive">1.00</td><td class="heatmap-cell neutral">0.08</td></tr>
-              <tr><td style="font-weight:600">LONGi Green Energy</td><td class="heatmap-cell neutral">0.12</td><td class="heatmap-cell neutral">0.08</td><td class="heatmap-cell positive">1.00</td></tr>
+              <tr><td>Daily Loss Limit</td><td>≤ 3%</td><td>0.5%</td><td><span class="badge badge-success">Normal</span></td></tr>
+              <tr><td>Max Drawdown Limit</td><td>≤ 15%</td><td>8.2%</td><td><span class="badge badge-warning">Warning</span></td></tr>
+              <tr><td>Industry Concentration</td><td>≤ 30%</td><td>64.9%</td><td><span class="badge badge-destructive">Exceeded</span></td></tr>
             </tbody>
           </table>
         </div>
@@ -144,21 +175,63 @@
     <div class="tab-panel" data-group="pf" data-panel="allocation">
       <div class="grid-2">
         <div class="card">
-          <div class="card-header"><h3 class="card-title">Current Configuration</h3></div>
+          <div class="card-header"><h3 class="card-title">Current Allocation</h3></div>
           <div style="display:flex;flex-direction:column;gap:10px">
-            <div><div style="display:flex;justify-content:space-between;font-size:13px"> <span>liquor industry</span> <span>92.2%</span></div> <div class="progress-bar"><div class="progress-fill" style="width:92%;background:var(--primary)"></div></div></div>
-            <div><div style="display:flex;justify-content:space-between;font-size:13px"> <span>photovoltaic industry</span> <span>7.8%</span></div> <div class="progress-bar"><div class="progress-fill" style="width:7.8%;background:var(--success)"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:13px"><span>Consumer Staples</span><span>92.2%</span></div><div class="progress-bar"><div class="progress-fill" style="width:92%;background:var(--primary)"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:13px"><span>Solar / Renewables</span><span>7.8%</span></div><div class="progress-bar"><div class="progress-fill" style="width:7.8%;background:#22c55e"></div></div></div>
           </div>
         </div>
         <div class="card">
-          <div class="card-header"><h3 class="card-title">Target Configuration</h3></div>
+          <div class="card-header"><h3 class="card-title">Target Allocation</h3></div>
           <div style="display:flex;flex-direction:column;gap:10px">
-            <div><div style="display:flex;justify-content:space-between;font-size:13px"> <span>liquor industry</span> <span>target 30%</span></div> <div class="progress-bar"><div class="progress-fill" style="width:30%;background:var(--primary)"></div></div></div>
-            <div><div style="display:flex;justify-content:space-between;font-size:13px"><span>Banking Industry</span><span>Target 25%</span></div><div class="progress-bar"><div class="progress-fill" style="width:25%;background:var(--success)"></div></div></div>
-            <div><div style="display:flex;justify-content:space-between;font-size:13px"><span>Photovoltaic Industry</span><span>Target 20%</span></div><div class="progress-bar"><div class="progress-fill" style="width:20%;background:var(--warning)"></div></div></div>
-            <div><div style="display:flex;justify-content:space-between;font-size:13px"><span>Technology Industry</span><span>Target 25%</span></div><div class="progress-bar"><div class="progress-fill" style="width:25%;background:var(--destructive)"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:13px"><span>Consumer Staples</span><span>Target 30%</span></div><div class="progress-bar"><div class="progress-fill" style="width:30%;background:var(--primary)"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:13px"><span>Banking / Finance</span><span>Target 25%</span></div><div class="progress-bar"><div class="progress-fill" style="width:25%;background:#22c55e"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:13px"><span>Solar / Renewables</span><span>Target 20%</span></div><div class="progress-bar"><div class="progress-fill" style="width:20%;background:#eab308"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:13px"><span>Technology</span><span>Target 25%</span></div><div class="progress-bar"><div class="progress-fill" style="width:25%;background:#ef4444"></div></div></div>
           </div>
-          <button class="btn btn-primary btn-sm" style="margin-top:12px" onclick="showToast('Target configuration has been applied','success')">Application Target Configuration</button>
+          <button class="btn btn-primary btn-sm" style="margin-top:12px" onclick="showToast('Target allocation applied','success')">Apply Target</button>
+        </div>
+      </div>
+
+      <!-- Composite Strategy Allocation -->
+      <div class="card" style="margin-top:16px">
+        <div class="card-header">
+          <h3 class="card-title">Composite Strategy Allocation</h3>
+          <a href="composite-strategies.html" class="btn btn-ghost btn-sm">Manage Composites</a>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Composite</th><th>Pipeline</th><th>Mode</th><th>Weight</th><th>Capital</th><th>Return</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><b>FactorAlpha_MACD</b></td>
+                <td style="font-size:12px"><span class="badge" style="background:hsl(260 60% 92%);color:hsl(260 60% 40%)">Factor Top-K</span> &rarr; <span class="badge" style="background:hsl(210 80% 92%);color:hsl(210 80% 35%)">MACD Trend</span> &rarr; <span class="badge" style="background:hsl(0 70% 92%);color:hsl(0 70% 40%)">Stop Loss + ATR</span></td>
+                <td><span class="badge" style="background:hsl(210 80% 93%);color:hsl(210 80% 40%)">Paper</span></td>
+                <td>40%</td>
+                <td>$400,000</td>
+                <td class="text-success">+28.3%</td>
+                <td><span class="badge badge-success">Active</span></td>
+              </tr>
+              <tr>
+                <td><b>SectorRotation_BB</b></td>
+                <td style="font-size:12px"><span class="badge" style="background:hsl(260 60% 92%);color:hsl(260 60% 40%)">Sector Screen</span> &rarr; <span class="badge" style="background:hsl(210 80% 92%);color:hsl(210 80% 35%)">Bollinger Band</span> &rarr; <span class="badge" style="background:hsl(0 70% 92%);color:hsl(0 70% 40%)">Position Sizing</span></td>
+                <td><span class="badge" style="background:hsl(148 60% 93%);color:hsl(148 60% 30%)">Live</span></td>
+                <td>35%</td>
+                <td>$350,000</td>
+                <td class="text-success">+15.6%</td>
+                <td><span class="badge badge-success">Active</span></td>
+              </tr>
+              <tr>
+                <td><b>IndexCore_MA</b></td>
+                <td style="font-size:12px"><span class="badge" style="background:hsl(260 60% 92%);color:hsl(260 60% 40%)">Index Components</span> &rarr; <span class="badge" style="background:hsl(210 80% 92%);color:hsl(210 80% 35%)">DualMA Cross</span> &rarr; <span class="badge" style="background:hsl(0 70% 92%);color:hsl(0 70% 40%)">Stop Loss + ATR</span></td>
+                <td><span class="badge" style="background:hsl(var(--muted));color:hsl(var(--foreground))">Backtest</span></td>
+                <td>25%</td>
+                <td>$250,000</td>
+                <td class="text-success">+19.8%</td>
+                <td><span class="badge badge-muted">Backtest</span></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -169,72 +242,106 @@
 <!-- Risk Settings Modal -->
 <div class="modal-overlay" id="riskModal">
   <div class="modal" style="max-width:520px">
-    <div class="modal-header"><h3 class="modal-title">Risk Control Settings</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('riskModal')">✕</button></div>
+    <div class="modal-header"><h3 class="modal-title">Risk Settings</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('riskModal')">×</button></div>
     <div class="modal-body">
       <div style="display:flex;flex-direction:column;gap:16px">
-        <div><label class="form-label">Maximum Position per Single Stock (%)</label><input type="number" class="form-input" value="20"></div>
+        <div><label class="form-label">Single Position Limit (%)</label><input type="number" class="form-input" value="20"></div>
         <div><label class="form-label">Total Position Limit (%)</label><input type="number" class="form-input" value="80"></div>
-        <div><label class="form-label">Maximum Daily Loss (%)</label><input type="number" class="form-input" value="3"></div>
-        <div><label class="form-label">Maximum Drawdown Limit (%)</label><input type="number" class="form-input" value="15"></div>
+        <div><label class="form-label">Daily Loss Limit (%)</label><input type="number" class="form-input" value="3"></div>
+        <div><label class="form-label">Max Drawdown Limit (%)</label><input type="number" class="form-input" value="15"></div>
         <div><label class="form-label">Industry Concentration Limit (%)</label><input type="number" class="form-input" value="30"></div>
       </div>
     </div>
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('riskModal')>Cancel</button><button class="btn btn-primary" onclick="submitModal('riskModal', 'Risk control settings have been saved')">Save</button></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('riskModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitModal('riskModal','Risk settings saved','success')">Save</button>
+    </div>
   </div>
 </div>
 
 <!-- Rebalance Modal -->
 <div class="modal-overlay" id="rebalanceModal">
-  <div class="modal" style="max-width:480px">
-    <div class="modal-header"><h3 class="modal-title">Portfolio Rebalancing</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('rebalanceModal')">✕</button></div>
+  <div class="modal" style="max-width:520px">
+    <div class="modal-header"><h3 class="modal-title">Portfolio Rebalance</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('rebalanceModal')">×</button></div>
     <div class="modal-body">
-      <p class="text-muted" style="margin-bottom:16px">The system will automatically generate portfolio adjustment recommendations based on the target configuration weights.</p>
+      <p class="text-muted" style="font-size:13px;margin:0 0 16px">The system will generate adjustment orders based on target allocation weights.</p>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Adjustment item</th><th>Operation</th><th>Target</th></tr></thead>
+          <thead><tr><th>Item</th><th>Operation</th><th>Target</th></tr></thead>
           <tbody>
-            <tr><td>Guizhou Moutai</td><td class="text-destructive">Reduced holdings by 62.2%</td><td>30%</td></tr>
+            <tr><td>Kweichow Moutai</td><td class="text-destructive">Reduce 62.2%</td><td>30%</td></tr>
             <tr><td>Bank ETF</td><td class="text-success">Buy 25%</td><td>25%</td></tr>
-            <tr><td>Photovoltaic ETF</td><td class="text-success">Increase holdings by 12.2%</td><td>20%</td></tr>
-            <tr><td>Technology ETF</td><td class="text-success">Buy 25%</td><td>25%</td></tr>
+            <tr><td>Solar ETF</td><td class="text-success">Increase 12.2%</td><td>20%</td></tr>
+            <tr><td>Tech ETF</td><td class="text-success">Buy 25%</td><td>25%</td></tr>
           </tbody>
         </table>
       </div>
     </div>
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('rebalanceModal')>Cancel</button><button class="btn btn-primary" onclick="submitModal('rebalanceModal', 'The rebalance command has been sent, please wait...')">Perform rebalancing</button></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('rebalanceModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitModal('rebalanceModal','Rebalance order submitted','success')">Execute Rebalance</button>
+    </div>
   </div>
 </div>
 
 <script src="shared.js"></script>
 <script>
-const tbody = document.getElementById('posDetailTable');
-MOCK.positions.forEach(p => {
-  const mv = p.current * p.qty;
-  tbody.innerHTML += `<tr>
-    <td class="font-mono">${p.symbol}</td><td>${p.name}</td><td>${p.strategy}</td>
-    <td><span class="badge badge-success">${p.dir}</span></td>
-    <td>${p.qty}</td><td>¥${p.entry.toFixed(2)}</td><td>¥${p.current.toFixed(2)}</td>
-    <td>¥${mv.toLocaleString()}</td>
-    <td class="${pnlColor(p.pnl)}">${pnlSign(p.pnl)}¥${Math.abs(p.pnl).toLocaleString()}</td>
-    <td class="${pnlColor(p.pnlPct)}">${pnlSign(p.pnlPct)}${p.pnlPct.toFixed(2)}%</td>
-    <td><button class="btn btn-ghost btn-sm" onclick="showConfirm('Are you sure you want to close ${p.name} (${p.symbol})?', function(){showToast('Close order has been sent','success')})"> close</button><button class="btn btn-ghost btn-sm" onclick="showToast('View ${p.name} position details','info')">Details</button></td>
-  </tr>`;
+/* ── Populate Positions Table ── */
+var tbody = document.getElementById('posDetailTable');
+MOCK.positions.forEach(function(p) {
+  var mv = p.current * p.qty;
+  tbody.innerHTML += '<tr>'
+    +'<td class="font-mono">'+p.symbol+'</td><td>'+p.name+'</td><td>'+p.strategy+'</td>'
+    +'<td><span class="badge badge-success">'+p.dir+'</span></td>'
+    +'<td>'+p.qty+'</td><td>¥'+p.entry.toFixed(2)+'</td><td>¥'+p.current.toFixed(2)+'</td>'
+    +'<td>¥'+mv.toLocaleString()+'</td>'
+    +'<td class="'+pnlColor(p.pnl)+'">'+pnlSign(p.pnl)+'¥'+Math.abs(p.pnl).toLocaleString()+'</td>'
+    +'<td class="'+pnlColor(p.pnlPct)+'">'+pnlSign(p.pnlPct)+p.pnlPct.toFixed(2)+'%</td>'
+  +'</tr>';
 });
 
-// NAV chart
+/* ── NAV Chart ── */
 function drawPfNav() {
-  const c = document.getElementById('pfNavCanvas');
+  var c = document.getElementById('pfNavCanvas');
   if (!c || !c.parentElement.offsetWidth) return;
-  const ctx = c.getContext('2d'); const W = c.parentElement.clientWidth, H = c.parentElement.clientHeight;
+  var ctx = c.getContext('2d'); var W = c.parentElement.clientWidth, H = c.parentElement.clientHeight;
   c.width = W; c.height = H;
-  const pts = [100,100.5,101.2,100.8,102,103.5,103,104.2,105.8,105,106.5,108,107.2,109,110.5,111,112.8,112,113.5,115,116.2,115.5,117,118.5,120,121.3,120.5,122,123.5,125.7];
-  const min = Math.min(...pts), max = Math.max(...pts), pad = 30;
+  var pts = [100,100.5,101.2,100.8,102,103.5,103,104.2,105.8,105,106.5,108,107.2,109,110.5,111,112.8,112,113.5,115,116.2,115.5,117,118.5,120,121.3,120.5,122,123.5,125.7];
+  var min = Math.min.apply(null,pts), max = Math.max.apply(null,pts), pad = 30;
   ctx.strokeStyle = '#3b82f6'; ctx.lineWidth = 2; ctx.beginPath();
-  pts.forEach((v,i) => { const x = pad+(i/(pts.length-1))*(W-pad*2); const y = H-pad-((v-min)/(max-min))*(H-pad*2); i===0?ctx.moveTo(x,y):ctx.lineTo(x,y); });
+  pts.forEach(function(v,i) { var x = pad+(i/(pts.length-1))*(W-pad*2); var y = H-pad-((v-min)/(max-min))*(H-pad*2); i===0?ctx.moveTo(x,y):ctx.lineTo(x,y); });
   ctx.stroke();
 }
 window.addEventListener('load', drawPfNav);
 window.addEventListener('resize', drawPfNav);
+
+/* ── Filters ── */
+document.addEventListener('DOMContentLoaded', function() {
+  var si = document.getElementById('posSearchIcon');
+  if (si) si.innerHTML = icon('search');
+  var search = document.getElementById('posSearch');
+  var stratF = document.getElementById('posStratFilter');
+  var dirF = document.getElementById('posDirFilter');
+  function filterPos() {
+    var q = (search.value||'').toLowerCase();
+    var sf = stratF.value;
+    var df = dirF.value;
+    document.getElementById('posDetailTable').querySelectorAll('tr').forEach(function(row) {
+      var sym = row.cells[0].textContent.toLowerCase();
+      var name = row.cells[1].textContent.toLowerCase();
+      var strat = row.cells[2].textContent;
+      var dir = row.cells[3].textContent;
+      var show = true;
+      if (q && sym.indexOf(q)<0 && name.indexOf(q)<0) show = false;
+      if (sf!=='all' && strat!==sf) show = false;
+      if (df!=='all' && dir.indexOf(df)<0) show = false;
+      row.style.display = show ? '' : 'none';
+    });
+  }
+  search.addEventListener('input', filterPos);
+  stratF.addEventListener('change', filterPos);
+  dirF.addEventListener('change', filterPos);
+});
 </script>
 </body>
 </html>

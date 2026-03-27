@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>QuantMate - AI Assistant</title>
+  <title>QuantMate — AI Assistant</title>
   <link rel="stylesheet" href="shared.css">
   <script src="https://cdn.tailwindcss.com?v=3.4"></script>
 </head>
@@ -11,211 +11,112 @@
   <aside class="sidebar" id="sidebar"></aside>
   <main class="main-content" id="main">
 
+    <!-- Header -->
     <div class="page-header">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
-        <div>
-          <h1 class="page-title">AI Assistant</h1>
-          <p class="page-subtitle">Intelligent Q&amp;A | Strategy generation | Market analysis | Code assistance</p>
-        </div>
-        <div style="display:flex;gap:8px">
-          <button class="btn btn-ghost btn-sm" onclick="showConfirm('Confirm clearing the conversation history?', ()=>showToast('Conversation cleared','success'))">Clear conversation</button>
-          <select class="form-select" style="max-width:160px" onchange="showToast('Switched to ' + this.value, 'success')"><option>GPT-4o</option><option>Claude 3.5</option><option>Qwen 2.5</option></select>
-        </div>
+      <div>
+        <h1 class="page-title">AI Assistant</h1>
+        <p class="page-subtitle">Smart chat, code generation, and strategy insights</p>
       </div>
     </div>
 
+    <!-- Tabs -->
     <div class="tabs" data-group="ai">
-      <button class="tab-btn active" data-tab="chat">AI Chat</button>
-      <button class="tab-btn" data-tab="codegen">Code Generation</button>
-      <button class="tab-btn" data-tab="insight">Market Insights</button>
-      <button class="tab-btn" data-tab="suggest">Strategy Recommendations</button>
+      <button class="tab-btn active" data-tab="chat">${icon('message-circle')} AI Chat</button>
+      <button class="tab-btn" data-tab="codegen">${icon('code')} Code Generation</button>
+      <button class="tab-btn" data-tab="insights">${icon('eye')} Insights</button>
+      <button class="tab-btn" data-tab="ideas">${icon('lightbulb')} Strategy Ideas</button>
     </div>
 
-    <!-- Tab: Chat -->
+    <!-- Tab: AI Chat -->
     <div class="tab-panel active" data-group="ai" data-panel="chat">
-      <div class="card" style="display:flex;flex-direction:column;height:calc(100vh - 260px);min-height:400px">
-        <div class="chat-messages" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:16px">
-          <!-- System -->
-          <div class="chat-msg system">
-            <div class="chat-bubble system">Hello! I am the QuantMate AI assistant, and I can help you analyze the market, generate strategy code, and interpret backtest results. How can I assist you?</div>
-          </div>
-          <!-- User -->
-          <div class="chat-msg user">
-            <div class="chat-bubble user">Help me analyze the recent trend of Kweichow Moutai, and provide a comprehensive recommendation based on both technical and fundamental aspects.</div>
-          </div>
-          <!-- AI Response -->
-          <div class="chat-msg system">
-            <div class="chat-bubble system">
-              <h4 style="font-weight:600;margin-bottom:8px">Market Analysis: Kweichow Moutai (600519.SH)</h4>
-              
-              <p style="font-weight:600;margin:12px 0 4px">Technical aspect:</p>
-              <ul style="margin:0;padding-left:16px;font-size:13px">
-                <li>Current price CNY 1,856, above MA5/MA10/MA20, with moving averages in a bullish alignment</li>
-                <li>RSI(14) = 62.5, in the neutral-to-bullish zone</li>
-                <li>MACD bullish crossover confirmed, DIF &gt; DEA, and the histogram is expanding</li>
-                <li>Trading above the middle band of the Bollinger Bands, the trend is relatively strong</li>
-                <li>Support levels: CNY 1,840 / CNY 1,820 | Resistance levels: CNY 1,875 / CNY 1,895</li>
-              </ul>
-
-              <p style="font-weight:600;margin:12px 0 4px">Fundamentals:</p>
-              <ul style="margin:0;padding-left:16px;font-size:13px">
-                <li>PE (TTM) 28.5, slightly higher than the industry median of 18.5</li>
-                <li>ROE 32.8%, maintaining high-quality profitability</li>
-                <li>Revenue for Q4 2025 is 38.25 billion, up 18.2% year-on-year</li>
-                <li>Abundant cash flow, stable dividend ratio</li>
-              </ul>
-
-              <p style="font-weight:600;margin:12px 0 4px">Overall Recommendation:</p>
-              <div style="background:var(--muted);padding:12px;border-radius:6px;font-size:13px">
-                <span class="badge badge-success" style="margin-bottom:6px">Bullish</span>
-                <p>The technical setup remains bullish, and the fundamentals show steady earnings growth. Consider adding near the CNY 1,840 support level, with a stop-loss around CNY 1,795 (MA60). The target range is CNY 1,895-1,920.</p>
-              </div>
-            </div>
-          </div>
-          <!-- User -->
-          <div class="chat-msg user">
-            <div class="chat-bubble user">Help me write a trading strategy based on MACD.</div>
-          </div>
-          <!-- AI Code Response -->
-          <div class="chat-msg system">
-            <div class="chat-bubble system">
-              <p>This is a trading strategy based on MACD golden cross/death cross:</p>
-              <pre class="code-block" style="margin:8px 0;font-size:12px"><code>class MACDStrategy:
-    def __init__(self, fast=12, slow=26, signal=9):
-        self.fast = fast
-        self.slow = slow
-        self.signal = signal
-    
-    def generate_signals(self, df):
-        exp1 = df['close'].ewm(span=self.fast).mean()
-        exp2 = df['close'].ewm(span=self.slow).mean()
-        df['macd'] = exp1 - exp2
-        df['signal_line'] = df['macd'].ewm(span=self.signal).mean()
-        df['histogram'] = df['macd'] - df['signal_line']
-        
-        df['signal'] = 0
-        # Buy on bullish crossover
-        df.loc[(df['macd'] > df['signal_line']) & 
-               (df['macd'].shift(1) <= df['signal_line'].shift(1)), 
-               'signal'] = 1
-        # Sell on bearish crossover
-        df.loc[(df['macd'] < df['signal_line']) & 
-               (df['macd'].shift(1) >= df['signal_line'].shift(1)), 
-               'signal'] = -1
-        return df</code></pre>
-              <div style="display:flex;gap:8px;margin-top:8px">
-                <button class="btn btn-primary btn-sm" onclick="showToast('Code has been copied to the clipboard', 'success')">Copy code</button>
-                <button class="btn btn-secondary btn-sm" onclick="showToast('Imported into the strategy editor','success')">Import to Strategy Editor</button>
-                <button class="btn btn-ghost btn-sm" onclick="showToast('Redirecting to the backtesting page...','info')">Backtest immediately</button>
-              </div>
-            </div>
+      <div class="card" style="display:flex;flex-direction:column;height:60vh;min-height:400px">
+        <div class="chat-container" id="chatMessages" style="flex:1;overflow-y:auto;max-height:none;padding:16px">
+          <!-- AI greeting -->
+          <div class="chat-msg chat-ai">Hello! I'm the QuantMate AI assistant. I can help you analyze strategies, generate code, and provide market insights. What would you like to explore?</div>
+          <!-- User message -->
+          <div class="chat-msg chat-user">Can you explain how a dual moving average crossover strategy works and when it performs best?</div>
+          <!-- AI response -->
+          <div class="chat-msg chat-ai">
+            <p style="font-weight:600;margin-bottom:8px">Dual Moving Average Crossover Strategy</p>
+            <p style="margin-bottom:8px">A dual MA crossover strategy uses two moving averages of different periods — typically a short-term (e.g. 10-day) and a long-term (e.g. 50-day).</p>
+            <ul style="margin:0 0 8px;padding-left:16px;font-size:13px">
+              <li><strong>Buy signal:</strong> Short MA crosses above the long MA (golden cross)</li>
+              <li><strong>Sell signal:</strong> Short MA crosses below the long MA (death cross)</li>
+            </ul>
+            <p style="margin-bottom:4px"><strong>Best conditions:</strong></p>
+            <ul style="margin:0;padding-left:16px;font-size:13px">
+              <li>Trending markets with sustained directional moves</li>
+              <li>Lower volatility environments reduce whipsaw signals</li>
+              <li>Works well on daily or weekly timeframes</li>
+            </ul>
           </div>
         </div>
 
-        <!-- Input Area -->
-        <div style="border-top:1px solid var(--border);padding:12px;display:flex;gap:8px;align-items:flex-end">
-          <div style="display:flex;gap:4px">
-            <button class="btn btn-ghost btn-icon btn-sm" title="Upload File" onclick="showToast('Please select the file to upload','info')">📎</button>
-            <button class="btn btn-ghost btn-icon btn-sm" title="Insert data" onclick="showToast('Please select the dataset to insert', 'info')">📊</button>
-          </div>
-          <textarea class="form-textarea" rows="1" style="flex:1;resize:none" placeholder="Enter a question... supports strategy analysis, market interpretation, code generation, and more"></textarea>
-          <button class="btn btn-primary btn-icon" onclick="showToast('AI is thinking...','info')">➤</button>
+        <!-- Input bar -->
+        <div class="chat-input-bar" style="padding:12px">
+          <input class="form-input" id="chatInput" type="text" placeholder="Ask about strategies, markets, or code..." onkeydown="if(event.key==='Enter')sendChat()">
+          <button class="btn btn-primary" onclick="sendChat()">${icon('send')} Send</button>
         </div>
       </div>
     </div>
 
     <!-- Tab: Code Generation -->
     <div class="tab-panel" data-group="ai" data-panel="codegen">
-      <div class="grid-2">
-        <div class="card">
-          <div class="card-header"><h3 class="card-title">Requirement Description</h3></div>
-          <textarea class="form-textarea" rows="8" placeholder="Describe your strategy logic in natural language...
-Example: Buy when RSI drops below 30 and the MACD histogram turns positive. Sell when RSI rises above 70. Trade 100 shares each time."></textarea>
-          <div style="margin-top:12px;display:flex;gap:8px">
-            <button class="btn btn-primary" onclick="showToast('Generating code, please wait...','info')">Generate code</button>
-            <select class="form-select" style="max-width:140px"><option>Python</option><option>Pine Script</option></select>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-header"><h3 class="card-title">Generated Result</h3><div style="display:flex;gap:8px"><button class="btn btn-ghost btn-sm" onclick="showToast('Code copied','success')">Copy</button><button class="btn btn-ghost btn-sm" onclick="showToast('Imported into the strategy editor','success')">Import Strategy</button></div></div>
-          <pre class="code-block" style="min-height:240px;font-size:12px"><code># AI generated strategy code will appear here
-# Click "Generate code" to start.</code></pre>
+      <!-- Requirement -->
+      <div class="card">
+        <div class="card-header"><h3 class="card-title">Requirement</h3></div>
+        <textarea class="form-textarea" id="codegenInput" rows="5" placeholder="Describe your strategy logic in plain English, e.g. Buy when the 10-day MA crosses above the 50-day MA, sell on the reverse cross. Position size: 100 shares."></textarea>
+        <div style="margin-top:12px">
+          <button class="btn btn-primary" onclick="generateCode()">Generate Code</button>
         </div>
       </div>
 
+      <!-- Generated Result -->
       <div class="card">
-        <div class="card-header"><h3 class="card-title">Common Templates</h3></div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px">
-          <button class="btn btn-secondary btn-sm" style="text-align:left" onclick="showToast('Trend tracking template loaded','success')">📈 Trend Following Strategy</button>
-          <button class="btn btn-secondary btn-sm" style="text-align:left" onclick="showToast('Mean Reversion Template Loaded','success')">🔄 Mean Reversion Strategy</button>
-          <button class="btn btn-secondary btn-sm" style="text-align:left" onclick="showToast('Multi-factor template loaded','success')">📊 Multi-Factor Stock Selection</button>
-          <button class="btn btn-secondary btn-sm" style="text-align:left" onclick="showToast('Momentum Breakthrough Template Loaded','success')">⚡ Momentum Breakout Strategy</button>
-          <button class="btn btn-secondary btn-sm" style="text-align:left" onclick="showToast('Risk parity template loaded','success')">🛡️ Risk Parity Portfolio</button>
-          <button class="btn btn-secondary btn-sm" style="text-align:left" onclick="showToast('Pair trading template loaded','success')">🔀 Pair Trading Strategy</button>
+        <div class="card-header">
+          <h3 class="card-title">Generated Result</h3>
+          <button class="btn btn-ghost btn-sm" onclick="copyCode()">${icon('copy')} Copy Code</button>
         </div>
+        <pre class="code-block" id="codegenOutput" style="min-height:180px;font-size:12px"><code># Generated strategy code will appear here
+# Click "Generate Code" to start</code></pre>
       </div>
-    </div>
 
-    <!-- Tab: Market Insight -->
-    <div class="tab-panel" data-group="ai" data-panel="insight">
+      <!-- Quick Prompts -->
       <div class="card">
-        <div class="card-header"><h3 class="card-title">AI Market Insights - 2026-03-14</h3><span class="badge badge-primary">Automatic update</span></div>
-        
-        <div style="display:flex;flex-direction:column;gap:16px">
-          <div class="card" style="border-left:3px solid var(--success)">
-            <h4 style="font-weight:600">🔥 Today's Hot Topics</h4>
-            <p class="text-muted" style="font-size:13px;margin-top:4px">The liquor sector collectively strengthened, with Maotai and Wuliangye leading the gains. AI concept stocks remained active, and the semiconductor industry chain attracted capital attention.</p>
+        <div class="card-header"><h3 class="card-title">Quick Prompts</h3></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px">
+          <div class="card" style="cursor:pointer" onclick="loadPrompt('dual-ma')">
+            <h4 style="font-weight:600;margin-bottom:4px">${icon('trending-up')} Dual MA</h4>
+            <p class="text-muted" style="font-size:13px">Generate a dual moving average crossover strategy with configurable fast/slow periods.</p>
           </div>
-          <div class="card" style="border-left:3px solid var(--primary)">
-            <h4 style="font-weight:600">📊 Liquidity Analysis</h4>
-            <p class="text-muted" style="font-size:13px;margin-top:4px">The total turnover of the two markets was 1.28 trillion yuan, an increase of 8.5% compared with yesterday. Northbound funds had a net inflow of 5.23 billion yuan, mainly flowing into the consumer and technology sectors. The margin balance slightly rebounded.</p>
+          <div class="card" style="cursor:pointer" onclick="loadPrompt('rsi')">
+            <h4 style="font-weight:600;margin-bottom:4px">${icon('activity')} RSI Reversal</h4>
+            <p class="text-muted" style="font-size:13px">Generate an RSI-based mean reversion strategy that buys oversold and sells overbought.</p>
           </div>
-          <div class="card" style="border-left:3px solid var(--warning)">
-            <h4 style="font-weight:600">⚠️ Risk Warning</h4>
-            <p class="text-muted" style="font-size:13px;margin-top:4px">The Federal Reserve's policy meeting is approaching (3/15), and market volatility may increase. Pay attention to the weakening technical trend in the photovoltaic sector; LONGi Green Energy has fallen below the 20-day moving average.</p>
-          </div>
-          <div class="card" style="border-left:3px solid var(--success)">
-            <h4 style="font-weight:600">💡 Strategy Suggestions</h4>
-            <p class="text-muted" style="font-size:13px;margin-top:4px">It is recommended to maintain a medium position (50-60%), overweight consumer and technology sectors, and underweight cyclical sectors. Pay attention to the market direction after the Federal Reserve's decision, and a short-term defensive approach may be appropriate.</p>
+          <div class="card" style="cursor:pointer" onclick="loadPrompt('macd')">
+            <h4 style="font-weight:600;margin-bottom:4px">${icon('bar-chart-3')} MACD Strategy</h4>
+            <p class="text-muted" style="font-size:13px">Generate a MACD crossover trend-following strategy with histogram confirmation.</p>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Tab: Strategy Suggestions -->
-    <div class="tab-panel" data-group="ai" data-panel="suggest">
+    <!-- Tab: Insights -->
+    <div class="tab-panel" data-group="ai" data-panel="insights">
       <div class="card">
-        <div class="card-header"><h3 class="card-title">AI Strategy Optimization Recommendations</h3></div>
-        <p class="text-muted" style="margin-bottom:16px">Based on your trading history and strategy performance, AI generates the following optimization suggestions:</p>
+        <div class="empty-state">
+          ${icon('eye')}
+          <p>No AI insights yet.</p>
+        </div>
+      </div>
+    </div>
 
-        <div style="display:flex;flex-direction:column;gap:16px">
-          <div class="card" style="border-left:3px solid var(--primary)">
-            <div style="display:flex;justify-content:space-between;align-items:start">
-              <div>
-                <h4 style="font-weight:600">DualMA_Cross Parameter Optimization</h4>
-                <p class="text-muted" style="font-size:13px;margin-top:4px">It is recommended to adjust the short-term moving average from 5 to 8 and the long-term moving average from 20 to 25, which can reduce false signals by about 15%, with an expected Sharpe ratio increase to 1.55.</p>
-              </div>
-              <button class="btn btn-primary btn-sm" onclick="showToast('Parameters have been applied to DualMA_Cross','success')">Application</button>
-            </div>
-          </div>
-          <div class="card" style="border-left:3px solid var(--warning)">
-            <div style="display:flex;justify-content:space-between;align-items:start">
-              <div>
-                <h4 style="font-weight:600">Industry concentration warning</h4>
-                <p class="text-muted" style="font-size:13px;margin-top:4px">The Baijiu sector accounts for 92.2%, far exceeding the 30% threshold. It is recommended to diversify into banks (25%), photovoltaics (20%), and technology (25%), with an expected drawdown reduction of 40%.</p>
-              </div>
-              <button class="btn btn-secondary btn-sm" onclick="showToast('Redirected to the combination configuration page', 'info')">View Configuration</button>
-            </div>
-          </div>
-          <div class="card" style="border-left:3px solid var(--success)">
-            <div style="display:flex;justify-content:space-between;align-items:start">
-              <div>
-                <h4 style="font-weight:600">New Strategic Opportunities</h4>
-                <p class="text-muted" style="font-size:13px;margin-top:4px">A signal of rising volume and price has been detected in the semiconductor sector. It is recommended to pay attention to pair trading opportunities. You can refer to AI-generated semiconductor momentum strategies.</p>
-              </div>
-              <button class="btn btn-primary btn-sm" onclick="showToast('AI is generating semiconductor momentum strategy...','info')">Generation strategy</button>
-            </div>
-          </div>
+    <!-- Tab: Strategy Ideas -->
+    <div class="tab-panel" data-group="ai" data-panel="ideas">
+      <div class="card">
+        <div class="empty-state">
+          ${icon('lightbulb')}
+          <p>No strategy suggestions yet.</p>
         </div>
       </div>
     </div>
@@ -224,5 +125,73 @@ Example: Buy when RSI drops below 30 and the MACD histogram turns positive. Sell
 </div>
 
 <script src="shared.js"></script>
+<script>
+function sendChat() {
+  var input = document.getElementById('chatInput');
+  var msg = (input.value || '').trim();
+  if (!msg) return;
+
+  var container = document.getElementById('chatMessages');
+  var userBubble = document.createElement('div');
+  userBubble.className = 'chat-msg chat-user';
+  userBubble.textContent = msg;
+  container.appendChild(userBubble);
+  input.value = '';
+
+  setTimeout(function() {
+    var aiBubble = document.createElement('div');
+    aiBubble.className = 'chat-msg chat-ai';
+    aiBubble.textContent = 'Thanks for your question! I\'m analyzing "' + msg + '" — this is a simulated response in the prototype.';
+    container.appendChild(aiBubble);
+    container.scrollTop = container.scrollHeight;
+  }, 600);
+
+  container.scrollTop = container.scrollHeight;
+}
+
+function generateCode() {
+  var input = document.getElementById('codegenInput');
+  var requirement = (input.value || '').trim();
+  if (!requirement) {
+    showToast('Please describe your strategy requirement first.', 'warning');
+    return;
+  }
+  showToast('Generating code...', 'info');
+  var output = document.getElementById('codegenOutput');
+  setTimeout(function() {
+    output.innerHTML = '<code>class GeneratedStrategy:\n' +
+      '    """Auto-generated from: ' + requirement.substring(0, 60) + '"""\n\n' +
+      '    def __init__(self):\n' +
+      '        self.name = "GeneratedStrategy"\n\n' +
+      '    def generate_signals(self, df):\n' +
+      '        # TODO: implement signal logic\n' +
+      '        df[\"signal\"] = 0\n' +
+      '        return df</code>';
+    showToast('Code generated successfully!', 'success');
+  }, 800);
+}
+
+function copyCode() {
+  var output = document.getElementById('codegenOutput');
+  var text = output.textContent || '';
+  if (text.indexOf('will appear here') !== -1) {
+    showToast('No code to copy yet.', 'warning');
+    return;
+  }
+  navigator.clipboard.writeText(text);
+  showToast('Code copied to clipboard!', 'success');
+}
+
+function loadPrompt(type) {
+  var input = document.getElementById('codegenInput');
+  var prompts = {
+    'dual-ma': 'Create a dual moving average crossover strategy. Use a 10-day fast MA and 50-day slow MA. Buy on golden cross, sell on death cross. Position size: 100 shares.',
+    'rsi': 'Create an RSI reversal strategy. Buy when RSI(14) drops below 30, sell when RSI rises above 70. Use closing prices. Position size: 100 shares.',
+    'macd': 'Create a MACD trend-following strategy. Use standard 12/26/9 parameters. Buy on bullish MACD crossover with positive histogram, sell on bearish crossover. Position size: 100 shares.'
+  };
+  input.value = prompts[type] || '';
+  showToast('Prompt loaded — click Generate Code to continue.', 'info');
+}
+</script>
 </body>
 </html>

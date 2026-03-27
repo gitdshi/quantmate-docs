@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>QuantMate - Monitoring Alerts</title>
+  <title>QuantMate — Monitoring &amp; Alerts</title>
   <link rel="stylesheet" href="shared.css">
   <script src="https://cdn.tailwindcss.com?v=3.4"></script>
 </head>
@@ -11,33 +11,32 @@
   <aside class="sidebar" id="sidebar"></aside>
   <main class="main-content" id="main">
 
+    <!-- Header -->
     <div class="page-header">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
         <div>
-          <h1 class="page-title">Monitoring alarm</h1>
-          <p class="page-subtitle">Real-time Monitoring · Rule Configuration · Alert Notifications</p>
+          <h1 class="page-title">Monitoring &amp; Alerts</h1>
+          <p class="page-subtitle">Live alerts, rule management, and notification channels</p>
         </div>
-        <div style="display:flex;gap:8px">
-          <button class="btn btn-secondary" onclick="activateTab('al','channels');showToast('Navigated to notification channel settings','info')">Alarm Settings</button>
-          <button class="btn btn-primary" onclick="openModal('newRule')">Create New Rule</button>
-        </div>
+        <button class="btn btn-primary" onclick="openModal('newRule')">${icon('plus')} New Rule</button>
       </div>
     </div>
 
+    <!-- Tabs -->
     <div class="tabs" data-group="al">
-      <button class="tab-btn active" data-tab="live">Real-time alert</button>
-      <button class="tab-btn" data-tab="rules">Rule Management</button>
-      <button class="tab-btn" data-tab="history">Alarm History</button>
-      <button class="tab-btn" data-tab="channels">Notification Channel</button>
+      <button class="tab-btn active" data-tab="live">${icon('alert-circle')} Live Alerts</button>
+      <button class="tab-btn" data-tab="rules">${icon('settings')} Rules</button>
+      <button class="tab-btn" data-tab="history">${icon('clock')} History</button>
+      <button class="tab-btn" data-tab="channels">${icon('bell')} Channels</button>
     </div>
 
     <!-- Tab: Live Alerts -->
     <div class="tab-panel active" data-group="al" data-panel="live">
       <div class="stat-grid cols-4">
         <div class="stat-card"><div class="stat-label">Active Alerts</div><div class="stat-value text-warning">3</div></div>
-        <div class="stat-card"><div class="stat-label">Serious</div><div class="stat-value text-destructive">1</div></div>
-        <div class="stat-card"><div class="stat-label">Triggered today</div><div class="stat-value">8</div></div>
-        <div class="stat-card"><div class="stat-label">Activity Rules</div><div class="stat-value">12</div></div>
+        <div class="stat-card"><div class="stat-label">Critical</div><div class="stat-value text-destructive">1</div></div>
+        <div class="stat-card"><div class="stat-label">Triggered Today</div><div class="stat-value">8</div></div>
+        <div class="stat-card"><div class="stat-label">Active Rules</div><div class="stat-value">12</div></div>
       </div>
 
       <div style="display:flex;flex-direction:column;gap:12px">
@@ -45,18 +44,15 @@
         <div class="card" style="border-left:4px solid var(--destructive)">
           <div style="display:flex;justify-content:space-between;align-items:start">
             <div>
-              <div style="display:flex;align-items:center;gap:8px">
-                <span class="badge badge-destructive">serious</span>
-                <span class="badge badge-primary">System error</span>
-                <span class="text-muted" style="font-size:12px">13:15:00</span>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+                <span class="badge badge-destructive">Critical</span>
+                <span style="font-weight:600">Worker Process Exited Abnormally</span>
               </div>
-              <h4 style="margin:8px 0 4px;font-weight:600">Worker process exited abnormally</h4>
-              <p class="text-muted" style="font-size:13px">The Worker process exited abnormally while executing policy scheduling, affecting the generation of policy live signals. It is recommended to check the service status immediately and restart it.</p>
+              <p class="text-muted" style="font-size:13px;margin-bottom:4px">Source: System Monitor</p>
+              <p class="text-muted" style="font-size:13px">Worker process exited unexpectedly during strategy scheduling. Live signal generation may be affected. Recommend checking service status immediately.</p>
+              <p class="text-muted" style="font-size:12px;margin-top:6px">2026-03-26 13:15:00</p>
             </div>
-            <div style="display:flex;gap:8px;flex-shrink:0">
-              <button class="btn btn-ghost btn-sm" onclick="showToast('Alert confirmed','success')">Confirm</button>
-              <button class="btn btn-primary btn-sm" onclick="showToast('Redirected to Worker status page', 'info')">Handle</button>
-            </div>
+            <button class="btn btn-secondary btn-sm" style="flex-shrink:0;margin-left:16px" onclick="showToast('Alert acknowledged','success')">Acknowledge</button>
           </div>
         </div>
 
@@ -64,18 +60,15 @@
         <div class="card" style="border-left:4px solid var(--warning)">
           <div style="display:flex;justify-content:space-between;align-items:start">
             <div>
-              <div style="display:flex;align-items:center;gap:8px">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
                 <span class="badge badge-warning">Warning</span>
-                <span class="badge badge-primary">Price fluctuation</span>
-                <span class="text-muted" style="font-size:12px">14:32:00</span>
+                <span style="font-weight:600">Portfolio Drawdown Exceeds 10%</span>
               </div>
-              <h4 style="margin:8px 0 4px;font-weight:600">LONGi Green Energy (601012.SH) falls more than 5%</h4>
-              <p class="text-muted" style="font-size:13px">Current decline -2.41%, triggering price monitoring rules. Holding 1,000 shares, unrealized loss ¥2,420.</p>
+              <p class="text-muted" style="font-size:13px;margin-bottom:4px">Source: Risk Monitor</p>
+              <p class="text-muted" style="font-size:13px">Current drawdown -12.3%, approaching the 15% maximum drawdown threshold. Consider reviewing position allocation.</p>
+              <p class="text-muted" style="font-size:12px;margin-top:6px">2026-03-26 14:32:00</p>
             </div>
-            <div style="display:flex;gap:8px;flex-shrink:0">
-              <button class="btn btn-ghost btn-sm" onclick="showToast('The alert has been ignored','info')">Ignore</button>
-              <button class="btn btn-primary btn-sm" onclick="showToast('Redirected to position details','info')">View Positions</button>
-            </div>
+            <button class="btn btn-secondary btn-sm" style="flex-shrink:0;margin-left:16px" onclick="showToast('Alert acknowledged','success')">Acknowledge</button>
           </div>
         </div>
 
@@ -83,17 +76,15 @@
         <div class="card" style="border-left:4px solid var(--primary)">
           <div style="display:flex;justify-content:space-between;align-items:start">
             <div>
-              <div style="display:flex;align-items:center;gap:8px">
-                <span class="badge badge-primary">Information</span>
-                <span class="badge badge-muted">Data delay</span>
-                <span class="text-muted" style="font-size:12px">10:05:00</span>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+                <span class="badge badge-primary">Info</span>
+                <span style="font-weight:600">Tushare Data Delay > 5 Minutes</span>
               </div>
-              <h4 style="margin:8px 0 4px;font-weight:600">Tushare Data delay > 5 minutes</h4>
-              <p class="text-muted" style="font-size:13px">The data source Tushare response delay has exceeded the threshold, which may affect real-time market quotes. The backup source has been automatically switched.</p>
+              <p class="text-muted" style="font-size:13px;margin-bottom:4px">Source: Data Monitor</p>
+              <p class="text-muted" style="font-size:13px">Tushare data source response latency exceeded threshold. Backup source has been activated automatically.</p>
+              <p class="text-muted" style="font-size:12px;margin-top:6px">2026-03-26 10:05:00</p>
             </div>
-            <div style="display:flex;gap:8px;flex-shrink:0">
-              <span class="badge badge-success">Automatically processed</span>
-            </div>
+            <button class="btn btn-secondary btn-sm" style="flex-shrink:0;margin-left:16px" onclick="showToast('Alert acknowledged','success')">Acknowledge</button>
           </div>
         </div>
       </div>
@@ -103,14 +94,62 @@
     <div class="tab-panel" data-group="al" data-panel="rules">
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Rule Name</th><th>Type</th><th>Condition</th><th>Level</th><th>Notification Channel</th><th>State</th><th>Operation</th></tr></thead>
+          <thead><tr><th>Rule Name</th><th>Type</th><th>Condition</th><th>Level</th><th>Channels</th><th>Last Triggered</th><th>Enabled</th></tr></thead>
           <tbody>
-            <tr><td>Individual stock price fluctuations</td><td>Price</td><td>Price change > ±5%</td><td><span class="badge badge-warning">Warning</span></td><td>WeChat Email</td><td><div class="toggle-switch"><input type="checkbox" checked onchange="showToast(this.checked ? 'Rule enabled' : 'Rule disabled', this.checked ? 'success' : 'warning')"><span class="toggle-slider"></span></div></td><td><button class="btn btn-ghost btn-sm" onclick="showToast('The rule editing popup has been opened','info')">Edit</button></td></tr>
-            <tr><td>Portfolio Maximum Drawdown</td><td>Risk control</td><td>Drawdown > 15%</td><td><span class="badge badge-destructive">Severe</span></td><td>WeChat SMS</td><td><div class="toggle-switch"><input type="checkbox" checked onchange="showToast(this.checked ? 'Rule enabled' : 'Rule disabled', this.checked ? 'success' : 'warning')"><span class="toggle-slider"></span></div></td><td><button class="btn btn-ghost btn-sm" onclick="showToast('The rule editing popup has been opened','info')">Edit</button></td></tr>
-            <tr><td>Worker Process Status</td><td>system</td><td>Process exited abnormally</td><td><span class="badge badge-destructive">Severe</span></td><td>WeChat SMS Email</td><td><div class=""toggle-switch"><input type="checkbox" checked onchange="showToast(this.checked ? 'Rule enabled' : 'Rule disabled', this.checked ? 'success' : 'warning')"><span class="toggle-slider"></span></div></td><td><button class="btn btn-ghost btn-sm" onclick="showToast('The rule editing popup has been opened','info')">Edit</button></td></tr>
-            <tr><td>Data synchronization delay</td><td>Data</td><td>Delay > 5 minutes</td><td><span class="badge badge-primary">Information</span></td><td>Email</td><td><div class="toggle-switch"><input type="checkbox" checked onchange="showToast(this.checked ? 'Rule enabled' : 'Rule disabled', this.checked ? 'success' : 'warning')"><span class="toggle-slider"></span></div></td><td><button class="btn btn-ghost btn-sm" onclick="showToast('The rule editing popup has been opened','info')">Edit</button></td></tr>
-            <tr><td>Single stock position exceeds limit</td><td>Risk control</td><td>Position > 20%</td><td><span class="badge badge-warning">Warning</span></td><td>WeChat</td><td><div class=""toggle-switch"><input type="checkbox" checked onchange="showToast(this.checked ? 'Rule enabled' : 'Rule disabled', this.checked ? 'success' : 'warning')"><span class="toggle-slider"></span></div></td><td><button class="btn btn-ghost btn-sm" onclick="showToast('The rule editing popup has been opened','info')">Edit</button></td></tr>
-            <tr><td>Strategy Signal Notification</td><td>Transaction</td><td>New signal triggered</td><td><span class="badge badge-primary">Information</span></td><td>WeChat</td><td><div class="toggle-switch"><input type="checkbox" onchange="showToast(this.checked ? 'Rule enabled' : 'Rule disabled', this.checked ? 'success' : 'warning')"><span class="toggle-slider"></span></div></td><td><button class="btn btn-ghost btn-sm" onclick="showToast('The rule editing popup has been opened','info')">Edit</button></td></tr>
+            <tr>
+              <td>Stock Price Swing</td>
+              <td><span class="badge badge-primary">Risk</span></td>
+              <td>Price change > ±5%</td>
+              <td><span class="badge badge-warning">Warning</span></td>
+              <td>WeCom, Email</td>
+              <td>2026-03-26 14:32</td>
+              <td><div class="toggle-switch"><input type="checkbox" checked onchange="showToast(this.checked ? 'Rule enabled' : 'Rule disabled', this.checked ? 'success' : 'warning')"><span class="toggle-slider"></span></div></td>
+            </tr>
+            <tr>
+              <td>Max Portfolio Drawdown</td>
+              <td><span class="badge badge-primary">Risk</span></td>
+              <td>Drawdown > 15%</td>
+              <td><span class="badge badge-destructive">Critical</span></td>
+              <td>WeCom, SMS</td>
+              <td>2026-03-25 09:45</td>
+              <td><div class="toggle-switch"><input type="checkbox" checked onchange="showToast(this.checked ? 'Rule enabled' : 'Rule disabled', this.checked ? 'success' : 'warning')"><span class="toggle-slider"></span></div></td>
+            </tr>
+            <tr>
+              <td>Worker Process Health</td>
+              <td><span class="badge badge-muted">Strategy Monitor</span></td>
+              <td>Process exited abnormally</td>
+              <td><span class="badge badge-destructive">Critical</span></td>
+              <td>WeCom, SMS, Email</td>
+              <td>2026-03-26 13:15</td>
+              <td><div class="toggle-switch"><input type="checkbox" checked onchange="showToast(this.checked ? 'Rule enabled' : 'Rule disabled', this.checked ? 'success' : 'warning')"><span class="toggle-slider"></span></div></td>
+            </tr>
+            <tr>
+              <td>Data Sync Latency</td>
+              <td><span class="badge badge-muted">Data Monitor</span></td>
+              <td>Delay > 5 minutes</td>
+              <td><span class="badge badge-primary">Info</span></td>
+              <td>Email</td>
+              <td>2026-03-26 10:05</td>
+              <td><div class="toggle-switch"><input type="checkbox" checked onchange="showToast(this.checked ? 'Rule enabled' : 'Rule disabled', this.checked ? 'success' : 'warning')"><span class="toggle-slider"></span></div></td>
+            </tr>
+            <tr>
+              <td>Single Position Limit</td>
+              <td><span class="badge badge-primary">Risk</span></td>
+              <td>Position > 20%</td>
+              <td><span class="badge badge-warning">Warning</span></td>
+              <td>WeCom</td>
+              <td>2026-03-20 11:30</td>
+              <td><div class="toggle-switch"><input type="checkbox" checked onchange="showToast(this.checked ? 'Rule enabled' : 'Rule disabled', this.checked ? 'success' : 'warning')"><span class="toggle-slider"></span></div></td>
+            </tr>
+            <tr>
+              <td>Strategy Signal Alert</td>
+              <td><span class="badge badge-muted">Trading</span></td>
+              <td>New signal triggered</td>
+              <td><span class="badge badge-primary">Info</span></td>
+              <td>WeCom</td>
+              <td>2026-03-24 15:00</td>
+              <td><div class="toggle-switch"><input type="checkbox" onchange="showToast(this.checked ? 'Rule enabled' : 'Rule disabled', this.checked ? 'success' : 'warning')"><span class="toggle-slider"></span></div></td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -119,21 +158,58 @@
     <!-- Tab: History -->
     <div class="tab-panel" data-group="al" data-panel="history">
       <div class="filter-bar">
-        <input type="date" class="form-input" value="2026-03-01" style="max-width:160px">
-        <span class="text-muted" style="line-height:38px">to</span>
-        <input type="date" class="form-input" value="2026-03-14" style="max-width:160px">
-        <select class="form-select" style="max-width:120px"><option>All levels</option><option>serious</option><option>Warning</option><option>Information</option></select>
-        <select class="form-select" style="max-width:120px"><option>All Statuses</option><option>Resolved</option><option>Confirmed</option><option>Unhandled</option></select>
+        <input type="text" class="form-input" placeholder="Search alerts..." style="max-width:240px">
+        <select class="form-select" style="max-width:140px">
+          <option>All Levels</option>
+          <option>Critical</option>
+          <option>Warning</option>
+          <option>Info</option>
+        </select>
       </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Time</th><th>Type</th><th>Level</th><th>Message</th><th>State</th><th>Handler</th></tr></thead>
+          <thead><tr><th>Level</th><th>Title</th><th>Message</th><th>Source</th><th>Time</th><th>Status</th></tr></thead>
           <tbody>
-            <tr><td>2026-03-14 14:32</td><td>Price fluctuation</td><td><span class="badge badge-warning">Warning</span></td><td>Longi Green Energy fell more than 5%</td><td><span class="badge badge-warning">Unhandled</span></td><td>-</td></tr>
-            <tr><td>2026-03-14 13:15</td><td>System error</td><td><span class="badge badge-destructive">Severe</span></td><td>Worker process exited abnormally</td><td><span class="badge badge-primary">Confirmed</span></td><td>demo_user</td></tr>
-            <tr><td>2026-03-14 10:05</td><td>Data delay</td><td><span class="badge badge-primary">Information</span></td><td>Tushare data delayed >5 minutes</td><td><span class="badge badge-success">Resolved</span></td><td>system</td></tr>
-            <tr><td>2026-03-13 15:00</td><td>Risk control</td><td><span class="badge badge-warning">Warning</span></td><td>Industry concentration exceeds limit (Baijiu 64.9%)</td><td><span class="badge badge-success">Resolved</span></td><td>demo_user</td></tr>
-            <tr><td>2026-03-12 09:35</td><td>Transaction</td><td><span class="badge badge-primary">Information</span></td><td>RSI_Reversal triggered a buy signal</td><td><span class="badge badge-success">Resolved</span></td><td>system</td></tr>
+            <tr>
+              <td><span class="badge badge-warning">Warning</span></td>
+              <td>Portfolio Drawdown Exceeds 10%</td>
+              <td>Current drawdown -12.3%</td>
+              <td>Risk Monitor</td>
+              <td>2026-03-26 14:32</td>
+              <td><span class="badge badge-warning">Pending</span></td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-destructive">Critical</span></td>
+              <td>Worker Process Exited Abnormally</td>
+              <td>Worker process exited unexpectedly</td>
+              <td>System Monitor</td>
+              <td>2026-03-26 13:15</td>
+              <td><span class="badge badge-success">Acknowledged</span></td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-primary">Info</span></td>
+              <td>Tushare Data Delay > 5 Minutes</td>
+              <td>Data source latency exceeded threshold</td>
+              <td>Data Monitor</td>
+              <td>2026-03-26 10:05</td>
+              <td><span class="badge badge-success">Acknowledged</span></td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-warning">Warning</span></td>
+              <td>Industry Concentration Exceeded</td>
+              <td>Sector concentration at 64.9%</td>
+              <td>Risk Monitor</td>
+              <td>2026-03-25 15:00</td>
+              <td><span class="badge badge-success">Acknowledged</span></td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-primary">Info</span></td>
+              <td>RSI_Reversal Buy Signal</td>
+              <td>New buy signal triggered for AAPL</td>
+              <td>Trading</td>
+              <td>2026-03-24 09:35</td>
+              <td><span class="badge badge-success">Acknowledged</span></td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -143,22 +219,31 @@
     <div class="tab-panel" data-group="al" data-panel="channels">
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px">
         <div class="card">
-          <div class="card-header"><h3 class="card-title">WeChat Push</h3><div class="toggle-switch"><input type="checkbox" checked onchange="showToast(this.checked ? 'WeChat push notifications enabled' : 'WeChat push notifications disabled', this.checked ? 'success' : 'warning')"><span class="toggle-slider"></span></div></div>
-          <p class="text-muted" style="font-size:13px">Push alert messages through Enterprise WeChat Webhook</p>
-          <div style="margin-top:12px"><label class="form-label">Webhook URL</label><input type="text" class="form-input" value="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=***"></div>
-          <button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="showToast('WeChat Webhook connected successfully','success')">Test connection</button>
+          <div class="card-header">
+            <h3 class="card-title">${icon('message-circle')} WeCom</h3>
+            <div class="toggle-switch"><input type="checkbox" checked onchange="showToast(this.checked ? 'WeCom enabled' : 'WeCom disabled', this.checked ? 'success' : 'warning')"><span class="toggle-slider"></span></div>
+          </div>
+          <p class="text-muted" style="font-size:13px">Push alerts via Enterprise WeChat Webhook</p>
+          <div style="margin-top:12px"><span class="text-muted" style="font-size:12px">Webhook URL</span><p style="font-size:13px;margin-top:4px">https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=***</p></div>
+          <button class="btn btn-ghost btn-sm" style="margin-top:12px" onclick="showToast('WeCom connection successful','success')">Test Connection</button>
         </div>
         <div class="card">
-          <div class="card-header"><h3 class="card-title">Email Notification</h3><div class="toggle-switch"><input type="checkbox" checked onchange="showToast(this.checked ? 'Email notifications enabled' : 'Email notifications disabled', this.checked ? 'success' : 'warning')"><span class="toggle-slider"></span></div></div>
-          <p class="text-muted" style="font-size:13px">Send alert emails to the specified mailbox</p>
-          <div style="margin-top:12px"><label class="form-label">Email Address</label><input type="email" class="form-input" value="demo@quantmate.io"></div>
-          <button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="showToast('Test email has been sent','success')">Test send</button>
+          <div class="card-header">
+            <h3 class="card-title">${icon('mail')} Email</h3>
+            <div class="toggle-switch"><input type="checkbox" checked onchange="showToast(this.checked ? 'Email enabled' : 'Email disabled', this.checked ? 'success' : 'warning')"><span class="toggle-slider"></span></div>
+          </div>
+          <p class="text-muted" style="font-size:13px">Send alert emails to specified address</p>
+          <div style="margin-top:12px"><span class="text-muted" style="font-size:12px">Email Address</span><p style="font-size:13px;margin-top:4px">demo@quantmate.io</p></div>
+          <button class="btn btn-ghost btn-sm" style="margin-top:12px" onclick="showToast('Test email sent','success')">Test Connection</button>
         </div>
         <div class="card">
-          <div class="card-header"><h3 class="card-title">SMS Notification</h3><div class="toggle-switch"><input type="checkbox" onchange="showToast(this.checked ? 'SMS notifications enabled' : 'SMS notifications disabled', this.checked ? 'success' : 'warning')"><span class="toggle-slider"></span></div></div>
-          <p class="text-muted" style="font-size:13px;color:var(--warning)">For use only for severe-level alarms</p>
-          <div style="margin-top:12px"><label class="form-label">Phone Number</label><input type="tel" class="form-input" value="138****8888"></div>
-          <button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="showToast('Test message sent', 'success')">Test send</button>
+          <div class="card-header">
+            <h3 class="card-title">${icon('smartphone')} SMS</h3>
+            <div class="toggle-switch"><input type="checkbox" onchange="showToast(this.checked ? 'SMS enabled' : 'SMS disabled', this.checked ? 'success' : 'warning')"><span class="toggle-slider"></span></div>
+          </div>
+          <p class="text-muted" style="font-size:13px">Reserved for critical-level alerts only</p>
+          <div style="margin-top:12px"><span class="text-muted" style="font-size:12px">Phone Number</span><p style="font-size:13px;margin-top:4px">138****8888</p></div>
+          <button class="btn btn-ghost btn-sm" style="margin-top:12px" onclick="showToast('Test SMS sent','success')">Test Connection</button>
         </div>
       </div>
     </div>
@@ -166,20 +251,20 @@
   </main>
 </div>
 
-<!-- New Rule Modal -->
+<!-- Modal: Create Alert Rule -->
 <div class="modal-overlay" id="newRule">
   <div class="modal" style="max-width:560px">
-    <div class="modal-header"><h3 class="modal-title">Create New Alert Rule</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('newRule')">✕</button></div>
+    <div class="modal-header"><h3 class="modal-title">Create Alert Rule</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('newRule')">✕</button></div>
     <div class="modal-body">
       <div style="display:flex;flex-direction:column;gap:16px">
-        <div><label class="form-label">Rule Name</label><input type="text" class="form-input" placeholder="For example: individual stock limit-up alert"></div>
-        <div><label class="form-label">Rule Type</label><select class="form-select"><option>Price fluctuation</option><option>Risk control</option><option>System Monitoring</option><option>Data Quality</option><option>Trading Signal</option></select></div>
-        <div><label class="form-label">Trigger Conditions</label><div style="display:flex;gap:8px"><select class="form-select"><option>Change Range</option><option>Price</option><option>Trading Volume</option></select><select class="form-select" style="max-width:80px"><option>&gt;</option><option>&lt;</option><option>=</option></select><input type="number" class="form-input" value="5" style="max-width:100px"><span style="line-height:38px">%</span></div></div>
-        <div><label class="form-label">Alarm Level</label><select class="form-select"><option>Information</option><option>Warning</option><option>serious</option></select></div>
-        <div><label class="form-label">Notification Channel</label><div style="display:flex;gap:12px"><label class="flex items-center gap-2"><input type="checkbox" checked> WeChat</label><label class="flex items-center gap-2"><input type="checkbox" checked> Email</label><label class="flex items-center gap-2"><input type="checkbox"> Text message</label></div></div>
+        <div><label class="form-label">Rule Name</label><input type="text" class="form-input" placeholder="e.g. Stock price swing alert"></div>
+        <div><label class="form-label">Type</label><select class="form-select"><option>Risk</option><option>Strategy Monitor</option><option>Data Monitor</option><option>Trading</option></select></div>
+        <div><label class="form-label">Level</label><select class="form-select"><option>Critical</option><option>Warning</option><option>Info</option></select></div>
+        <div><label class="form-label">Condition</label><input type="text" class="form-input" placeholder="e.g. Price change > ±5%"></div>
+        <div><label class="form-label">Channels</label><div style="display:flex;gap:16px"><label style="display:flex;align-items:center;gap:6px"><input type="checkbox" checked> WeCom</label><label style="display:flex;align-items:center;gap:6px"><input type="checkbox" checked> Email</label><label style="display:flex;align-items:center;gap:6px"><input type="checkbox"> SMS</label></div></div>
       </div>
     </div>
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('newRule')>Cancel</button><button class="btn btn-primary" onclick="submitModal('newRule','Alert rule has been created','success')">Create Rule</button></div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('newRule')">Cancel</button><button class="btn btn-primary" onclick="submitModal('newRule','Alert rule created','success')">Create Rule</button></div>
   </div>
 </div>
 

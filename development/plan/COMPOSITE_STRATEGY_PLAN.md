@@ -100,16 +100,34 @@
 
 ### 3.4 Portfolio 管理层
 
-**职责**: 多策略/多品种的全局资产配置  
-**输入**: 多个组合策略的输出 + 账户总资产  
-**输出**: 各策略/品种的资金分配权重
+> **设计原则**: Portfolio 层拆分为 **Allocator (决策)** 和 **PortfolioLedger (账本)** 两个职责，避免一个对象同时承担"资金分配决策"和"持仓/交易/快照记录"。
+
+#### 3.4.1 Strategy Allocator (策略配置器)
+
+**职责**: 多策略的目标权重计算与资金分配决策  
+**输入**: 多个组合策略的风险/收益特征 + 账户总资产  
+**输出**: 各策略/品种的目标权重 `Dict[strategy_id, target_weight]`
 
 | 能力 | 说明 | 现有实现 |
 |------|------|---------|
 | 权重分配 | 等权/市值加权/风险平价 | ✅ PositionSizingService (部分) |
 | 风险预算 | 总 VaR/CVaR 预算分配到子策略 | ✅ RiskAnalysisService (部分) |
-| 再平衡 | 定期/触发式再平衡 | ❌ 待实现 |
+| 再平衡触发 | 定期/偏离阈值触发 | ❌ 待实现 |
+
+#### 3.4.2 Portfolio Ledger (组合账本)
+
+**职责**: 账户、持仓、交易流水、净值快照的真实记录  
+**输入**: Allocator 的目标权重 + Executor 的成交回报  
+**输出**: 持仓快照、净值曲线、交易记录
+
+| 能力 | 说明 | 现有实现 |
+|------|------|---------|
+| 持仓追踪 | 多策略持仓合并/独立视图 | 部分 (单策略持仓) |
+| 净值计算 | 基于真实行情的 NAV 计算 | ⚠️ 当前 paper trading 中 current_price=avg_cost, pnl=0 |
 | 绩效归因 | Brinson 分解/因子归因 | ✅ AttributionService |
+| 交易流水 | 完整成交记录 | ✅ trade_records 表 |
+
+> **⚠️ 前置依赖**: Portfolio Ledger 的数据可信度依赖于 paper_trading_service 的真实行情接入。当前 `current_price = avg_cost, pnl = 0` 的简化实现必须先升级，否则 Portfolio 语义不可信。
 
 ### 3.5 执行策略 (Phase 2+)
 
@@ -164,10 +182,16 @@
 class CompositeBacktestEngine:
     def run(self, composite_strategy, date_range, initial_capital, benchmark):
         portfolio = Portfolio(initial_capital)
+        constraints = MarketConstraints(composite_strategy.market_constraints)
+        # constraints 包含: t_plus_n, lot_size, price_limit_pct, suspension_calendar
         
         for trading_day in date_range:
-            # 1. 选股
+            # 0. 市场约束: 更新停牌/涨跌停/复权状态
+            tradable = constraints.get_tradable_symbols(trading_day)
+            
+            # 1. 选股 (过滤不可交易标的)
             universe = self.universe_engine.select(trading_day, market_data)
+            universe = [s for s in universe if s in tradable]
             
             # 2. 生成信号
             signals = []
@@ -178,13 +202,28 @@ class CompositeBacktestEngine:
             # 3. 风控过滤 + 仓位分配
             orders = self.risk_engine.filter_and_size(signals, portfolio)
             
-            # 4. 模拟成交
-            trades = self.execute_orders(orders, close_prices[trading_day])
+            # 4. T+1 约束: 过滤当日买入的卖出信号
+            orders = constraints.apply_t_plus_n(orders, portfolio.position_history)
             
-            # 5. 更新组合净值
-            portfolio.update(trades, close_prices[trading_day])
+            # 5. 涨跌停约束: 移除触及涨跌停的订单
+            orders = constraints.apply_price_limits(orders, close_prices[trading_day])
             
-            # 6. 再平衡检查
+            # 6. 整手约束: 调整为 100 股整数倍
+            orders = constraints.apply_lot_size(orders)
+            
+            # 7. 模拟成交 (使用调仓价, 非收盘价; 计入冲击成本)
+            fill_prices = self._get_fill_prices(
+                orders, trading_day,
+                slippage_bps=constraints.slippage_bps,
+                commission_rate=constraints.commission_rate
+            )
+            trades = self.execute_orders(orders, fill_prices)
+            
+            # 8. 更新组合净值 (使用复权后收盘价)
+            adj_prices = market_data.get_adj_close(trading_day)
+            portfolio.update(trades, adj_prices)
+            
+            # 9. 再平衡检查
             portfolio.check_rebalance()
         
         return BacktestResult(
@@ -195,6 +234,17 @@ class CompositeBacktestEngine:
             attribution=compute_attribution(portfolio)
         )
 ```
+
+> **市场约束 (market_constraints) 在引擎中的生效点**:
+> | 约束 | 生效步骤 | 说明 |
+> |------|---------|------|
+> | 停牌 | Step 0 + Step 1 | 从选股结果中排除停牌标的 |
+> | T+1 | Step 4 | 阻止当日买入标的的卖出信号 |
+> | 涨跌停 | Step 5 | 触及涨跌停价格的订单不成交 |
+> | 整手约束 | Step 6 | A 股 100 股整数倍 |
+> | 复权 | Step 8 | 净值计算使用后复权价格 |
+> | 冲击成本 | Step 7 | 按成交额/流动性计算滑点 |
+> | 佣金 | Step 7 | 按固定费率 + 印花税 |
 
 ### 5.2 回测类型对比
 
@@ -273,7 +323,9 @@ CREATE TABLE strategy_components (
   layer           ENUM('universe', 'trading', 'risk') NOT NULL,
   sub_type        VARCHAR(50) NOT NULL COMMENT '子类型: factor/technical/trend/grid/stop_loss/...',
   description     TEXT,
-  code            MEDIUMTEXT NOT NULL,
+  -- 组件定义: code 或 config 二选一
+  code            MEDIUMTEXT DEFAULT NULL COMMENT '可执行 Python 源码 (主要用于 trading 层)',
+  config          JSON DEFAULT NULL COMMENT '声明式配置 (factor DSL / 规则参数 / 筛选条件)',
   parameters      JSON DEFAULT NULL,
   version         INT DEFAULT 1,
   is_active       BOOLEAN DEFAULT TRUE,
@@ -282,26 +334,44 @@ CREATE TABLE strategy_components (
   INDEX idx_user_layer (user_id, layer),
   INDEX idx_sub_type (sub_type)
 );
+-- 设计说明:
+-- - Universe 组件更适合声明式 config (因子表达式 / 筛选 DSL / Qlib 模型引用)
+-- - Trading 组件通常需要 code (可执行策略逻辑)
+-- - Risk 组件更适合 config (规则参数: 止损比例/最大仓位/VaR 阈值)
+-- - 同时保留 code + config 字段，按 sub_type 语义决定用哪个
 
 -- 组合策略表
 CREATE TABLE composite_strategies (
-  id                      INT AUTO_INCREMENT PRIMARY KEY,
-  user_id                 INT NOT NULL,
-  name                    VARCHAR(100) NOT NULL,
-  description             TEXT,
-  universe_component_id   INT COMMENT '选股策略组件 → strategy_components.id',
-  trading_component_id    INT COMMENT '交易策略组件 → strategy_components.id',
-  risk_component_id       INT COMMENT '风控策略组件 → strategy_components.id',
-  portfolio_config        JSON COMMENT '权重分配/再平衡配置',
-  market_constraints      JSON COMMENT 'T+1/涨跌停等市场约束',
-  execution_mode          ENUM('backtest', 'paper', 'live') DEFAULT 'backtest',
-  is_active               BOOLEAN DEFAULT TRUE,
-  created_at              TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at              TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (universe_component_id) REFERENCES strategy_components(id),
-  FOREIGN KEY (trading_component_id) REFERENCES strategy_components(id),
-  FOREIGN KEY (risk_component_id) REFERENCES strategy_components(id)
+  id                INT AUTO_INCREMENT PRIMARY KEY,
+  user_id           INT NOT NULL,
+  name              VARCHAR(100) NOT NULL,
+  description       TEXT,
+  portfolio_config  JSON COMMENT '权重分配/再平衡配置',
+  market_constraints JSON COMMENT 'T+1/涨跌停等市场约束',
+  execution_mode    ENUM('backtest', 'paper', 'live') DEFAULT 'backtest',
+  is_active         BOOLEAN DEFAULT TRUE,
+  created_at        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at        TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_user (user_id)
 );
+
+-- 组合-组件绑定表 (支持每层多个组件)
+CREATE TABLE composite_component_bindings (
+  id                    INT AUTO_INCREMENT PRIMARY KEY,
+  composite_strategy_id INT NOT NULL,
+  component_id          INT NOT NULL,
+  layer                 ENUM('universe', 'trading', 'risk') NOT NULL,
+  ordinal               INT DEFAULT 0 COMMENT '同层内排序 (多组件时用于优先级/投票权重)',
+  weight                DECIMAL(5,4) DEFAULT 1.0 COMMENT '同层多组件时的权重 (投票/合并)',
+  config_override       JSON DEFAULT NULL COMMENT '组合级参数覆盖',
+  FOREIGN KEY (composite_strategy_id) REFERENCES composite_strategies(id) ON DELETE CASCADE,
+  FOREIGN KEY (component_id) REFERENCES strategy_components(id),
+  INDEX idx_composite_layer (composite_strategy_id, layer)
+);
+-- 设计说明:
+-- - 用 binding 表而非 3 个 FK 列，支持: 双选股来源合并、多交易子策略投票、多重风控规则链
+-- - weight 用于同层多组件的信号合并 (如 2 个交易策略各占 50% 投票权)
+-- - ordinal 用于风控层的规则链顺序 (止损→仓位→VaR 依次过滤)
 
 -- 组合策略回测结果表
 CREATE TABLE composite_backtests (
@@ -329,55 +399,103 @@ CREATE TABLE composite_backtests (
 ### 7.2 兼容性
 
 - 现有 `strategies` 表不变 — 仍支持「整体策略」（legacy CTA 模式）
-- 现有 CTA 策略可被引用为 trading 层组件
+- 现有 CTA 策略可被引用为 trading 层组件 (通过 `composite_component_bindings` 绑定)
 - 前端同时支持旧模式和新组合模式
+
+> **⚠️ 双模型复杂度**: 旧策略 (strategy_id) 和组合策略 (composite_strategy_id) 并存会导致以下 UI/API 分叉:
+> - 部署: 旧策略走 `/strategies/{id}/deploy` → paper_trading_service; 组合策略走 `/composite-strategies/{id}/deploy` → Orchestrator
+> - 回测: 旧策略走 vnpy BacktestingEngine; 组合策略走 CompositeBacktestEngine
+> - Dashboard/Portfolio 页面需同时展示两种策略的状态卡片
+> - 模板市场需区分"单体策略模板"和"组合策略模板"
+>
+> **缓解策略**: Step 1 先不引入部署分叉，组合策略初期只支持 backtest 模式。等模型稳定后再对接 paper/live。
 
 ---
 
-## 8. 实现步骤
+## 8. 当前代码现状评估
 
-### Phase 1: 策略分类体系重构 (基础)
+> 文档目标架构和代码现实之间存在明显落差，列举如下以确保实现计划充分考虑迁移成本。
 
-1. DB Migration: 新增 `strategy_components` 表
-2. 后端模型: `StrategyComponent` Pydantic model (layer, sub_type 枚举)
-3. Service + DAO: `StrategyComponentService` CRUD
-4. API Routes: `/api/v1/strategy-components`
-5. 前端: 重构类型系统 (layer × sub_type 二维分类)
-6. 迁移: 现有 CTA 策略自动标记为 `layer='trading', sub_type='trend'`
+### 8.1 后端
 
-### Phase 2: 组合策略编排框架 (核心, 依赖 Phase 1)
+| 模块 | 当前状态 | 差距 |
+|------|---------|------|
+| **策略模型** (`api/models/strategy.py`) | 单体: name/class_name/code/parameters，无 layer/sub_type | 需引入第二套策略对象体系 |
+| **策略服务** (`domains/strategies/service.py`) | 围绕单表 CRUD + 版本历史 | 需扩展组件 CRUD + 组合 CRUD |
+| **Paper Trading** (`domains/trading/paper_trading_service.py`) | `current_price = avg_cost, pnl = 0` | Portfolio 语义不可信，需先接真实行情 |
+| **Portfolio API** (`api/routes/portfolio.py`) | 仅 `/positions` GET + `/close` POST | 远非"资产配置中枢" |
+| **MatchingEngine** | 简化撮合，不含 T+1/涨跌停完整约束 | 组合回测需加强市场规则 |
 
-7. DB Migration: 新增 `composite_strategies` 表
-8. `CompositeStrategyOrchestrator` 编排引擎
-   - `UniverseEngine` (调用 FactorLab / expression_engine)
-   - `TradingEngine` (VnpyAdapter + NativeAdapter)
-   - `RiskEngine` (复用 StopLoss / PositionSizing / RiskAnalysis)
-9. API Routes: `/api/v1/composite-strategies` CRUD + 部署
-10. 前端: 组合策略编排页面 (三栏选择 → 预览 → 配置)
+### 8.2 前端
 
-### Phase 3: 组合策略回测 (验证, 依赖 Phase 2)
+| 模块 | 当前状态 | 差距 |
+|------|---------|------|
+| **Strategies.tsx** | category 仍为 `cta \| alpha \| statArb \| grid \| ai \| custom` | 需引入 layer/sub_type 二维分类 |
+| **类型定义** (`types/index.ts`) | 无 StrategyComponent / CompositeStrategy 类型 | 需新增 |
+| **导航** | 已有 Composite Strategies 入口 (原型) | 需在 portal 实现 |
 
-11. DB Migration: 新增 `composite_backtests` 表
-12. `CompositeBacktestEngine` (日频回测循环)
-13. RQ Worker 集成 (backtest queue)
-14. 前端: 组合回测结果页面 (净值曲线 + 归因分析)
+### 8.3 关键前置条件
 
-### Phase 4: Portfolio 管理增强 (依赖 Phase 2)
+1. **paper_trading_service 真实行情接入** — Portfolio Ledger 可信度前置
+2. **MatchingEngine 市场约束补全** — 组合回测准确性前置
+3. **策略模板市场的双模型兼容设计** — 避免用户困惑
 
-15. Portfolio 引擎: 多策略权重分配 + 风险预算
-16. 再平衡逻辑: 定期 / 触发式
-17. 前端: Portfolio 仪表盘增强
+---
 
-### Phase 5: 因子→组合策略闭环 (依赖 Phase 2+3)
+## 9. 实现步骤 (收敛后)
+
+> 原 Phase 1~5 跨度过大 (从 strategy_components 到 Portfolio 引擎到 FactorLab 闭环)，容易把策略模型、回测、执行、前端导航、数据库迁移全部耦合在一起。以下收敛为 3 个更小的步骤，每步可独立交付和验证。
+
+### Step 1: 策略元模型升级 (最小改动，不破坏现有流程)
+
+**目标**: 给现有策略和新组件建立分层语义，但不改变现有 CRUD/部署/回测流程。
+
+1. DB Migration: 新增 `strategy_components` 表 + `composite_strategies` 表 + `composite_component_bindings` 表
+2. 后端: `StrategyComponent` Pydantic model + `CompositeStrategy` model
+3. Service + DAO: `StrategyComponentService` CRUD, `CompositeStrategyService` CRUD
+4. API: `/api/v1/strategy-components` CRUD, `/api/v1/composite-strategies` CRUD (仅定义，不含执行)
+5. 前端: Composite Strategies 页面 (组件列表 + 组合定义)
+6. **不做**: 不改现有 strategies 表/接口/页面，不做部署/执行
+
+**验收**: 用户可创建 Universe/Trading/Risk 组件，组合成 CompositeStrategy，保存到数据库。但此时组合策略只是"定义"，不可运行。
+
+### Step 2: 组合策略回测 (验证组合心智 + 回测结果结构)
+
+**目标**: CompositeStrategy 可提交回测，验证三层编排的端到端链路。
+
+7. `CompositeBacktestEngine` (日频回测 + 市场约束)
+8. `CompositeStrategyOrchestrator` (编排 Universe→Trading→Risk 链路)
+9. DB Migration: 新增 `composite_backtests` 表
+10. RQ Worker 集成: composite backtest queue
+11. 前端: 组合回测结果页 (净值曲线 + 三层归因分析)
+12. **不做**: 不做 paper/live 部署，不做 Portfolio 多策略管理
+
+**验收**: 用户创建 "因子选股 + MACD 交易 + 止损风控" 组合 → 提交回测 → 查看净值曲线 + 归因分析。
+
+### Step 3: 组合 Portfolio + Paper/Live 部署
+
+**前置**: paper_trading_service 已接入真实行情 (`current_price` 和 `pnl` 可信)
+
+13. Strategy Allocator: 多组合策略权重分配
+14. Portfolio Ledger: 持仓追踪 + 净值快照
+15. Orchestrator 对接 PaperStrategyExecutor (paper 模式)
+16. Orchestrator 对接 vnpy Gateway (live 模式)
+17. 前端: Portfolio 仪表盘增强 (多策略持仓/权重/净值)
+
+**验收**: 组合策略可部署到 paper trading，Portfolio 页展示多策略的真实持仓和 PnL。
+
+### 后续: 因子→组合策略闭环 (依赖 Step 2+3)
 
 18. FactorLab 增强: 因子打标 (适用层)
 19. 自动选股策略生成
 20. `multi_factor_engine` 升级 (支持组合策略)
 21. 端到端向导: 因子→选股→交易→风控一键组合
 
+> **产品交互建议**: Step 1-2 的前端优先用"模板向导"模式 (选股模板→交易模板→风控模板→资金配置→回测)，而非一上来就做三栏实时编排器。等模型稳定后再补充高级编排器。
+
 ---
 
-## 9. 关键文件
+## 10. 关键文件
 
 ### 需修改
 - `quantmate/app/domains/strategies/service.py` — 扩展组件化
@@ -410,7 +528,7 @@ CREATE TABLE composite_backtests (
 
 ---
 
-## 10. 验证
+## 11. 验证
 
 1. **单元测试**: 每个 Engine (Universe/Trading/Risk) 独立可测试
 2. **集成测试**: Orchestrator 端到端: 因子选股 → MACD 交易 → 止损风控 → 日频回测
@@ -419,7 +537,7 @@ CREATE TABLE composite_backtests (
 
 ---
 
-## 11. 决策记录
+## 12. 决策记录
 
 | 决策 | 选择 | 理由 |
 |------|------|------|
@@ -429,18 +547,42 @@ CREATE TABLE composite_backtests (
 | 向后兼容 | 现有策略保持可用 | legacy 整体策略仍是 trading 层组件 |
 | 目标市场 | 全市场 (A 股+期货+港美股) | 通过 market_constraints 配置差异 |
 | 执行策略 | Phase 2+ | TWAP/VWAP 本次不含 |
+| 组合表结构 | binding 关联表 (非 3 FK) | 支持每层多组件: 投票/链式/合并 |
+| 组件载体 | code + config 双字段 | Universe/Risk 适合声明式，Trading 适合代码 |
+| Portfolio 职责 | Allocator + Ledger 拆分 | 避免决策和账本职责混合 |
+| 初始 scope | Step 1+2 仅 backtest | 降低风险，先验证组合心智 |
 
 ---
 
-## 12. 待讨论
+## 13. 待讨论 / 设计决策
+
+### 13.1 已确认
 
 1. **TradingEngine 适配器**: 提供 `VnpyTradingAdapter` (包装现有 CTA) + `NativeTradingAdapter` (纯 Python)，让用户选择
-2. **实盘调度**: 日频策略用定时调度 (收盘后选股, 次日开盘下单) vs 实时流式
-3. **多策略信号冲突**: 同一标的被多个交易策略产生矛盾信号时的处理 — 加权投票 + 风控层裁决
+2. **多策略信号冲突**: 同一标的被多个交易策略产生矛盾信号时的处理 — 通过 `composite_component_bindings.weight` 加权投票 + 风控层裁决
+3. **组合表结构**: 采用 `composite_component_bindings` 关联表而非 3 个 FK 列，支持每层多组件
+4. **组件载体多样性**: strategy_components 同时支持 `code` (可执行 Python) 和 `config` (声明式 DSL/规则)，按 layer/sub_type 语义决定
+5. **Portfolio 职责拆分**: 拆为 Strategy Allocator (决策) + Portfolio Ledger (账本)，避免单一对象承担过多职责
+6. **初始 scope**: Step 1+2 仅支持 backtest 模式，不对接 paper/live 部署
+
+### 13.2 待确认
+
+1. **优先做什么**: "研究编排 + 组合回测" vs "真实运行的 strategy portfolio 管理"？
+   - **建议**: 先做前者 (Step 1+2)，后者 (Step 3) 等 paper trading 行情可信后再做
+2. **Universe 层对期货的适用性**: Universe 层主要面向股票/基金 (先选标的再交易)。期货策略通常直接交易固定合约，强行套 Universe 模型会变别扭
+   - **建议**: 期货策略允许跳过 Universe 层 (universe binding 为空)，直接从 Trading 层开始
+3. **Custom 类型在新体系中的定位**: 长期保留的 escape hatch，还是过渡兼容？
+   - **建议**: 长期保留。Custom = "整体策略" 模式，不强制分层，但可通过 binding 表作为 trading 组件被组合引用
+4. **实盘调度**: 日频策略用定时调度 (收盘后选股, 次日开盘下单) vs 实时流式
+   - **待定**: 取决于目标用户的交易频率需求
+5. **前端交互模式**: 三栏实时编排器 vs 模板向导
+   - **建议**: Step 1-2 先做模板向导 (选股模板→交易模板→风控模板→回测)，模型稳定后再补三栏编排器
+6. **产品术语区分**: "Strategy Portfolio" (策略组合/资金分配视角) vs "Holdings Portfolio" (账户持仓/交易结果视角)
+   - **建议**: 在 UI 和 API 中明确区分，前端 Portfolio 页拆分为两个 Tab
 
 ---
 
-## 13. 原型设计
+## 14. 原型设计
 
 参见 `quantmate-docs/prototype/` 下的 HTML 原型:
 - `strategies.html` — 策略研究页 (更新: 增加组件视图)

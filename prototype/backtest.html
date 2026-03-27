@@ -2,314 +2,411 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>QuantMate - Backtesting Evaluation</title>
+  <title>QuantMate - Backtesting</title>
   <link rel="stylesheet" href="shared.css">
   <script src="https://cdn.tailwindcss.com?v=3.4"></script>
+  <style>
+    .result-overlay { position:fixed; inset:0; z-index:200; background:hsl(var(--background)); overflow-y:auto; display:none; }
+    .result-overlay.active { display:block; }
+    .result-close { position:sticky; top:0; z-index:201; background:hsl(var(--background)); padding:16px 24px; border-bottom:1px solid hsl(var(--border)); display:flex; justify-content:space-between; align-items:center; }
+  </style>
 </head>
 <body>
 <div class="app-layout">
   <aside class="sidebar" id="sidebar"></aside>
   <main class="main-content" id="main">
 
+    <!-- Page Header -->
     <div class="page-header">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">
         <div>
-          <h1 class="page-title">Backtesting Evaluation</h1>
-          <p class="page-subtitle">Strategy Backtesting Engine · Multi-Dimensional Performance Analysis</p>
+          <h1 class="page-title">Backtesting</h1>
+          <p class="page-subtitle">Strategy backtest engine with multi-dimensional performance analysis</p>
         </div>
-        <button class="btn btn-primary" onclick="openModal('newBT')">New Backtest</button>
-      </div>
-    </div>
-
-    <div class="tabs" data-group="bt">
-      <button class="tab-btn active" data-tab="runs">Backtesting List</button>
-      <button class="tab-btn" data-tab="result">Backtest results</button>
-      <button class="tab-btn" data-tab="compare">Strategy Comparison</button>
-      <button class="tab-btn" data-tab="optimize">Parameter Optimization</button>
-    </div>
-
-    <!-- Tab: Runs -->
-    <div class="tab-panel active" data-group="bt" data-panel="runs">
-      <div class="filter-bar">
-        <input type="text" class="form-input" placeholder="🔍 Search strategy..." style="max-width:240px">
-        <select class="form-select" style="max-width:140px"><option>All Statuses</option><option>Completed</option><option>Running</option><option>Failure</option><option>In line</option></select>
-        <select class="form-select" style="max-width:140px"><option>Last 7 days</option><option>The last 30 days</option><option>All</option></select>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>ID</th><th>Strategy</th><th>Target</th><th>State</th><th>Yield</th><th>Sharpe</th><th>Maximum drawdown</th><th>Date</th><th>Operation</th></tr></thead>
-          <tbody id="btTable"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Tab: Result Detail -->
-    <div class="tab-panel" data-group="bt" data-panel="result">
-      <div class="stat-grid cols-4">
-        <div class="stat-card">
-          <div class="stat-label">Total return</div>
-          <div class="stat-value text-success">+23.50%</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Annualized Return</div>
-          <div class="stat-value text-success">+31.20%</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Sharpe Ratio</div>
-          <div class="stat-value">1.42</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Maximum drawdown</div>
-          <div class="stat-value text-destructive">-12.30%</div>
-        </div>
-      </div>
-
-      <div class="stat-grid cols-4" style="margin-top:12px">
-        <div class="stat-card">
-          <div class="stat-label">Win rate</div>
-          <div class="stat-value">62.5%</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Profit and Loss Ratio</div>
-          <div class="stat-value">1.85</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Total number of transactions</div>
-          <div class="stat-value">48</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Average holding period</div>
-          <div class="stat-value">6.3</div>
-        </div>
-      </div>
-
-      <div class="grid-2">
-        <div class="card">
-          <div class="card-header"><h3 class="card-title">Net Value Curve vs Benchmark</h3></div>
-          <div class="chart-placeholder" style="height:260px"><canvas id="btNavCanvas"></canvas></div>
-        </div>
-        <div class="card">
-          <div class="card-header"><h3 class="card-title">Drawdown Analysis</h3></div>
-          <div class="chart-placeholder" style="height:260px"><canvas id="btDDCanvas"></canvas></div>
-        </div>
-      </div>
-
-      <div class="grid-2">
-        <div class="card">
-          <div class="card-header"><h3 class="card-title">Monthly Revenue Heatmap</h3></div>
-          <div style="overflow-x:auto">
-            <table style="font-size:12px;text-align:center">
-              <thead><tr><th></th><th>January</th><th>February</th><th>March</th><th>April</th><th>May</th><th>June</th><th>July</th><th>August</th><th>September</th><th>October</th><th>November</th><th>December</th></tr></thead>
-              <tbody>
-                <tr><td>2025</td><td class="heatmap-cell positive">3.2%</td><td class="heatmap-cell negative">-1.5%</td><td class="heatmap-cell positive">4.8%</td><td class="heatmap-cell positive">2.1%</td><td class="heatmap-cell negative">-0.8%</td><td class="heatmap-cell positive">5.3%</td><td class="heatmap-cell positive">1.9%</td><td class="heatmap-cell negative">-3.2%</td><td class="heatmap-cell positive">6.1%</td><td class="heatmap-cell positive">2.7%</td><td class="heatmap-cell positive">1.4%</td><td class="heatmap-cell positive">3.6%</td></tr>
-                <tr><td>2026</td><td class="heatmap-cell positive">4.1%</td><td class="heatmap-cell positive">2.8%</td><td class="heatmap-cell positive">1.5%</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-header"><h3 class="card-title">Transaction Distribution</h3></div>
-          <div class="chart-placeholder" style="height:180px">
-            <div style="display:flex;align-items:flex-end;gap:4px;height:100%;padding:20px">
-              <div style="flex:1;background:var(--success);height:60%;border-radius:3px 3px 0 0" title="Profitable Trade 30"></div>
-              <div style="flex:1;background:var(--success);height:45%;border-radius:3px 3px 0 0"></div>
-              <div style="flex:1;background:var(--destructive);height:20%;border-radius:3px 3px 0 0"></div>
-              <div style="flex:1;background:var(--success);height:70%;border-radius:3px 3px 0 0"></div>
-              <div style="flex:1;background:var(--destructive);height:35%;border-radius:3px 3px 0 0"></div>
-              <div style="flex:1;background:var(--success);height:55%;border-radius:3px 3px 0 0"></div>
-              <div style="flex:1;background:var(--destructive);height:15%;border-radius:3px 3px 0 0"></div>
-              <div style="flex:1;background:var(--success);height:80%;border-radius:3px 3px 0 0"></div>
-              <div style="flex:1;background:var(--success);height:40%;border-radius:3px 3px 0 0"></div>
-              <div style="flex:1;background:var(--destructive);height:25%;border-radius:3px 3px 0 0"></div>
-            </div>
-          </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-secondary" onclick="openModal('bulkBT')">${icon('layers')} Bulk Backtest</button>
+          <button class="btn btn-primary" onclick="openModal('newBT')">${icon('play')} New Backtest</button>
         </div>
       </div>
     </div>
 
-    <!-- Tab: Compare -->
-    <div class="tab-panel" data-group="bt" data-panel="compare">
-      <div class="card">
-        <div class="card-header"><h3 class="card-title">Strategy Comparison and Selection</h3></div>
-        <div style="display:flex;gap:12px;flex-wrap:wrap">
-          <label class="flex items-center gap-2"><input type="checkbox" checked> DualMA_Cross (BT-001)</label>
-          <label class="flex items-center gap-2"><input type="checkbox" checked> RSI_Reversal (BT-002)</label>
-          <label class="flex items-center gap-2"><input type="checkbox"> BollingerBand</label>
-          <label class="flex items-center gap-2"><input type="checkbox"> MACD_Trend</label>
-          <button class="btn btn-primary btn-sm" style="margin-left:auto" onclick="showToast('Comparison report has been generated','success')">Generate comparison</button>
+    <!-- Summary Stat Cards -->
+    <div class="stat-grid cols-4">
+      <div class="stat-card">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span class="stat-label">Backtest Runs</span>
+          <span style="color:hsl(var(--primary))">${icon('bar-chart-3')}</span>
+        </div>
+        <div class="stat-value">5</div>
+      </div>
+      <div class="stat-card">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span class="stat-label">Running</span>
+          <span style="color:#3b82f6">${icon('activity')}</span>
+        </div>
+        <div class="stat-value">1</div>
+      </div>
+      <div class="stat-card">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span class="stat-label">Completed</span>
+          <span style="color:#10b981">${icon('trending-up')}</span>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:8px">
+          <div class="stat-value">3</div>
+          <span class="text-muted" style="font-size:12px">60%</span>
         </div>
       </div>
-
-      <div class="table-wrap" style="margin-top:16px">
-        <table>
-          <thead><tr><th>Indicator</th><th>DualMA_Cross</th><th>RSI_Reversal</th></tr></thead>
-          <tbody>
-            <tr><td>Total return</td><td class="text-success">+23.50%</td><td class="text-success">+15.20%</td></tr>
-            <tr><td>Annualized Return</td><td class="text-success">+31.20%</td><td class="text-success">+20.10%</td></tr>
-            <tr><td>Sharpe</td><td><b>1.42</b></td><td>1.18</td></tr>
-            <tr><td>Maximum drawdown</td><td class="text-destructive">-12.30%</td><td class="text-destructive">-8.70%</td></tr>
-            <tr><td>Win rate</td><td>62.5%</td><td>58.3%</td></tr>
-            <tr><td>Profit and Loss Ratio</td><td><b>1.85</b></td><td>1.52</td></tr>
-            <tr><td>Total number of transactions</td><td>48</td><td>36</td></tr>
-            <tr><td>Calmar Ratio</td><td><b>2.54</b></td><td>2.31</td></tr>
-          </tbody>
-        </table>
+      <div class="stat-card">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span class="stat-label">Bulk Jobs</span>
+          <span style="color:#f97316">${icon('layers')}</span>
+        </div>
+        <div class="stat-value">1</div>
       </div>
     </div>
 
-    <!-- Tab: Optimize -->
-    <div class="tab-panel" data-group="bt" data-panel="optimize">
-      <div class="card">
-        <div class="card-header"><h3 class="card-title">Parameter Optimization Configuration</h3></div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px">
+    <!-- Main Card with Tabs -->
+    <div class="card" style="padding:20px">
+      <div style="margin-bottom:16px">
+        <h2 style="font-size:18px;font-weight:600;margin:0">Backtest Runs</h2>
+        <p class="text-muted" style="font-size:13px;margin:4px 0 0">Click a completed backtest item to open result details. Bulk jobs support summary view and drill-down into child results.</p>
+      </div>
+
+      <div class="tabs" data-group="bt">
+        <button class="tab-btn active" data-tab="runs">Backtest Runs</button>
+        <button class="tab-btn" data-tab="compare">Strategy Compare</button>
+        <button class="tab-btn" data-tab="optimize">Optimization</button>
+      </div>
+
+      <!-- Tab: Runs -->
+      <div class="tab-panel active" data-group="bt" data-panel="runs">
+        <div class="filter-bar" style="margin-bottom:16px">
+          <div class="search-wrap"><span id="btSearchIcon"></span><input id="btSearch" type="text" class="form-input" placeholder="Search strategies or symbols..."></div>
+          <select id="btStatusFilter" class="form-select" style="width:160px;flex:0 0 160px">
+            <option value="all">All Statuses</option>
+            <option value="completed">Completed</option>
+            <option value="running">Running</option>
+            <option value="failed">Failed</option>
+            <option value="queued">Queued</option>
+          </select>
+          <select id="btStratFilter" class="form-select" style="width:180px;flex:0 0 180px">
+            <option value="all">All Strategies</option>
+            <option>DualMA_Cross</option>
+            <option>RSI_Reversal</option>
+            <option>MyAlpha01</option>
+          </select>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Job ID</th><th>Strategy</th><th>Symbol</th><th>Status</th><th>Return</th><th>Sharpe</th><th>Max DD</th><th>Date</th><th>Actions</th></tr></thead>
+            <tbody id="btTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tab: Compare -->
+      <div class="tab-panel" data-group="bt" data-panel="compare">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px">
           <div>
-            <label class="form-label">Strategy</label>
-            <select class="form-select"><option>DualMA_Cross</option><option>RSI_Reversal</option></select>
+            <h3 style="font-size:16px;font-weight:600;margin:0">Select strategies to compare</h3>
           </div>
-          <div>
-            <label class="form-label">Parameter: short_window</label>
-            <div style="display:flex;gap:8px"><input class="form-input" value="3" style="width:60px"><span class="text-muted" style="line-height:38px">~</span><input class="form-input" value="15" style="width:60px"><span class="text-muted" style="line-height:38px">Step Length</span><input class="form-input" value="1" style="width:50px"></div>
-          </div>
-          <div>
-            <label class="form-label">Parameter: long_window</label>
-            <div style="display:flex;gap:8px"><input class="form-input" value="10" style="width:60px"><span class="text-muted" style="line-height:38px">~</span><input class="form-input" value="60" style="width:60px"><span class="text-muted" style="line-height:38px">Step Length</span><input class="form-input" value="5" style="width:50px"></div>
-          </div>
-          <div>
-            <label class="form-label">Optimization Goal</label>
-            <select class="form-select"><option>Sharpe Ratio</option><option>Total return</option><option>Calmar Ratio</option></select>
-          </div>
+          <button class="btn btn-primary btn-sm" onclick="showToast('Comparison report generated','success')">Generate Compare</button>
         </div>
-        <div style="margin-top:16px"><button class="btn btn-primary" onclick="showToast('Optimization task has started, approximately 143 parameter combinations','info')">Start optimization (a total of 143 combinations)</button></div>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px">
+          <label style="display:flex;align-items:center;gap:8px;font-size:14px"><input type="checkbox" checked> DualMA_Cross (BT-001)</label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:14px"><input type="checkbox" checked> RSI_Reversal (BT-002)</label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:14px"><input type="checkbox"> MyAlpha01 (BT-003)</label>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Metric</th><th>DualMA_Cross</th><th>RSI_Reversal</th></tr></thead>
+            <tbody>
+              <tr><td>Total Return</td><td class="text-success">+23.50%</td><td class="text-success">+15.20%</td></tr>
+              <tr><td>Annualized Return</td><td class="text-success">+31.20%</td><td class="text-success">+20.10%</td></tr>
+              <tr><td>Sharpe Ratio</td><td><b>1.42</b></td><td>1.18</td></tr>
+              <tr><td>Max Drawdown</td><td class="text-destructive">-12.30%</td><td class="text-destructive">-8.70%</td></tr>
+              <tr><td>Win Rate</td><td>62.5%</td><td>58.3%</td></tr>
+              <tr><td>Profit/Loss Ratio</td><td><b>1.85</b></td><td>1.52</td></tr>
+              <tr><td>Total Trades</td><td>48</td><td>36</td></tr>
+              <tr><td>Calmar Ratio</td><td><b>2.54</b></td><td>2.31</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      <div class="card" style="margin-top:16px">
-        <div class="card-header"><h3 class="card-title">Optimization Result Heatmap</h3></div>
-        <div class="chart-placeholder" style="height:240px">
-          <div style="display:grid;grid-template-columns:repeat(11,1fr);gap:2px;padding:20px;height:100%">
-            <div class="heatmap-cell positive" style="padding:4px;font-size:10px">1.42</div>
-            <div class="heatmap-cell positive" style="padding:4px;font-size:10px">1.35</div>
-            <div class="heatmap-cell positive" style="padding:4px;font-size:10px">1.28</div>
-            <div class="heatmap-cell positive" style="padding:4px;font-size:10px">1.21</div>
-            <div class="heatmap-cell neutral" style="padding:4px;font-size:10px">0.95</div>
-            <div class="heatmap-cell neutral" style="padding:4px;font-size:10px">0.88</div>
-            <div class="heatmap-cell negative" style="padding:4px;font-size:10px">-0.12</div>
-            <div class="heatmap-cell positive" style="padding:4px;font-size:10px">1.05</div>
-            <div class="heatmap-cell positive" style="padding:4px;font-size:10px">1.18</div>
-            <div class="heatmap-cell neutral" style="padding:4px;font-size:10px">0.72</div>
-            <div class="heatmap-cell negative" style="padding:4px;font-size:10px">-0.45</div>
-          </div>
+      <!-- Tab: Optimize -->
+      <div class="tab-panel" data-group="bt" data-panel="optimize">
+        <div style="margin-bottom:16px">
+          <h3 style="font-size:16px;font-weight:600;margin:0">Optimization Tasks</h3>
+          <p class="text-muted" style="font-size:13px;margin:4px 0 0">Configure parameter ranges and start the optimization.</p>
         </div>
-        <p class="text-muted" style="font-size:12px;margin-top:4px">X-axis: short_window (3~15) · Y-axis: long_window (10~60) · Color: Sharpe ratio</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Task ID</th><th>Strategy</th><th>Parameters</th><th>Combinations</th><th>Objective</th><th>Status</th><th>Best Sharpe</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="font-mono">OPT-001</td>
+                <td>DualMA_Cross</td>
+                <td class="text-muted" style="font-size:12px">short_window: 3~15, long_window: 10~60</td>
+                <td>143</td>
+                <td>Sharpe Ratio</td>
+                <td><span class="badge badge-success">completed</span></td>
+                <td><b>1.42</b></td>
+                <td><button class="btn btn-ghost btn-sm" onclick="showToast('Optimization results loaded','info')">${icon('eye')} Results</button></td>
+              </tr>
+              <tr>
+                <td class="font-mono">OPT-002</td>
+                <td>RSI_Reversal</td>
+                <td class="text-muted" style="font-size:12px">rsi_window: 7~28, overbought: 65~85</td>
+                <td>88</td>
+                <td>Total Return</td>
+                <td><span class="badge badge-primary">running</span></td>
+                <td>—</td>
+                <td><button class="btn btn-ghost btn-sm" disabled>${icon('loader')} Running</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
   </main>
 </div>
 
+<!-- Backtest Results Overlay -->
+<div id="btResultOverlay" class="result-overlay">
+  <div class="result-close">
+    <h2 style="font-size:18px;font-weight:600;margin:0">Backtest Results — <span id="btResultTitle"></span></h2>
+    <button class="btn btn-ghost" onclick="closeBtResult()">${icon('x')} Close</button>
+  </div>
+  <div style="padding:24px;max-width:1280px;margin:0 auto">
+    <div class="stat-grid cols-4">
+      <div class="stat-card"><div class="stat-label">Total Return</div><div class="stat-value text-success">+23.50%</div></div>
+      <div class="stat-card"><div class="stat-label">Annualized Return</div><div class="stat-value text-success">+31.20%</div></div>
+      <div class="stat-card"><div class="stat-label">Sharpe Ratio</div><div class="stat-value">1.42</div></div>
+      <div class="stat-card"><div class="stat-label">Max Drawdown</div><div class="stat-value text-destructive">-12.30%</div></div>
+    </div>
+    <div class="stat-grid cols-4" style="margin-top:12px">
+      <div class="stat-card"><div class="stat-label">Win Rate</div><div class="stat-value">62.5%</div></div>
+      <div class="stat-card"><div class="stat-label">Profit/Loss Ratio</div><div class="stat-value">1.85</div></div>
+      <div class="stat-card"><div class="stat-label">Total Trades</div><div class="stat-value">48</div></div>
+      <div class="stat-card"><div class="stat-label">Avg Holding Period</div><div class="stat-value">6.3 days</div></div>
+    </div>
+    <div class="grid-2" style="margin-top:16px">
+      <div class="card"><div class="card-header"><h3 class="card-title">NAV Curve vs Benchmark</h3></div><div class="chart-placeholder" style="height:260px"><canvas id="btNavCanvas"></canvas></div></div>
+      <div class="card"><div class="card-header"><h3 class="card-title">Drawdown Analysis</h3></div><div class="chart-placeholder" style="height:260px"><canvas id="btDDCanvas"></canvas></div></div>
+    </div>
+    <div class="grid-2" style="margin-top:16px">
+      <div class="card">
+        <div class="card-header"><h3 class="card-title">Monthly Returns Heatmap</h3></div>
+        <div style="overflow-x:auto">
+          <table style="font-size:12px;text-align:center">
+            <thead><tr><th></th><th>Jan</th><th>Feb</th><th>Mar</th><th>Apr</th><th>May</th><th>Jun</th><th>Jul</th><th>Aug</th><th>Sep</th><th>Oct</th><th>Nov</th><th>Dec</th></tr></thead>
+            <tbody>
+              <tr><td>2025</td><td class="heatmap-cell positive">3.2%</td><td class="heatmap-cell negative">-1.5%</td><td class="heatmap-cell positive">4.8%</td><td class="heatmap-cell positive">2.1%</td><td class="heatmap-cell negative">-0.8%</td><td class="heatmap-cell positive">5.3%</td><td class="heatmap-cell positive">1.9%</td><td class="heatmap-cell negative">-3.2%</td><td class="heatmap-cell positive">6.1%</td><td class="heatmap-cell positive">2.7%</td><td class="heatmap-cell positive">1.4%</td><td class="heatmap-cell positive">3.6%</td></tr>
+              <tr><td>2026</td><td class="heatmap-cell positive">4.1%</td><td class="heatmap-cell positive">2.8%</td><td class="heatmap-cell positive">1.5%</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3 class="card-title">Trade Distribution</h3></div>
+        <div class="chart-placeholder" style="height:180px">
+          <div style="display:flex;align-items:flex-end;gap:4px;height:100%;padding:20px">
+            <div style="flex:1;background:var(--success);height:60%;border-radius:3px 3px 0 0" title="Profitable"></div>
+            <div style="flex:1;background:var(--success);height:45%;border-radius:3px 3px 0 0"></div>
+            <div style="flex:1;background:var(--destructive);height:20%;border-radius:3px 3px 0 0"></div>
+            <div style="flex:1;background:var(--success);height:70%;border-radius:3px 3px 0 0"></div>
+            <div style="flex:1;background:var(--destructive);height:35%;border-radius:3px 3px 0 0"></div>
+            <div style="flex:1;background:var(--success);height:55%;border-radius:3px 3px 0 0"></div>
+            <div style="flex:1;background:var(--destructive);height:15%;border-radius:3px 3px 0 0"></div>
+            <div style="flex:1;background:var(--success);height:80%;border-radius:3px 3px 0 0"></div>
+            <div style="flex:1;background:var(--success);height:40%;border-radius:3px 3px 0 0"></div>
+            <div style="flex:1;background:var(--destructive);height:25%;border-radius:3px 3px 0 0"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- New Backtest Modal -->
 <div class="modal-overlay" id="newBT">
   <div class="modal" style="max-width:600px">
-    <div class="modal-header"><h3 class="modal-title">New Backtest</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('newBT')">✕</button></div>
+    <div class="modal-header"><h3 class="modal-title">New Backtest</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('newBT')">×</button></div>
     <div class="modal-body">
+      <p class="text-muted" style="font-size:13px;margin:0 0 16px">Configure and submit a single-strategy backtest job.</p>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-        <div><label class="form-label">Strategy</label><select class="form-select"><option>DualMA_Cross</option><option>RSI_Reversal</option><option>BollingerBand</option><option>MyAlpha01</option></select></div>
-        <div><label class="form-label">Subject</label><input class="form-input" value="600519.SH" placeholder="Stock code"></div>
+        <div><label class="form-label">Strategy</label><select class="form-select"><option>DualMA_Cross</option><option>RSI_Reversal</option><option>MyAlpha01</option><option>GridTrader</option><optgroup label="Composite"><option>FactorAlpha_MACD</option><option>QlibAI_DualMA</option><option>SectorRotation_BB</option><option>IndexCore_MA</option></optgroup></select></div>
+        <div><label class="form-label">Symbol</label><input class="form-input" value="600519.SH" placeholder="e.g. 600519.SH"></div>
         <div><label class="form-label">Start Date</label><input type="date" class="form-input" value="2024-01-01"></div>
         <div><label class="form-label">End Date</label><input type="date" class="form-input" value="2026-03-13"></div>
-        <div><label class="form-label">Initial Funds</label><input type="number" class="form-input" value="1000000"></div>
+        <div><label class="form-label">Initial Capital</label><input type="number" class="form-input" value="1000000"></div>
         <div><label class="form-label">Benchmark</label><select class="form-select"><option>CSI 300</option><option>SSE 50</option><option>CSI 500</option></select></div>
       </div>
     </div>
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('newBT')>Cancel</button><button class="btn btn-primary" onclick="submitModal('newBT', 'Backtest has been submitted, please check the progress in the list')">Start backtesting</button></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('newBT')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitModal('newBT','Backtest job submitted','success')">Submit Backtest</button>
+    </div>
+  </div>
+</div>
+
+<!-- Bulk Backtest Modal -->
+<div class="modal-overlay" id="bulkBT">
+  <div class="modal" style="max-width:640px">
+    <div class="modal-header"><h3 class="modal-title">Bulk Backtest</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('bulkBT')">×</button></div>
+    <div class="modal-body">
+      <p class="text-muted" style="font-size:13px;margin:0 0 16px">Run one strategy across multiple symbols at once.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div><label class="form-label">Strategy</label><select class="form-select"><option>DualMA_Cross</option><option>RSI_Reversal</option><option>MyAlpha01</option></select></div>
+        <div><label class="form-label">Symbol Selection</label>
+          <select class="form-select"><option>CSI 300 constituents</option><option>SSE 50 constituents</option><option>CSI 500 constituents</option><option>Custom list</option></select>
+        </div>
+        <div><label class="form-label">Start Date</label><input type="date" class="form-input" value="2024-01-01"></div>
+        <div><label class="form-label">End Date</label><input type="date" class="form-input" value="2026-03-13"></div>
+        <div><label class="form-label">Initial Capital (per symbol)</label><input type="number" class="form-input" value="1000000"></div>
+        <div><label class="form-label">Benchmark</label><select class="form-select"><option>CSI 300</option><option>SSE 50</option><option>CSI 500</option></select></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('bulkBT')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitModal('bulkBT','Bulk backtest submitted','success')">Submit Bulk Backtest</button>
+    </div>
   </div>
 </div>
 
 <script src="shared.js"></script>
 <script>
-const tbody = document.getElementById('btTable');
-MOCK.backtests.forEach(b => {
-  tbody.innerHTML += `<tr>
-    <td class="font-mono">${b.id}</td><td>${b.strategy}</td><td class="font-mono">${b.symbol}</td>
-    <td>${statusBadge(b.status)}</td>
-    <td class="${b.return !== null ? pnlColor(b.return) : ''}">${b.return !== null ? pnlSign(b.return)+b.return+'%' : '-'}</td>
-    <td>${b.sharpe ?? '-'}</td>
-    <td class="${b.maxDD !== null ? 'text-destructive' : ''}">${b.maxDD !== null ? b.maxDD+'%' : '-'}</td>
-    <td>${b.date}</td>
-    <td><button class="btn btn-ghost btn-sm" onclick="activateTab('bt','result');showToast('Backtest results for ${b.id} have been loaded','info'> view</button>< Battenklaas = "Benben-Gersteben-Smu" Onklik = "Shawkonfilm ('Are you sure you want to rerun the backtest for ${b.id}?', function(){showToast('${b.id} has been added to the backtest queue', 'success')})">Rerun</button></td>
-  </tr>`;
+/* ── Populate Backtest Table ── */
+var tbody = document.getElementById('btTable');
+MOCK.backtests.forEach(function(b) {
+  var retCell = b.return !== null ? '<td class="'+pnlColor(b.return)+'">'+pnlSign(b.return)+b.return+'%</td>' : '<td>—</td>';
+  var sharpeCell = '<td>'+(b.sharpe != null ? b.sharpe : '—')+'</td>';
+  var ddCell = b.maxDD !== null ? '<td class="text-destructive">'+b.maxDD+'%</td>' : '<td>—</td>';
+  tbody.innerHTML += '<tr>'
+    +'<td class="font-mono">'+b.id+'</td>'
+    +'<td>'+b.strategy+'</td>'
+    +'<td class="font-mono">'+b.symbol+'</td>'
+    +'<td>'+statusBadge(b.status)+'</td>'
+    +retCell+sharpeCell+ddCell
+    +'<td>'+b.date+'</td>'
+    +'<td>'
+      +'<button class="btn btn-ghost btn-sm" onclick="openBtResult(\''+b.id+'\')">'+icon('eye')+' View</button> '
+      +'<button class="btn btn-ghost btn-sm" onclick="showConfirm(\'Rerun backtest '+b.id+'?\',function(){showToast(\''+b.id+' resubmitted\',\'success\')})">'+icon('refresh-cw')+' Rerun</button>'
+    +'</td></tr>';
 });
 
-// Draw backtest NAV chart
+/* ── Composite Backtest entries ── */
+var compositeBacktests = [
+  { id: 'CBT-001', strategy: 'FactorAlpha_MACD', symbol: 'Multi (30)', status: 'completed', ret: 28.3, sharpe: 1.52, maxDD: -9.8, date: '2026-03-20' },
+  { id: 'CBT-002', strategy: 'QlibAI_DualMA', symbol: 'Multi (25)', status: 'completed', ret: 23.5, sharpe: 1.42, maxDD: -12.3, date: '2026-03-18' },
+  { id: 'CBT-003', strategy: 'SectorRotation_BB', symbol: 'Multi (15)', status: 'running', ret: null, sharpe: null, maxDD: null, date: '2026-03-21' }
+];
+compositeBacktests.forEach(function(b) {
+  var retCell = b.ret !== null ? '<td class="'+pnlColor(b.ret)+'">'+pnlSign(b.ret)+b.ret+'%</td>' : '<td>—</td>';
+  var sharpeCell = '<td>'+(b.sharpe != null ? b.sharpe : '—')+'</td>';
+  var ddCell = b.maxDD !== null ? '<td class="text-destructive">'+b.maxDD+'%</td>' : '<td>—</td>';
+  tbody.innerHTML += '<tr style="background:hsl(260 60% 97%)">'
+    +'<td class="font-mono">'+b.id+' <span class="badge" style="font-size:10px;background:hsl(260 60% 92%);color:hsl(260 60% 40%)">Composite</span></td>'
+    +'<td>'+b.strategy+'</td>'
+    +'<td class="font-mono">'+b.symbol+'</td>'
+    +'<td>'+statusBadge(b.status)+'</td>'
+    +retCell+sharpeCell+ddCell
+    +'<td>'+b.date+'</td>'
+    +'<td>'
+      +'<button class="btn btn-ghost btn-sm" onclick="openBtResult(\''+b.id+'\')">'+icon('eye')+' View</button> '
+      +'<button class="btn btn-ghost btn-sm" onclick="showConfirm(\'Rerun composite backtest '+b.id+'?\',function(){showToast(\''+b.id+' resubmitted\',\'success\')})">'+icon('refresh-cw')+' Rerun</button>'
+    +'</td></tr>';
+});
+
+/* ── Result Overlay ── */
+function openBtResult(id) {
+  document.getElementById('btResultTitle').textContent = id;
+  document.getElementById('btResultOverlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+  setTimeout(function() { drawBTNav(); drawDD(); }, 50);
+}
+function closeBtResult() {
+  document.getElementById('btResultOverlay').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+/* ── Charts ── */
 function drawBTNav() {
-  const c = document.getElementById('btNavCanvas');
+  var c = document.getElementById('btNavCanvas');
   if (!c || !c.parentElement.offsetWidth) return;
-  const ctx = c.getContext('2d');
-  const W = c.parentElement.clientWidth, H = c.parentElement.clientHeight;
+  var ctx = c.getContext('2d');
+  var W = c.parentElement.clientWidth, H = c.parentElement.clientHeight;
   c.width = W; c.height = H;
-  const pad = 30;
-  // Strategy line
-  const strat = [100,101,103,102,105,108,107,110,112,111,115,118,117,120,123,122,125,124,128,123.5];
-  const bench = [100,100.5,101,100.8,102,103,102.5,104,105,104.5,106,107,106.5,108,109,108.5,110,109.5,111,110.8];
-  const all = [...strat, ...bench];
-  const min = Math.min(...all), max = Math.max(...all);
+  var pad = 30;
+  var strat = [100,101,103,102,105,108,107,110,112,111,115,118,117,120,123,122,125,124,128,123.5];
+  var bench = [100,100.5,101,100.8,102,103,102.5,104,105,104.5,106,107,106.5,108,109,108.5,110,109.5,111,110.8];
+  var all = strat.concat(bench);
+  var min = Math.min.apply(null,all), max = Math.max.apply(null,all);
   function drawLine(pts, color) {
     ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.beginPath();
-    pts.forEach((v,i) => {
-      const x = pad + (i/(pts.length-1))*(W-pad*2);
-      const y = H - pad - ((v-min)/(max-min))*(H-pad*2);
+    pts.forEach(function(v,i) {
+      var x = pad + (i/(pts.length-1))*(W-pad*2);
+      var y = H - pad - ((v-min)/(max-min))*(H-pad*2);
       i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
     });
     ctx.stroke();
   }
   drawLine(strat, '#3b82f6');
   drawLine(bench, '#9ca3af');
-  // Legend
   ctx.font = '12px system-ui';
   ctx.fillStyle = '#3b82f6'; ctx.fillRect(W-180, 10, 12, 3); ctx.fillText('Strategy', W-164, 15);
   ctx.fillStyle = '#9ca3af'; ctx.fillRect(W-100, 10, 12, 3); ctx.fillText('CSI 300', W-84, 15);
 }
 function drawDD() {
-  const c = document.getElementById('btDDCanvas');
+  var c = document.getElementById('btDDCanvas');
   if (!c || !c.parentElement.offsetWidth) return;
-  const ctx = c.getContext('2d');
-  const W = c.parentElement.clientWidth, H = c.parentElement.clientHeight;
+  var ctx = c.getContext('2d');
+  var W = c.parentElement.clientWidth, H = c.parentElement.clientHeight;
   c.width = W; c.height = H;
-  const dd = [0,0,-1.2,-0.8,-2.5,-1.1,0,-0.5,-3.8,-2.1,-1.0,0,-0.3,-5.2,-12.3,-8.1,-4.5,-1.2,0,0];
-  const min = Math.min(...dd);
-  const pad = 30;
+  var dd = [0,0,-1.2,-0.8,-2.5,-1.1,0,-0.5,-3.8,-2.1,-1.0,0,-0.3,-5.2,-12.3,-8.1,-4.5,-1.2,0,0];
+  var min = Math.min.apply(null,dd);
+  var pad = 30;
   ctx.fillStyle = 'rgba(239,68,68,0.3)'; ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 1.5;
   ctx.beginPath();
-  dd.forEach((v,i) => {
-    const x = pad + (i/(dd.length-1))*(W-pad*2);
-    const y = pad + (v/min)*(H-pad*2);
+  dd.forEach(function(v,i) {
+    var x = pad + (i/(dd.length-1))*(W-pad*2);
+    var y = pad + (v/min)*(H-pad*2);
     i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
   });
   ctx.stroke();
-  const lastX = pad+(1)*(W-pad*2);
+  var lastX = pad+(1)*(W-pad*2);
   ctx.lineTo(lastX, pad); ctx.lineTo(pad, pad); ctx.closePath(); ctx.fill();
 }
-window.addEventListener('load', () => { drawBTNav(); drawDD(); });
-window.addEventListener('resize', () => { drawBTNav(); drawDD(); });
 
-// Filters
-(function(){
-  var search=document.querySelector('.filter-bar .form-input');
-  var selStat=document.querySelectorAll('.filter-bar .form-select')[0];
-  function filterBT(){
-    var q=(search?search.value:'').toLowerCase();
-    var s=selStat?selStat.value:'';
-    document.getElementById('btTable').querySelectorAll('tr').forEach(function(row){
-      var strat=row.cells[1].textContent.toLowerCase();
-      var stat=row.cells[3].textContent;
-      var show=true;
-      if(q&&strat.indexOf(q)<0)show=false;
-      if(s&&s!=='All Statuses'&&stat.indexOf(s.replace('Completed','completed').replace('Running','running').replace('Failure','failed').replace('In line','queued'))<0&&stat.indexOf(s)<0)show=false;
-      row.style.display=show?'':'none';
+/* ── Filters ── */
+document.addEventListener('DOMContentLoaded', function() {
+  var si = document.getElementById('btSearchIcon');
+  if (si) si.innerHTML = icon('search');
+  var search = document.getElementById('btSearch');
+  var statF = document.getElementById('btStatusFilter');
+  var stratF = document.getElementById('btStratFilter');
+  function filterBT() {
+    var q = (search.value||'').toLowerCase();
+    var sf = statF.value;
+    var stf = stratF.value;
+    document.getElementById('btTable').querySelectorAll('tr').forEach(function(row) {
+      var strat = row.cells[1].textContent.toLowerCase();
+      var sym = row.cells[2].textContent.toLowerCase();
+      var stat = row.cells[3].textContent.toLowerCase();
+      var show = true;
+      if (q && strat.indexOf(q)<0 && sym.indexOf(q)<0) show = false;
+      if (sf!=='all' && stat.indexOf(sf)<0) show = false;
+      if (stf!=='all' && row.cells[1].textContent!==stf) show = false;
+      row.style.display = show ? '' : 'none';
     });
   }
-  if(search) search.addEventListener('input',filterBT);
-  if(selStat) selStat.addEventListener('change',filterBT);
-})();
+  search.addEventListener('input', filterBT);
+  statF.addEventListener('change', filterBT);
+  stratF.addEventListener('change', filterBT);
+});
+document.addEventListener('keydown', function(e) { if(e.key==='Escape') closeBtResult(); });
 </script>
 </body>
 </html>

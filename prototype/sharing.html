@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>QuantMate - Sharing Center</title>
+  <title>QuantMate — Team Space</title>
   <link rel="stylesheet" href="shared.css">
   <script src="https://cdn.tailwindcss.com?v=3.4"></script>
 </head>
@@ -14,272 +14,177 @@
     <div class="page-header">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
         <div>
-          <h1 class="page-title">Sharing Center</h1>
-          <p class="page-subtitle">Strategy sharing | Collaboration | Community activity</p>
+          <h1 class="page-title">Team Space</h1>
+          <p class="page-subtitle">Collaborative workspaces, member management, and strategy sharing</p>
         </div>
-        <button class="btn btn-primary" onclick="openModal('shareNew')">Share strategy</button>
+        <button class="btn btn-primary" id="btnCreateWs" onclick="openModal('createWs')">+ Create Workspace</button>
       </div>
     </div>
 
-    <div class="tabs" data-group="sh">
-      <button class="tab-btn active" data-tab="myshares">My Shares</button>
-      <button class="tab-btn" data-tab="received">Received shares</button>
-      <button class="tab-btn" data-tab="public">Public Strategies</button>
-    </div>
+    <!-- Workspace List View -->
+    <div id="workspaceList"></div>
 
-    <!-- My Shares -->
-    <div class="tab-panel active" data-group="sh" data-panel="myshares">
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px">
-
-        <div class="card">
-          <div style="display:flex;justify-content:space-between;align-items:start">
-            <h3 style="font-weight:600">DualMA_Cross v3</h3>
-            <span class="badge badge-success">Public</span>
-          </div>
-          <p class="text-muted" style="font-size:13px;margin:4px 0">Double moving average crossover | Daily frequency | A-shares</p>
-          <div style="display:flex;gap:12px;margin:12px 0;font-size:13px">
-            <span>⭐ 4.5</span><span>📥 128 clones</span><span>❤️ 45 Favorites</span>
-          </div>
-          <div style="font-size:12px;color:var(--muted-foreground);margin-bottom:12px">
-            Shared on 2026-02-15 | 3 comments
-          </div>
-          <div style="display:flex;gap:8px">
-            <button class="btn btn-ghost btn-sm" onclick="showToast('Share editing opened', 'info')">Edit</button>
-            <button class="btn btn-ghost btn-sm" onclick="showToast('Share link: quantmate.io/s/dual-ma-xxx','info')">View link</button>
-            <button class="btn btn-ghost btn-sm" style="color:var(--destructive)" onclick="showConfirm('Confirm cancel sharing DualMA_Cross v3?', ()=>showToast('Sharing canceled','warning'))">Cancel Share</button>
-          </div>
-        </div>
-
-        <div class="card">
-          <div style="display:flex;justify-content:space-between;align-items:start">
-            <h3 style="font-weight:600">RSI_Reversal</h3>
-            <span class="badge badge-warning">Link only</span>
-          </div>
-          <p class="text-muted" style="font-size:13px;margin:4px 0">RSI reversal | Daily frequency | A-shares</p>
-          <div style="display:flex;gap:12px;margin:12px 0;font-size:13px">
-            <span>⭐ —</span><span>📥 12 visits</span><span>❤️ 3 Favorites</span>
-          </div>
-          <div style="font-size:12px;color:var(--muted-foreground);margin-bottom:12px">
-            Shared on 2026-03-01 | 1 comment
-          </div>
-          <div style="display:flex;gap:8px">
-            <button class="btn btn-ghost btn-sm" onclick="showToast('Share editing opened', 'info')">Edit</button>
-            <button class="btn btn-ghost btn-sm" onclick="openModal('shareLink')">Copy link</button>
-            <button class="btn btn-ghost btn-sm" style="color:var(--destructive)" onclick="showConfirm('Confirm cancel sharing RSI_Reversal?', ()=>showToast('Sharing canceled','warning'))">Cancel Share</button>
-          </div>
-        </div>
-
-        <div class="card">
-          <div style="display:flex;justify-content:space-between;align-items:start">
-            <h3 style="font-weight:600">BollingerBand_Breakout</h3>
-            <span class="badge badge-muted">Specific members</span>
-          </div>
-          <p class="text-muted" style="font-size:13px;margin:4px 0">Bollinger band breakout | 15-minute | A-shares</p>
-          <div style="display:flex;gap:12px;margin:12px 0;font-size:13px">
-            <span>👥 3 recipients</span><span>📥 5 views</span>
-          </div>
-          <div style="font-size:12px;color:var(--muted-foreground);margin-bottom:12px">
-            Shared on 2026-03-05 | 2 viewed
-          </div>
-          <div style="display:flex;gap:8px">
-            <button class="btn btn-ghost btn-sm" onclick="showToast('Permission manager opened','info')">Manage access</button>
-            <button class="btn btn-ghost btn-sm" style="color:var(--destructive)" onclick="showConfirm('Confirm cancel sharing BollingerBand_Breakout?', ()=>showToast('Sharing canceled','warning'))">Cancel Share</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Received -->
-    <div class="tab-panel" data-group="sh" data-panel="received">
-      <div class="card">
-        <div class="card-header"><h3 class="card-title">Received shares</h3></div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Strategy Name</th><th>Sharer</th><th>Permission</th><th>Time</th><th>Status</th><th>Actions</th></tr></thead>
-            <tbody>
-              <tr>
-                <td><b>MultiFactorAlpha_v2</b><br><span class="text-muted" style="font-size:12px">Multi-factor stock selection | Sharpe 2.10</span></td>
-                <td>alice_quant</td>
-                <td><span class="badge badge-primary">Editable</span></td>
-                <td>2026-03-10</td>
-                <td><span class="badge badge-success">Accepted</span></td>
-                <td><button class="btn btn-primary btn-sm" onclick="showToast('MultiFactorAlpha_v2 has been opened','success')">Open</button></td>
-              </tr>
-              <tr>
-                <td><b>Pairs_Trading</b><br><span class="text-muted" style="font-size:12px">Pairs trading | Statistical arbitrage</span></td>
-                <td>bob_dev</td>
-                <td><span class="badge badge-muted">View only</span></td>
-                <td>2026-03-08</td>
-                <td><span class="badge badge-success">Accepted</span></td>
-                <td><button class="btn btn-primary btn-sm" onclick="showToast('Pairs_Trading has been opened','success')">Open</button></td>
-              </tr>
-              <tr>
-                <td><b>EventDriven_Earnings</b><br><span class="text-muted" style="font-size:12px">Event-driven | Earnings release</span></td>
-                <td>charlie_analyst</td>
-                <td><span class="badge badge-warning">Commentable</span></td>
-                <td>2026-03-12</td>
-                <td><span class="badge badge-warning">Pending acceptance</span></td>
-                <td><button class="btn btn-primary btn-sm" onclick="showToast('Share accepted','success')">Accept</button><button class="btn btn-ghost btn-sm" onclick="showConfirm('Decline this share?',()=>showToast('Share declined','warning'))">Decline</button></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- Public Strategies -->
-    <div class="tab-panel" data-group="sh" data-panel="public">
-      <div class="filter-bar" style="margin-bottom:16px">
-        <input type="text" class="form-input" style="width:240px" placeholder="Searching public strategies...">
-        <select class="form-select" style="width:140px"><option>All categories</option><option>Trend Following</option><option>Mean reversion</option><option>Multi-factor</option><option>Arbitrage</option></select>
-        <select class="form-select" style="width:120px"><option>Sort by popularity</option><option>Sort by rating</option><option>Sort by latest</option></select>
-      </div>
-
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px">
-        <div class="card">
-          <div style="display:flex;justify-content:space-between;align-items:start">
-            <h3 style="font-weight:600;font-size:15px">CTA Trend Following v3</h3>
-            <span style="font-size:14px">⭐ 4.8</span>
-          </div>
-          <p class="text-muted" style="font-size:13px;margin:4px 0">by quant_master · Futures CTA</p>
-          <div style="font-size:13px;margin:8px 0">Annualized: <b style="color:var(--success)">+38.5%</b> · Sharpe: <b>1.82</b> · MaxDD: <b>12.3%</b></div>
-          <div style="display:flex;gap:8px;font-size:12px;color:var(--muted-foreground)">
-            <span>?? 342 clones</span><span>?? 128</span><span>?? 23</span>
-          </div>
-          <div style="display:flex;gap:8px;margin-top:12px">
-            <button class="btn btn-primary btn-sm">Clone</button><button class="btn btn-ghost btn-sm">Details</button>
-          </div>
-        </div>
-
-        <div class="card">
-          <div style="display:flex;justify-content:space-between;align-items:start">
-            <h3 style="font-weight:600;font-size:15px">IC Weighted Multi-Factor v2</h3>
-            <span style="font-size:14px">⭐ 4.6</span>
-          </div>
-          <p class="text-muted" style="font-size:13px;margin:4px 0">by alpha_lab · Multi-factor Stock Selection</p>
-          <div style="font-size:13px;margin:8px 0">Annualized: <b style="color:var(--success)">+28.1%</b> · Sharpe: <b>2.10</b> · MaxDD: <b>15.8%</b></div>
-          <div style="display:flex;gap:8px;font-size:12px;color:var(--muted-foreground)">
-            <span>?? 256 clones</span><span>?? 95</span><span>?? 18</span>
-          </div>
-          <div style="display:flex;gap:8px;margin-top:12px">
-            <button class="btn btn-primary btn-sm">Clone</button><button class="btn btn-ghost btn-sm">Details</button>
-          </div>
-        </div>
-
-        <div class="card">
-          <div style="display:flex;justify-content:space-between;align-items:start">
-            <h3 style="font-weight:600;font-size:15px">Statistical Arbitrage Beta Neutral</h3>
-            <span style="font-size:14px">⭐ 4.4</span>
-          </div>
-          <p class="text-muted" style="font-size:13px;margin:4px 0">by pair_trader · Pair Arbitrage</p>
-          <div style="font-size:13px;margin:8px 0">Annualized: <b style="color:var(--success)">+16.2%</b> · Sharpe: <b>2.45</b> · MaxDD: <b>5.1%</b></div>
-          <div style="display:flex;gap:8px;font-size:12px;color:var(--muted-foreground)">
-            <span>?? 189 clones</span><span>?? 72</span><span>?? 12</span>
-          </div>
-          <div style="display:flex;gap:8px;margin-top:12px">
-            <button class="btn btn-primary btn-sm">Clone</button><button class="btn btn-ghost btn-sm">Details</button>
-          </div>
-        </div>
-
-        <div class="card">
-          <div style="display:flex;justify-content:space-between;align-items:start">
-            <h3 style="font-weight:600;font-size:15px">Dragon and Tiger List Tracking</h3>
-            <span style="font-size:14px">⭐ 4.2</span>
-          </div>
-          <p class="text-muted" style="font-size:13px;margin:4px 0">by data_miner · Event-driven</p>
-          <div style="font-size:13px;margin:8px 0">Annualized: <b style="color:var(--success)">+22.7%</b> · Sharpe: <b>1.35</b> · MaxDD: <b>18.9%</b></div>
-          <div style="display:flex;gap:8px;font-size:12px;color:var(--muted-foreground)">
-            <span>?? 156 clones</span><span>?? 58</span><span>?? 9</span>
-          </div>
-          <div style="display:flex;gap:8px;margin-top:12px">
-            <button class="btn btn-primary btn-sm">Clone</button><button class="btn btn-ghost btn-sm">Details</button>
-          </div>
-        </div>
-
-        <div class="card">
-          <div style="display:flex;justify-content:space-between;align-items:start">
-            <h3 style="font-weight:600;font-size:15px">Convertible Bond Rotation</h3>
-            <span style="font-size:14px">⭐ 4.1</span>
-          </div>
-          <p class="text-muted" style="font-size:13px;margin:4px 0">by bond_quant ? Convertible bond</p>
-          <div style="font-size:13px;margin:8px 0">Annualized: <b style="color:var(--success)">+18.5%</b> · Sharpe: <b>1.68</b> · MaxDD: <b>8.7%</b></div>
-          <div style="display:flex;gap:8px;font-size:12px;color:var(--muted-foreground)">
-            <span>?? 98 clones</span><span>?? 41</span><span>?? 7</span>
-          </div>
-          <div style="display:flex;gap:8px;margin-top:12px">
-            <button class="btn btn-primary btn-sm">Clone</button><button class="btn btn-ghost btn-sm">Details</button>
-          </div>
-        </div>
-
-        <div class="card">
-          <div style="display:flex;justify-content:space-between;align-items:start">
-            <h3 style="font-weight:600;font-size:15px">Machine Learning Price Prediction</h3>
-            <span style="font-size:14px">⭐ 3.9</span>
-          </div>
-          <p class="text-muted" style="font-size:13px;margin:4px 0">by ml_trader ? AI quant</p>
-          <div style="font-size:13px;margin:8px 0">Annualized: <b style="color:var(--success)">+24.3%</b> · Sharpe: <b>1.15</b> · MaxDD: <b>22.6%</b></div>
-          <div style="display:flex;gap:8px;font-size:12px;color:var(--muted-foreground)">
-            <span>?? 215 clones</span><span>?? 67</span><span>?? 31</span>
-          </div>
-          <div style="display:flex;gap:8px;margin-top:12px">
-            <button class="btn btn-primary btn-sm">Clone</button><button class="btn btn-ghost btn-sm">Details</button>
-          </div>
-        </div>
-      </div>
-    </div>
+    <!-- Member Detail View -->
+    <div id="memberDetail" style="display:none"></div>
 
   </main>
 </div>
 
-<!-- Share Strategy Modal -->
-<div class="modal-overlay" id="shareNew">
-  <div class="modal" style="max-width:520px">
-    <div class="modal-header"><h3 class="modal-title">Share Strategy</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('shareNew')">✕</button></div>
+<!-- Create Workspace Modal -->
+<div class="modal-overlay" id="createWs">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <h3 class="modal-title">Create Workspace</h3>
+      <button class="btn btn-ghost btn-icon" onclick="closeModal('createWs')">&#10005;</button>
+    </div>
     <div class="modal-body">
       <div style="display:flex;flex-direction:column;gap:16px">
-        <div><label class="form-label">Choose Strategy</label><select class="form-select"><option>DualMA_Cross v3</option><option>RSI_Reversal v1</option><option>BollingerBand_Breakout v2</option><option>MomentumAlpha_v1</option></select></div>
-        <div><label class="form-label">Sharing method</label>
-          <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
-            <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="radio" name="shareMode" checked> Public - visible and cloneable by everyone</label>
-            <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="radio" name="shareMode"> Link only - people who have the link can view</label>
-            <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="radio" name="shareMode"> Specific members - choose individual users</label>
-          </div>
+        <div>
+          <label class="form-label">Workspace Name</label>
+          <input type="text" class="form-input" placeholder="Enter workspace name">
         </div>
-        <div><label class="form-label">Permission Control</label><select class="form-select"><option>View only - Can browse strategy code and backtest results</option><option>Comment - Can view and add comments</option><option>Edit - Can modify strategy parameters</option><option>Full access - Can modify strategy code</option></select></div>
-        <div><label class="form-label">Description</label><textarea class="form-textarea" rows="3" placeholder="Add sharing description (optional)..."></textarea></div>
+        <div>
+          <label class="form-label">Description</label>
+          <textarea class="form-textarea" rows="4" placeholder="Describe the purpose of this workspace..."></textarea>
+        </div>
       </div>
     </div>
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('shareNew')">Cancel</button><button class="btn btn-primary" onclick="submitModal('shareNew', 'The strategy has been shared successfully', 'success')">Share</button></div>
-  </div>
-</div>
-
-<!-- Share Link Modal -->
-<div class="modal-overlay" id="shareLink">
-  <div class="modal" style="max-width:420px">
-    <div class="modal-header"><h3 class="modal-title">Share Link</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('shareLink')">✕</button></div>
-    <div class="modal-body">
-      <p style="margin-bottom:12px;font-size:14px">Copy the following link to send to other users:</p>
-      <div style="display:flex;gap:8px">
-        <input type="text" class="form-input" value="https://quantmate.io/s/rsi-reversal-abc123" readonly style="flex:1">
-        <button class="btn btn-primary" onclick="showToast('The link has been copied to the clipboard','success')">Copy</button>
-      </div>
-      <p class="text-muted" style="font-size:12px;margin-top:8px">This link is valid for 30 days, and 12 people have already accessed it through this link.</p>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('createWs')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitModal('createWs', 'Workspace created successfully', 'success')">Create</button>
     </div>
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('shareLink')">Close</button></div>
   </div>
 </div>
 
 <script src="shared.js"></script>
 <script>
-// Public strategy card buttons
-document.querySelectorAll('[data-panel="public"] .card').forEach(card=>{
-  const title=(card.querySelector('h3')||{}).textContent||'';
-  card.querySelectorAll('.btn-sm').forEach(btn=>{
-    const t=btn.textContent.trim();
-    if(t==='Clone') btn.onclick=()=>showToast('Cloned "' + title + '" to my strategies','success');
-    else if(t==='Details') btn.onclick=()=>showToast('Loading details for "' + title + '"','info');
-  });
-});
+var workspaces = [
+  { id: 'ws1', name: 'Alpha Research Lab', role: 'owner', description: 'Core quantitative strategy research and development', members: 5, strategies: 12, created_at: '2026-01-15' },
+  { id: 'ws2', name: 'Quant Trading Team', role: 'admin', description: 'High-frequency and algorithmic trading strategies', members: 8, strategies: 24, created_at: '2025-11-20' },
+  { id: 'ws3', name: 'Risk Analytics Group', role: 'member', description: 'Portfolio risk measurement and hedging research', members: 3, strategies: 6, created_at: '2026-02-28' },
+  { id: 'ws4', name: 'ML Factor Research', role: 'viewer', description: 'Machine learning based factor discovery and validation', members: 12, strategies: 31, created_at: '2025-09-05' }
+];
+
+var membersByWs = {
+  ws1: [
+    { username: 'Daniel Shi', email: 'daniel@quantmate.io', role: 'owner', joined_at: '2026-01-15', last_active: '2026-03-26' },
+    { username: 'Alice Chen', email: 'alice@quantmate.io', role: 'admin', joined_at: '2026-01-20', last_active: '2026-03-25' },
+    { username: 'Bob Wang', email: 'bob@quantmate.io', role: 'member', joined_at: '2026-02-01', last_active: '2026-03-24' },
+    { username: 'Carol Li', email: 'carol@quantmate.io', role: 'member', joined_at: '2026-02-15', last_active: '2026-03-20' },
+    { username: 'David Zhang', email: 'david@quantmate.io', role: 'viewer', joined_at: '2026-03-01', last_active: '2026-03-18' }
+  ],
+  ws2: [
+    { username: 'Sarah Liu', email: 'sarah@quantmate.io', role: 'owner', joined_at: '2025-11-20', last_active: '2026-03-26' },
+    { username: 'Daniel Shi', email: 'daniel@quantmate.io', role: 'admin', joined_at: '2025-12-01', last_active: '2026-03-25' },
+    { username: 'Mike Zhao', email: 'mike@quantmate.io', role: 'member', joined_at: '2025-12-15', last_active: '2026-03-23' },
+    { username: 'Emily Xu', email: 'emily@quantmate.io', role: 'member', joined_at: '2026-01-05', last_active: '2026-03-22' },
+    { username: 'Frank Wu', email: 'frank@quantmate.io', role: 'member', joined_at: '2026-01-10', last_active: '2026-03-21' },
+    { username: 'Grace Huang', email: 'grace@quantmate.io', role: 'member', joined_at: '2026-02-01', last_active: '2026-03-19' },
+    { username: 'Henry Tan', email: 'henry@quantmate.io', role: 'viewer', joined_at: '2026-02-10', last_active: '2026-03-17' },
+    { username: 'Ivy Guo', email: 'ivy@quantmate.io', role: 'viewer', joined_at: '2026-02-20', last_active: '2026-03-15' }
+  ],
+  ws3: [
+    { username: 'Kevin Sun', email: 'kevin@quantmate.io', role: 'owner', joined_at: '2026-02-28', last_active: '2026-03-26' },
+    { username: 'Linda Ma', email: 'linda@quantmate.io', role: 'admin', joined_at: '2026-03-01', last_active: '2026-03-25' },
+    { username: 'Daniel Shi', email: 'daniel@quantmate.io', role: 'member', joined_at: '2026-03-05', last_active: '2026-03-24' }
+  ],
+  ws4: [
+    { username: 'Nathan Zhou', email: 'nathan@quantmate.io', role: 'owner', joined_at: '2025-09-05', last_active: '2026-03-26' },
+    { username: 'Olivia Jiang', email: 'olivia@quantmate.io', role: 'admin', joined_at: '2025-09-10', last_active: '2026-03-25' },
+    { username: 'Peter He', email: 'peter@quantmate.io', role: 'admin', joined_at: '2025-09-15', last_active: '2026-03-24' },
+    { username: 'Queenie Luo', email: 'queenie@quantmate.io', role: 'member', joined_at: '2025-10-01', last_active: '2026-03-23' },
+    { username: 'Rachel Feng', email: 'rachel@quantmate.io', role: 'member', joined_at: '2025-10-15', last_active: '2026-03-22' },
+    { username: 'Sam Deng', email: 'sam@quantmate.io', role: 'member', joined_at: '2025-11-01', last_active: '2026-03-21' },
+    { username: 'Tina Ye', email: 'tina@quantmate.io', role: 'member', joined_at: '2025-11-15', last_active: '2026-03-20' },
+    { username: 'Daniel Shi', email: 'daniel@quantmate.io', role: 'viewer', joined_at: '2025-12-01', last_active: '2026-03-19' },
+    { username: 'Vicky Pan', email: 'vicky@quantmate.io', role: 'viewer', joined_at: '2025-12-15', last_active: '2026-03-18' },
+    { username: 'Will Cao', email: 'will@quantmate.io', role: 'viewer', joined_at: '2026-01-01', last_active: '2026-03-16' },
+    { username: 'Xavier Lu', email: 'xavier@quantmate.io', role: 'viewer', joined_at: '2026-01-15', last_active: '2026-03-14' },
+    { username: 'Yuki Mori', email: 'yuki@quantmate.io', role: 'viewer', joined_at: '2026-02-01', last_active: '2026-03-12' }
+  ]
+};
+
+function roleBadge(role) {
+  var variant = 'primary';
+  if (role === 'owner') variant = 'destructive';
+  else if (role === 'admin') variant = 'warning';
+  var label = role.charAt(0).toUpperCase() + role.slice(1);
+  return '<span class="badge badge-' + variant + '">' + label + '</span>';
+}
+
+function renderWorkspaceList() {
+  var container = document.getElementById('workspaceList');
+  var html = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px">';
+  for (var i = 0; i < workspaces.length; i++) {
+    var ws = workspaces[i];
+    html += '<div class="card" style="cursor:pointer;transition:box-shadow .2s" onmouseover="this.style.boxShadow=\'0 4px 12px rgba(0,0,0,.1)\'" onmouseout="this.style.boxShadow=\'\'" onclick="showMembers(\'' + ws.id + '\')">'
+      + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">'
+      + '<h3 style="font-weight:600;font-size:16px">' + ws.name + '</h3>'
+      + roleBadge(ws.role)
+      + '</div>'
+      + '<p class="text-muted" style="font-size:13px;margin-bottom:16px">' + ws.description + '</p>'
+      + '<div style="display:flex;gap:20px;font-size:13px;color:var(--muted-foreground)">'
+      + '<span>' + icon('users') + ' ' + ws.members + ' members</span>'
+      + '<span>' + ws.strategies + ' strategies</span>'
+      + '<span>Created ' + ws.created_at + '</span>'
+      + '</div>'
+      + '</div>';
+  }
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+function showMembers(wsId) {
+  var ws = null;
+  for (var i = 0; i < workspaces.length; i++) {
+    if (workspaces[i].id === wsId) { ws = workspaces[i]; break; }
+  }
+  if (!ws) return;
+
+  var members = membersByWs[wsId] || [];
+  document.getElementById('workspaceList').style.display = 'none';
+  var detail = document.getElementById('memberDetail');
+  detail.style.display = 'block';
+
+  var html = '<a href="#" style="font-size:14px;color:var(--primary);text-decoration:none" onclick="backToList();return false">'
+    + '← Back to workspace list</a>'
+    + '<div class="card" style="margin-top:16px">'
+    + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'
+    + '<h3 style="font-weight:600;font-size:16px">' + ws.name + ' — Member Management</h3>'
+    + '<button class="btn btn-primary btn-sm" onclick="showToast(\'Invite link copied!\', \'success\')">'
+    + icon('plus') + ' Invite Member</button>'
+    + '</div>'
+    + '<div class="table-wrap"><table><thead><tr>'
+    + '<th>Member</th><th>Email</th><th>Role</th><th>Joined At</th><th>Last Active</th><th>Actions</th>'
+    + '</tr></thead><tbody>';
+
+  for (var j = 0; j < members.length; j++) {
+    var m = members[j];
+    var actionCell = '';
+    if (m.role !== 'owner') {
+      actionCell = '<button class="btn btn-ghost btn-icon btn-sm" onclick="showToast(\'Member settings opened\', \'info\')">'
+        + icon('settings') + '</button>';
+    }
+    html += '<tr>'
+      + '<td style="font-weight:500">' + m.username + '</td>'
+      + '<td>' + m.email + '</td>'
+      + '<td>' + roleBadge(m.role) + '</td>'
+      + '<td>' + m.joined_at + '</td>'
+      + '<td>' + m.last_active + '</td>'
+      + '<td>' + actionCell + '</td>'
+      + '</tr>';
+  }
+
+  html += '</tbody></table></div></div>';
+  detail.innerHTML = html;
+}
+
+function backToList() {
+  document.getElementById('memberDetail').style.display = 'none';
+  document.getElementById('workspaceList').style.display = 'block';
+}
+
+renderWorkspaceList();
 </script>
 </body>
 </html>

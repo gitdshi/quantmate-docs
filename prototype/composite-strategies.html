@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>QuantMate — Composite Strategies</title>
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    .composer-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+    .lane { border: 1px solid hsl(var(--border)); border-radius: 12px; background: hsl(var(--card)); min-height: 380px; display: flex; flex-direction: column; }
+    .lane-header { padding: 14px 18px; border-bottom: 1px solid hsl(var(--border)); display: flex; align-items: center; gap: 10px; }
+    .lane-header-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .lane-header-icon.universe { background: hsl(260 60% 92%); color: hsl(260 60% 40%); }
+    .lane-header-icon.trading { background: hsl(210 80% 92%); color: hsl(210 80% 35%); }
+    .lane-header-icon.risk { background: hsl(0 70% 92%); color: hsl(0 70% 40%); }
+    .dark .lane-header-icon.universe { background: hsl(260 40% 22%); color: hsl(260 60% 75%); }
+    .dark .lane-header-icon.trading { background: hsl(210 40% 22%); color: hsl(210 80% 75%); }
+    .dark .lane-header-icon.risk { background: hsl(0 40% 22%); color: hsl(0 70% 75%); }
+    .lane-body { flex: 1; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+    .lane-slot { border: 1px solid hsl(var(--border)); border-radius: 10px; padding: 12px 14px; background: hsl(var(--background)); transition: border-color .15s, box-shadow .15s; cursor: pointer; }
+    .lane-slot:hover { border-color: hsl(var(--ring)/.5); }
+    .lane-slot.selected { border-color: hsl(var(--primary)); box-shadow: 0 0 0 2px hsl(var(--primary)/.15); }
+    .lane-slot-name { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+    .lane-slot-desc { font-size: 12px; color: hsl(var(--muted-foreground)); }
+    .badge-universe { background: hsl(260 60% 92%); color: hsl(260 60% 40%); }
+    .badge-trading { background: hsl(210 80% 92%); color: hsl(210 80% 35%); }
+    .badge-risk { background: hsl(0 70% 92%); color: hsl(0 70% 40%); }
+    .dark .badge-universe { background: hsl(260 40% 22%); color: hsl(260 60% 75%); }
+    .dark .badge-trading { background: hsl(210 40% 22%); color: hsl(210 80% 75%); }
+    .dark .badge-risk { background: hsl(0 40% 22%); color: hsl(0 70% 75%); }
+    .pipeline-preview { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 8px; background: hsl(var(--muted)/.4); font-size: 12px; flex-wrap: wrap; }
+    .pipeline-preview .arrow { color: hsl(var(--muted-foreground)); font-weight: 700; }
+    .config-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(220px,1fr)); gap: 16px; }
+    .composite-list-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(380px,1fr)); gap: 16px; }
+    .composite-card { border: 1px solid hsl(var(--border)); border-radius: 12px; padding: 18px 20px; background: hsl(var(--card)); transition: border-color .15s, box-shadow .15s; cursor: pointer; }
+    .composite-card:hover { border-color: hsl(var(--ring)/.5); box-shadow: 0 2px 8px rgba(15,23,42,.06); }
+    .exec-badge { font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 500; }
+    .exec-badge.backtest { background: hsl(var(--muted)); color: hsl(var(--foreground)); }
+    .exec-badge.paper { background: hsl(210 80% 93%); color: hsl(210 80% 40%); }
+    .exec-badge.live { background: hsl(148 60% 93%); color: hsl(148 60% 30%); }
+    @media (max-width: 1024px) { .composer-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <main class="main-content" id="main">
+    <div class="page-header">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+        <div>
+          <h1 class="page-title">Composite Strategies</h1>
+          <p class="page-subtitle">Assemble Universe, Trading, and Risk components into complete trading pipelines</p>
+        </div>
+        <button class="btn btn-primary" onclick="activateTab('cs','composer')">+ New Composite</button>
+      </div>
+    </div>
+
+    <div class="tabs" data-group="cs">
+      <button class="tab-btn active" data-tab="list">My Composites</button>
+      <button class="tab-btn" data-tab="composer">Composer</button>
+      <button class="tab-btn" data-tab="components">Components</button>
+      <button class="tab-btn" data-tab="detail">Pipeline Detail</button>
+    </div>
+
+    <!-- ═══════════ Tab: My Composites ═══════════ -->
+    <div class="tab-panel active" data-group="cs" data-panel="list">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:16px">
+        <div class="stat-card"><div class="stat-label">Total Composites</div><div class="stat-value">4</div></div>
+        <div class="stat-card"><div class="stat-label">Active (Live/Paper)</div><div class="stat-value" style="color:hsl(var(--success))">2</div></div>
+        <div class="stat-card"><div class="stat-label">Backtest Only</div><div class="stat-value">2</div></div>
+        <div class="stat-card"><div class="stat-label">Avg Sharpe</div><div class="stat-value">1.30</div></div>
+      </div>
+      <div style="display:flex;gap:12px;margin-bottom:16px">
+        <input type="text" class="form-input" placeholder="Search composites..." style="max-width:260px">
+        <select class="form-select" style="max-width:160px"><option>All Status</option><option>Active</option><option>Draft</option><option>Completed</option></select>
+      </div>
+      <div class="composite-list-grid" id="compositeListGrid"></div>
+    </div>
+
+    <!-- ═══════════ Tab: Composer ═══════════ -->
+    <div class="tab-panel" data-group="cs" data-panel="composer">
+      <div class="card" style="margin-bottom:20px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+          <div>
+            <h3 class="card-title" style="margin:0">Pipeline Composer</h3>
+            <p class="text-muted" style="font-size:13px;margin:4px 0 0">Select one component from each layer to create a composite strategy pipeline.</p>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-secondary" onclick="resetComposer()">Reset</button>
+            <button class="btn btn-primary" onclick="saveComposite()">Save Composite</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Three-Lane Composer -->
+      <div class="composer-grid">
+        <div class="lane">
+          <div class="lane-header">
+            <div class="lane-header-icon universe"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+            <div><div style="font-weight:600;font-size:14px">1. Universe</div><div class="text-muted" style="font-size:12px">Stock picking / filtering</div></div>
+          </div>
+          <div class="lane-body" id="universeLane"></div>
+        </div>
+        <div class="lane">
+          <div class="lane-header">
+            <div class="lane-header-icon trading"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></div>
+            <div><div style="font-weight:600;font-size:14px">2. Trading</div><div class="text-muted" style="font-size:12px">Signal generation</div></div>
+          </div>
+          <div class="lane-body" id="tradingLane"></div>
+        </div>
+        <div class="lane">
+          <div class="lane-header">
+            <div class="lane-header-icon risk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg></div>
+            <div><div style="font-weight:600;font-size:14px">3. Risk</div><div class="text-muted" style="font-size:12px">Control / position sizing</div></div>
+          </div>
+          <div class="lane-body" id="riskLane"></div>
+        </div>
+      </div>
+
+      <!-- Pipeline Preview -->
+      <div class="card" style="margin-top:20px">
+        <h3 class="card-title" style="margin:0 0 12px">Pipeline Preview</h3>
+        <div id="pipelinePreview" class="pipeline-preview">
+          <span class="text-muted">Select components above to preview the pipeline flow</span>
+        </div>
+      </div>
+
+      <!-- Configuration -->
+      <div class="card" style="margin-top:16px">
+        <h3 class="card-title" style="margin:0 0 16px">Composite Configuration</h3>
+        <div class="config-grid">
+          <div><label class="form-label">Composite Name</label><input type="text" class="form-input" placeholder="e.g. FactorAlpha_MACD_v1"></div>
+          <div><label class="form-label">Initial Capital</label><input type="number" class="form-input" value="1000000"></div>
+          <div><label class="form-label">Weight Method</label><select class="form-select"><option>Equal Weight</option><option>Risk Parity</option><option>Kelly Criterion</option><option>Market Cap Weight</option></select></div>
+          <div><label class="form-label">Rebalance Frequency</label><select class="form-select"><option>Daily</option><option selected>Weekly</option><option>Monthly</option><option>Trigger-based</option></select></div>
+          <div><label class="form-label">Benchmark</label><select class="form-select"><option>SPY (S&amp;P 500)</option><option>QQQ (NASDAQ 100)</option><option>IWM (Russell 2000)</option><option>None</option></select></div>
+          <div><label class="form-label">Market Constraints</label><select class="form-select"><option>US Equities (T+2)</option><option>A-Share (T+1)</option><option>Futures (T+0 Bilateral)</option></select></div>
+        </div>
+        <div style="margin-top:16px"><label class="form-label">Description</label><textarea class="form-textarea" rows="2" placeholder="Describe the strategy objective..."></textarea></div>
+      </div>
+    </div>
+
+    <!-- ═══════════ Tab: Components ═══════════ -->
+    <div class="tab-panel" data-group="cs" data-panel="components">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:16px">
+        <div>
+          <h2 style="font-size:18px;font-weight:600;margin:0">Strategy Components</h2>
+          <p class="text-muted" style="font-size:13px;margin:4px 0 0">Individual building blocks organized by layer</p>
+        </div>
+        <button class="btn btn-primary" onclick="openModal('newComponent')">+ New Component</button>
+      </div>
+
+      <!-- Universe -->
+      <div class="card" style="padding:16px;margin-bottom:16px">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px">
+          <span style="width:8px;height:8px;border-radius:50%;background:hsl(260 60% 50%);display:inline-block"></span>
+          <h3 style="font-size:15px;font-weight:600;margin:0">Universe Components</h3>
+          <span class="badge badge-muted" style="margin-left:auto">5</span>
+        </div>
+        <div class="table-wrap"><table><thead><tr><th>Name</th><th>Sub-type</th><th>Description</th><th>Version</th><th>Used In</th><th>Actions</th></tr></thead><tbody id="universeTable"></tbody></table></div>
+      </div>
+      <!-- Trading -->
+      <div class="card" style="padding:16px;margin-bottom:16px">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px">
+          <span style="width:8px;height:8px;border-radius:50%;background:hsl(210 80% 45%);display:inline-block"></span>
+          <h3 style="font-size:15px;font-weight:600;margin:0">Trading Components</h3>
+          <span class="badge badge-muted" style="margin-left:auto">6</span>
+        </div>
+        <div class="table-wrap"><table><thead><tr><th>Name</th><th>Sub-type</th><th>Description</th><th>Version</th><th>Used In</th><th>Actions</th></tr></thead><tbody id="tradingTable"></tbody></table></div>
+      </div>
+      <!-- Risk -->
+      <div class="card" style="padding:16px">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px">
+          <span style="width:8px;height:8px;border-radius:50%;background:hsl(0 70% 50%);display:inline-block"></span>
+          <h3 style="font-size:15px;font-weight:600;margin:0">Risk Components</h3>
+          <span class="badge badge-muted" style="margin-left:auto">4</span>
+        </div>
+        <div class="table-wrap"><table><thead><tr><th>Name</th><th>Sub-type</th><th>Description</th><th>Version</th><th>Used In</th><th>Actions</th></tr></thead><tbody id="riskTable"></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- ═══════════ Tab: Pipeline Detail ═══════════ -->
+    <div class="tab-panel" data-group="cs" data-panel="detail">
+      <div id="detailContent"><div class="card" style="padding:40px;text-align:center;color:hsl(var(--muted-foreground))"><p>Select a composite from the list to view its details.</p></div></div>
+    </div>
+
+  </main>
+</div>
+
+<!-- New Component Modal -->
+<div class="modal-overlay" id="newComponent">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-header"><h3 class="modal-title">New Strategy Component</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('newComponent')">&#10005;</button></div>
+    <div class="modal-body">
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div><label class="form-label">Name</label><input type="text" class="form-input" placeholder="e.g. MomentumTopK"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div><label class="form-label">Layer</label><select class="form-select"><option>Universe</option><option>Trading</option><option>Risk</option></select></div>
+          <div><label class="form-label">Sub-type</label><select class="form-select"><option>Factor</option><option>Technical</option><option>Trend</option><option>Mean Reversion</option><option>Stop Loss</option><option>AI/ML</option></select></div>
+        </div>
+        <div><label class="form-label">Description</label><textarea class="form-textarea" rows="2" placeholder="Component description..."></textarea></div>
+        <div><label class="form-label">Code</label><textarea class="form-textarea" rows="6" style="font-family:monospace;font-size:13px" placeholder="# Python strategy component code..."></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('newComponent')">Cancel</button><button class="btn btn-primary" onclick="submitModal('newComponent','Component created','success')">Create</button></div>
+  </div>
+</div>
+
+<script src="shared.js"></script>
+<script>
+/* ── Component Data ── */
+var UNIVERSE = [
+  { id: 'U1', name: 'Factor Top-K', sub: 'Factor', desc: 'Multi-factor ranking, select top K by composite score', ver: 3, used: 2 },
+  { id: 'U2', name: 'Index Components', sub: 'Index', desc: 'Filter from S&P 500 / NASDAQ 100 index constituents', ver: 1, used: 1 },
+  { id: 'U3', name: 'Sector Screen', sub: 'Technical', desc: 'Screen stocks by sector rotation momentum', ver: 2, used: 1 },
+  { id: 'U4', name: 'Qlib Ranking', sub: 'AI/ML', desc: 'Qlib model-based symbol ranking (Alpha158)', ver: 2, used: 1 },
+  { id: 'U5', name: 'Cointegration Pairs', sub: 'Statistical', desc: 'Find cointegrated pairs for stat-arb trading', ver: 1, used: 0 }
+];
+var TRADING = [
+  { id: 'T1', name: 'DualMA Cross', sub: 'Trend', desc: 'Dual moving average crossover signal generation', ver: 3, used: 2 },
+  { id: 'T2', name: 'MACD Trend', sub: 'Trend', desc: 'MACD histogram-based trend following', ver: 1, used: 1 },
+  { id: 'T3', name: 'RSI Reversal', sub: 'Mean Reversion', desc: 'RSI overbought/oversold reversal signals', ver: 2, used: 0 },
+  { id: 'T4', name: 'Bollinger Band', sub: 'Mean Reversion', desc: 'Bollinger band breakout and squeeze signals', ver: 1, used: 1 },
+  { id: 'T5', name: 'Grid Trader', sub: 'Range', desc: 'Dynamic grid levels for range-bound markets', ver: 1, used: 0 },
+  { id: 'T6', name: 'Spread Trading', sub: 'Pairs', desc: 'Z-score based pair spread entry/exit signals', ver: 1, used: 0 }
+];
+var RISK = [
+  { id: 'R1', name: 'Stop Loss + ATR', sub: 'Stop Loss', desc: 'ATR-based trailing stop loss with fixed floor', ver: 2, used: 3 },
+  { id: 'R2', name: 'Position Sizing', sub: 'Position Mgmt', desc: 'Kelly criterion / equal risk position sizing', ver: 1, used: 2 },
+  { id: 'R3', name: 'VaR Constraint', sub: 'Risk Limit', desc: 'Portfolio VaR must not exceed threshold', ver: 1, used: 1 },
+  { id: 'R4', name: 'Market Rules', sub: 'Compliance', desc: 'T+1 / price limit / lot size constraints', ver: 1, used: 1 }
+];
+
+var COMPOSITES = [
+  { id: 'CS-001', name: 'FactorAlpha_MACD', status: 'active', universe: 'Factor Top-K', trading: 'MACD Trend', risk: 'Stop Loss + ATR', mode: 'paper', capital: '$1,000,000', rebalance: 'Weekly', benchmark: 'SPY', ret: '+28.3%', sharpe: '1.52', dd: '-9.8%', created: '2026-03-10', desc: 'Multi-factor selection + MACD trend following + ATR stop loss' },
+  { id: 'CS-002', name: 'QlibAI_DualMA', status: 'completed', universe: 'Qlib Ranking', trading: 'DualMA Cross', risk: 'VaR Constraint', mode: 'backtest', capital: '$2,000,000', rebalance: 'Daily', benchmark: 'QQQ', ret: '+23.5%', sharpe: '1.42', dd: '-12.3%', created: '2026-03-12', desc: 'AI-ranked universe + dual MA signals + VaR constraint' },
+  { id: 'CS-003', name: 'SectorRotation_BB', status: 'active', universe: 'Sector Screen', trading: 'Bollinger Band', risk: 'Position Sizing', mode: 'live', capital: '$500,000', rebalance: 'Monthly', benchmark: 'SPY', ret: '+15.6%', sharpe: '1.18', dd: '-7.2%', created: '2026-03-14', desc: 'Sector momentum screen + Bollinger breakout + position sizing' },
+  { id: 'CS-004', name: 'IndexCore_MA', status: 'completed', universe: 'Index Components', trading: 'DualMA Cross', risk: 'Stop Loss + ATR', mode: 'backtest', capital: '$1,000,000', rebalance: 'Weekly', benchmark: 'SPY', ret: '+19.8%', sharpe: '1.35', dd: '-10.5%', created: '2026-03-19', desc: 'S&P 500 constituents + dual MA + stop loss + risk parity' }
+];
+
+/* ── Composer State ── */
+var composer = { universe: null, trading: null, risk: null };
+
+function findComp(layer, id) {
+  var map = { universe: UNIVERSE, trading: TRADING, risk: RISK };
+  var arr = map[layer] || [];
+  for (var i = 0; i < arr.length; i++) { if (arr[i].id === id) return arr[i]; }
+  return null;
+}
+
+function renderLane(laneId, layer) {
+  var map = { universe: UNIVERSE, trading: TRADING, risk: RISK };
+  var items = map[layer];
+  var root = document.getElementById(laneId);
+  var html = '';
+  for (var i = 0; i < items.length; i++) {
+    var s = items[i];
+    var sel = composer[layer] === s.id ? ' selected' : '';
+    html += '<div class="lane-slot' + sel + '" onclick="selectComponent(\'' + layer + '\',\'' + s.id + '\')">';
+    html += '<div class="lane-slot-name">' + s.name + ' <span class="badge badge-muted" style="font-size:11px">v' + s.ver + '</span></div>';
+    html += '<div class="lane-slot-desc">' + s.desc + '</div></div>';
+  }
+  root.innerHTML = html;
+}
+
+function selectComponent(layer, id) {
+  composer[layer] = (composer[layer] === id) ? null : id;
+  renderLane(layer + 'Lane', layer);
+  updatePipelinePreview();
+}
+
+function updatePipelinePreview() {
+  var p = document.getElementById('pipelinePreview');
+  var parts = [];
+  if (composer.universe) { var c = findComp('universe', composer.universe); if (c) parts.push('<span class="badge badge-universe">' + c.name + '</span>'); }
+  if (composer.trading) { var c = findComp('trading', composer.trading); if (c) parts.push('<span class="badge badge-trading">' + c.name + '</span>'); }
+  if (composer.risk) { var c = findComp('risk', composer.risk); if (c) parts.push('<span class="badge badge-risk">' + c.name + '</span>'); }
+  if (!parts.length) { p.innerHTML = '<span class="text-muted">Select components above to preview the pipeline flow</span>'; return; }
+  p.innerHTML = parts.join('<span class="arrow"> &rarr; </span>');
+}
+
+function resetComposer() {
+  composer = { universe: null, trading: null, risk: null };
+  renderAllLanes();
+  updatePipelinePreview();
+  showToast('Composer reset', 'info');
+}
+
+function saveComposite() {
+  if (!composer.universe || !composer.trading || !composer.risk) {
+    showToast('Please select one component from each layer', 'warning');
+    return;
+  }
+  showToast('Composite strategy saved successfully!', 'success');
+}
+
+function renderAllLanes() {
+  renderLane('universeLane', 'universe');
+  renderLane('tradingLane', 'trading');
+  renderLane('riskLane', 'risk');
+}
+
+/* ── Composite List ── */
+function renderCompositeList() {
+  var grid = document.getElementById('compositeListGrid');
+  var html = '';
+  for (var i = 0; i < COMPOSITES.length; i++) {
+    var c = COMPOSITES[i];
+    var modeClass = c.mode === 'live' ? 'live' : (c.mode === 'paper' ? 'paper' : 'backtest');
+    var modeLabel = c.mode === 'live' ? 'Live' : (c.mode === 'paper' ? 'Paper' : 'Backtest');
+    html += '<div class="composite-card" onclick="showCompositeDetail(\'' + c.id + '\')">';
+    html += '<div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px">';
+    html += '<div><strong style="font-size:15px">' + c.name + '</strong> <span class="badge badge-muted" style="font-size:11px">' + c.id + '</span></div>';
+    html += '<div style="display:flex;gap:6px"><span class="exec-badge ' + modeClass + '">' + modeLabel + '</span>' + statusBadge(c.status) + '</div></div>';
+    html += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;flex-wrap:wrap">';
+    html += '<span class="badge badge-universe">' + c.universe + '</span>';
+    html += '<span style="color:hsl(var(--muted-foreground));font-weight:700">&rarr;</span>';
+    html += '<span class="badge badge-trading">' + c.trading + '</span>';
+    html += '<span style="color:hsl(var(--muted-foreground));font-weight:700">&rarr;</span>';
+    html += '<span class="badge badge-risk">' + c.risk + '</span></div>';
+    html += '<p class="text-muted" style="font-size:12px;margin:0 0 8px">' + c.desc + '</p>';
+    html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">';
+    html += '<div><div style="font-size:11px;color:hsl(var(--muted-foreground))">Return</div><div style="font-size:14px;font-weight:600;color:hsl(var(--success))">' + c.ret + '</div></div>';
+    html += '<div><div style="font-size:11px;color:hsl(var(--muted-foreground))">Sharpe</div><div style="font-size:14px;font-weight:600">' + c.sharpe + '</div></div>';
+    html += '<div><div style="font-size:11px;color:hsl(var(--muted-foreground))">Max DD</div><div style="font-size:14px;font-weight:600;color:hsl(var(--destructive))">' + c.dd + '</div></div>';
+    html += '<div><div style="font-size:11px;color:hsl(var(--muted-foreground))">Created</div><div style="font-size:14px;font-weight:600">' + c.created + '</div></div>';
+    html += '</div></div>';
+  }
+  grid.innerHTML = html;
+}
+
+/* ── Detail View ── */
+function layerBadge(l) {
+  var m = { universe: 'Universe', trading: 'Trading', risk: 'Risk' };
+  return '<span class="badge badge-' + l + '">' + (m[l] || l) + '</span>';
+}
+
+function showCompositeDetail(id) {
+  var c = null;
+  for (var i = 0; i < COMPOSITES.length; i++) { if (COMPOSITES[i].id === id) { c = COMPOSITES[i]; break; } }
+  if (!c) return;
+
+  var html = '';
+  html += '<div class="card" style="margin-bottom:16px"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">';
+  html += '<div><h3 style="font-size:18px;font-weight:600;margin:0 0 6px">' + c.name + ' <span class="badge badge-muted">' + c.id + '</span> ' + statusBadge(c.status) + '</h3>';
+  html += '<p class="text-muted" style="font-size:13px;margin:0">' + c.desc + '</p></div>';
+  html += '<div style="display:flex;gap:8px">';
+  html += '<button class="btn btn-secondary btn-sm" onclick="showToast(\'Cloned\',\'success\')">Clone</button>';
+  html += '<button class="btn btn-secondary btn-sm" onclick="location.href=\'backtest.html\'">Backtest</button>';
+  html += '<button class="btn btn-primary btn-sm" onclick="showToast(\'Deployed to paper trading\',\'success\')">Deploy</button>';
+  html += '</div></div></div>';
+
+  html += '<div class="card" style="margin-bottom:16px"><h4 style="margin:0 0 12px;font-size:15px;font-weight:600">Pipeline Components</h4>';
+  html += '<div class="pipeline-preview" style="font-size:14px">';
+  html += '<span class="badge badge-universe" style="padding:6px 14px">' + c.universe + '</span><span class="arrow"> &rarr; </span>';
+  html += '<span class="badge badge-trading" style="padding:6px 14px">' + c.trading + '</span><span class="arrow"> &rarr; </span>';
+  html += '<span class="badge badge-risk" style="padding:6px 14px">' + c.risk + '</span></div></div>';
+
+  html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:16px">';
+  html += '<div class="stat-card"><div class="stat-label">Initial Capital</div><div class="stat-value">' + c.capital + '</div></div>';
+  html += '<div class="stat-card"><div class="stat-label">Rebalance</div><div class="stat-value">' + c.rebalance + '</div></div>';
+  html += '<div class="stat-card"><div class="stat-label">Benchmark</div><div class="stat-value">' + c.benchmark + '</div></div>';
+  html += '<div class="stat-card"><div class="stat-label">Created</div><div class="stat-value">' + c.created + '</div></div></div>';
+
+  html += '<div class="card" style="margin-bottom:16px"><h4 style="margin:0 0 16px;font-size:15px;font-weight:600">Backtest Results</h4>';
+  html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">';
+  html += '<div class="stat-card"><div class="stat-label">Total Return</div><div class="stat-value text-success">' + c.ret + '</div></div>';
+  html += '<div class="stat-card"><div class="stat-label">Sharpe Ratio</div><div class="stat-value">' + c.sharpe + '</div></div>';
+  html += '<div class="stat-card"><div class="stat-label">Max Drawdown</div><div class="stat-value text-destructive">' + c.dd + '</div></div></div></div>';
+
+  html += '<div class="card"><h4 style="margin:0 0 12px;font-size:15px;font-weight:600">Layer Attribution</h4>';
+  html += '<div class="table-wrap"><table><thead><tr><th>Layer</th><th>Component</th><th>Contribution</th><th>Signal Count</th><th>Hit Rate</th></tr></thead><tbody>';
+  html += '<tr><td>' + layerBadge('universe') + '</td><td>' + c.universe + '</td><td class="text-success">+6.2%</td><td>30 stocks</td><td>68%</td></tr>';
+  html += '<tr><td>' + layerBadge('trading') + '</td><td>' + c.trading + '</td><td class="text-success">+14.8%</td><td>86 trades</td><td>62%</td></tr>';
+  html += '<tr><td>' + layerBadge('risk') + '</td><td>' + c.risk + '</td><td class="text-destructive">-2.5%</td><td>12 stops</td><td>&mdash;</td></tr>';
+  html += '</tbody></table></div></div>';
+
+  document.getElementById('detailContent').innerHTML = html;
+  activateTab('cs', 'detail');
+}
+
+/* ── Component Tables ── */
+function renderComponentTable(tableId, items) {
+  var tbody = document.getElementById(tableId);
+  var html = '';
+  for (var i = 0; i < items.length; i++) {
+    var item = items[i];
+    html += '<tr>';
+    html += '<td><b>' + item.name + '</b></td>';
+    html += '<td><span class="badge badge-muted">' + item.sub + '</span></td>';
+    html += '<td>' + item.desc + '</td>';
+    html += '<td>v' + item.ver + '</td>';
+    html += '<td>' + item.used + ' composites</td>';
+    html += '<td><button class="btn btn-ghost btn-sm" onclick="showToast(\'Editing ' + item.name + '\', \'info\')">' + icon('edit') + '</button>';
+    html += '<button class="btn btn-ghost btn-sm" onclick="showToast(\'Viewing code\', \'info\')">' + icon('file-code') + '</button></td>';
+    html += '</tr>';
+  }
+  tbody.innerHTML = html;
+}
+
+/* ── Init ── */
+renderAllLanes();
+updatePipelinePreview();
+renderCompositeList();
+renderComponentTable('universeTable', UNIVERSE);
+renderComponentTable('tradingTable', TRADING);
+renderComponentTable('riskTable', RISK);
+</script>
+</body>
+</html>

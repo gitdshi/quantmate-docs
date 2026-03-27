@@ -12,56 +12,55 @@
   <main class="main-content" id="main">
 
     <div class="page-header">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
-        <div>
-          <h1 class="page-title">Dashboard</h1>
-          <p class="page-subtitle">Real-time Overview · Last Updated 14:35:02</p>
-        </div>
-        <div style="display:flex;gap:8px">
-          <button class="btn btn-ghost" onclick="toggleDark()">${icon('moon')} Toggle Theme</button>
-          <button class="btn btn-secondary" onclick="showToast('Data has been refreshed','success');drawNavChart();drawPieChart()">${icon('refresh-cw')} Refresh</button>
-        </div>
+      <div>
+        <h1 class="page-title">Dashboard</h1>
+        <p class="page-subtitle">Overview of your trading system status</p>
       </div>
     </div>
 
-    <!-- KPI Row -->
+    <!-- KPI Cards -->
     <div class="stat-grid cols-4">
       <div class="stat-card">
-        <div class="stat-icon">${icon('wallet')}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span class="stat-label">Total Assets</span>
+          <span style="color:#3b82f6">${icon('dollar-sign')}</span>
+        </div>
         <div class="stat-value">¥ 1,256,800</div>
-        <div class="stat-label">Total Assets</div>
-        <div class="stat-trend up">2.35% Today</div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon">${icon('trending-up')}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span class="stat-label">Daily P&amp;L</span>
+          <span style="color:#22c55e">${icon('trending-up')}</span>
+        </div>
         <div class="stat-value text-success">+¥ 28,960</div>
-        <div class="stat-label">Today's Profit and Loss</div>
-        <div class="stat-trend up">+2.35%</div>
+        <div class="text-muted" style="font-size:12px;color:#22c55e">+2.35%</div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon">${icon('activity')}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span class="stat-label">Active Strategies</span>
+          <span style="color:#a855f7">${icon('activity')}</span>
+        </div>
         <div class="stat-value">6</div>
-        <div class="stat-label">Active strategy</div>
-        <div class="stat-trend neutral">4 Running</div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon">${icon('bell')}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span class="stat-label">Unread Alerts</span>
+          <span style="color:#eab308">${icon('bell')}</span>
+        </div>
         <div class="stat-value text-warning">3</div>
-        <div class="stat-label">Unprocessed Alarm</div>
-        <div class="stat-trend down">1 Severe</div>
       </div>
     </div>
 
-    <!-- Charts Row -->
+    <!-- Charts: NAV + Allocation Pie -->
     <div class="grid-2">
       <div class="card">
         <div class="card-header">
-          <h3 class="card-title">Portfolio Net Value Curve</h3>
-          <div class="tabs" data-group="curve">
-            <button class="tab-btn active" data-tab="1w">1 week</button>
-            <button class="tab-btn" data-tab="1m">January</button>
-            <button class="tab-btn" data-tab="3m">March</button>
-            <button class="tab-btn" data-tab="ytd">This year</button>
+          <h3 class="card-title">NAV Trend</h3>
+          <div style="display:flex;gap:4px" id="navPeriodBtns">
+            <button class="btn btn-ghost btn-sm nav-period active" data-period="1w" onclick="setNavPeriod(this)">1w</button>
+            <button class="btn btn-ghost btn-sm nav-period" data-period="1m" onclick="setNavPeriod(this)">1m</button>
+            <button class="btn btn-ghost btn-sm nav-period" data-period="3m" onclick="setNavPeriod(this)">3m</button>
+            <button class="btn btn-ghost btn-sm nav-period" data-period="ytd" onclick="setNavPeriod(this)">ytd</button>
           </div>
         </div>
         <div class="chart-placeholder" style="height:220px" id="navChart">
@@ -70,7 +69,7 @@
       </div>
       <div class="card">
         <div class="card-header">
-          <h3 class="card-title">Position Distribution</h3>
+          <h3 class="card-title">Position Allocation</h3>
         </div>
         <div class="chart-placeholder" style="height:220px" id="pieChart">
           <canvas id="pieCanvas"></canvas>
@@ -82,76 +81,91 @@
     <div class="card">
       <div class="card-header">
         <h3 class="card-title">Current Positions</h3>
-        <a href="portfolio.html" class="btn btn-ghost btn-sm">View All →</a>
       </div>
       <div class="table-wrap">
         <table>
           <thead>
-            <tr><th>Code</th><th>Name</th><th>Strategy</th><th>Direction</th><th>Quantity</th><th>Cost</th><th>Current price</th><th>Profit and loss</th><th>Profit and Loss %</th></tr>
+            <tr><th>Symbol</th><th>Name</th><th>Direction</th><th>Quantity</th><th>Avg Cost</th><th>Market Price</th><th>Market Value</th><th>P&amp;L</th><th>P&amp;L %</th></tr>
           </thead>
           <tbody id="posTable"></tbody>
         </table>
       </div>
     </div>
 
-    <!-- Recent Orders + Alerts -->
+    <!-- Orders + Alerts side by side -->
     <div class="grid-2">
       <div class="card">
         <div class="card-header">
-          <h3 class="card-title">Recently commissioned</h3>
-          <a href="trading.html" class="btn btn-ghost btn-sm">All →</a>
+          <h3 class="card-title">Recent Orders</h3>
         </div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Time</th><th>Code</th><th>Direction</th><th>Price</th><th>Quantity</th><th>State</th></tr></thead>
+            <thead><tr><th>Symbol</th><th>Direction</th><th>Quantity</th><th>Price</th><th>Status</th></tr></thead>
             <tbody id="orderTable"></tbody>
           </table>
         </div>
       </div>
       <div class="card">
         <div class="card-header">
-          <h3 class="card-title">Latest Alert</h3>
-          <a href="alerts.html" class="btn btn-ghost btn-sm">All →</a>
+          <h3 class="card-title">Alert Feed</h3>
         </div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Time</th><th>Type</th><th>Level</th><th>Message</th><th>State</th></tr></thead>
+            <thead><tr><th>Level</th><th>Message</th><th>Time</th></tr></thead>
             <tbody id="alertTable"></tbody>
           </table>
         </div>
       </div>
     </div>
 
-    <!-- Strategy Status List -->
-    <div class="card">
-      <div class="card-header">
-        <h3 class="card-title">Strategy operating status</h3>
-        <a href="strategies.html" class="btn btn-ghost btn-sm">Management →</a>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;padding-top:4px">
+    <!-- Strategy Status Cards -->
+    <div>
+      <h3 style="font-weight:600;margin-bottom:12px">Strategy Status</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px">
         <div class="card" style="border-left:3px solid var(--success)">
-          <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
             <b>DualMA_Cross</b><span class="badge badge-success">Running</span>
           </div>
-          <div class="text-muted" style="font-size:13px;margin-top:4px">Today's earnings ¥3,600 · Sharpe 1.42</div>
+          <div style="display:flex;justify-content:space-between;font-size:13px"><span class="text-muted">Daily Return</span><span class="text-success">+1.82%</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-top:2px"><span class="text-muted">Total Return</span><span class="text-success">+12.5%</span></div>
         </div>
         <div class="card" style="border-left:3px solid var(--success)">
-          <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
             <b>RSI_Reversal</b><span class="badge badge-success">Running</span>
           </div>
-          <div class="text-muted" style="font-size:13px;margin-top:4px">Today's earnings ¥3,900 · Sharpe 1.18</div>
+          <div style="display:flex;justify-content:space-between;font-size:13px"><span class="text-muted">Daily Return</span><span class="text-success">+0.95%</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-top:2px"><span class="text-muted">Total Return</span><span class="text-success">+8.3%</span></div>
         </div>
-        <div class="card" style="border-left:3px solid var(--primary)">
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <b>MyAlpha01</b><span class="badge badge-primary">In backtesting</span>
+        <div class="card" style="border-left:3px solid var(--destructive)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <b>MyAlpha01</b><span class="badge badge-destructive">Error</span>
           </div>
-          <div class="text-muted" style="font-size:13px;margin-top:4px">Progress 67% · Estimated 3 minutes remaining</div>
+          <div style="display:flex;justify-content:space-between;font-size:13px"><span class="text-muted">Daily Return</span><span class="text-destructive">-0.42%</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-top:2px"><span class="text-muted">Total Return</span><span class="text-destructive">-1.8%</span></div>
         </div>
         <div class="card" style="border-left:3px solid var(--muted-foreground)">
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <b>MeanRevert_v2</b><span class="badge badge-muted">Draft</span>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <b>MeanRevert_v2</b><span class="badge badge-muted">Stopped</span>
           </div>
-          <div class="text-muted" style="font-size:13px;margin-top:4px">v2 · Pending verification</div>
+          <div style="display:flex;justify-content:space-between;font-size:13px"><span class="text-muted">Daily Return</span><span>0.00%</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-top:2px"><span class="text-muted">Total Return</span><span class="text-success">+5.1%</span></div>
+        </div>
+        <!-- Composite Strategies -->
+        <div class="card" style="border-left:3px solid hsl(260 60% 50%)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <div style="display:flex;align-items:center;gap:6px"><b>FactorAlpha_MACD</b><span class="badge" style="font-size:10px;background:hsl(260 60% 92%);color:hsl(260 60% 40%)">Composite</span></div>
+            <span class="badge badge-success">Running</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:13px"><span class="text-muted">Daily Return</span><span class="text-success">+2.15%</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-top:2px"><span class="text-muted">Total Return</span><span class="text-success">+28.3%</span></div>
+        </div>
+        <div class="card" style="border-left:3px solid hsl(260 60% 50%)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <div style="display:flex;align-items:center;gap:6px"><b>SectorRotation_BB</b><span class="badge" style="font-size:10px;background:hsl(260 60% 92%);color:hsl(260 60% 40%)">Composite</span></div>
+            <span class="badge badge-success">Running</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:13px"><span class="text-muted">Daily Return</span><span class="text-success">+0.72%</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-top:2px"><span class="text-muted">Total Return</span><span class="text-success">+15.6%</span></div>
         </div>
       </div>
     </div>
@@ -161,99 +175,105 @@
 
 <script src="shared.js"></script>
 <script>
-// Replace template literals in static HTML
-document.querySelectorAll('.stat-icon, .btn').forEach(el => {
-  // icons are already injected via shared.js icon() won't work in static HTML
+/* ── Populate Positions Table ── */
+var posBody = document.getElementById('posTable');
+MOCK.positions.forEach(function(p) {
+  var mv = p.current * p.qty;
+  posBody.innerHTML += '<tr>'
+    +'<td class="font-mono">'+p.symbol+'</td><td>'+p.name+'</td>'
+    +'<td><span class="badge badge-success">'+p.dir+'</span></td>'
+    +'<td>'+p.qty+'</td><td>¥'+p.entry.toFixed(2)+'</td><td>¥'+p.current.toFixed(2)+'</td>'
+    +'<td>¥'+mv.toLocaleString()+'</td>'
+    +'<td class="'+pnlColor(p.pnl)+'">'+pnlSign(p.pnl)+'¥'+Math.abs(p.pnl).toLocaleString()+'</td>'
+    +'<td class="'+pnlColor(p.pnlPct)+'">'+pnlSign(p.pnlPct)+p.pnlPct.toFixed(2)+'%</td>'
+  +'</tr>';
 });
 
-// Populate tables
-const posBody = document.getElementById('posTable');
-MOCK.positions.forEach(p => {
-  posBody.innerHTML += `<tr>
-    <td class="font-mono">${p.symbol}</td><td>${p.name}</td><td>${p.strategy}</td>
-    <td><span class="badge badge-success">${p.dir}</span></td>
-    <td>${p.qty}</td><td>¥${p.entry.toFixed(2)}</td><td>¥${p.current.toFixed(2)}</td>
-    <td class="${pnlColor(p.pnl)}">${pnlSign(p.pnl)}¥${Math.abs(p.pnl).toLocaleString()}</td>
-    <td class="${pnlColor(p.pnlPct)}">${pnlSign(p.pnlPct)}${p.pnlPct.toFixed(2)}%</td>
-  </tr>`;
+/* ── Populate Orders Table ── */
+var orderBody = document.getElementById('orderTable');
+MOCK.orders.slice(0, 5).forEach(function(o) {
+  orderBody.innerHTML += '<tr>'
+    +'<td class="font-mono">'+o.symbol+'</td>'
+    +'<td><span class="badge '+(o.dir==='Buy'?'badge-success':'badge-destructive')+'">'+o.dir+'</span></td>'
+    +'<td>'+o.qty+'</td><td>¥'+o.price.toFixed(2)+'</td>'
+    +'<td>'+statusBadge(o.status)+'</td>'
+  +'</tr>';
 });
 
-const orderBody = document.getElementById('orderTable');
-MOCK.orders.slice(0, 4).forEach(o => {
-  orderBody.innerHTML += `<tr>
-    <td>${o.time}</td><td class="font-mono">${o.symbol}</td>
-    <td><span class="badge ${o.dir === 'Buy' ? 'badge-success' : 'badge-destructive'}">${o.dir}</span></td>
-    <td>¥${o.price.toFixed(2)}</td><td>${o.qty}</td><td>${statusBadge(o.status)}</td>
-  </tr>`;
+/* ── Populate Alerts Table ── */
+var alertBody = document.getElementById('alertTable');
+MOCK.alerts.forEach(function(a) {
+  alertBody.innerHTML += '<tr>'
+    +'<td>'+statusBadge(a.level)+'</td>'
+    +'<td>'+a.msg+'</td>'
+    +'<td>'+a.time+'</td>'
+  +'</tr>';
 });
 
-const alertBody = document.getElementById('alertTable');
-MOCK.alerts.forEach(a => {
-  alertBody.innerHTML += `<tr>
-    <td>${a.time}</td><td>${a.type}</td><td>${statusBadge(a.level)}</td>
-    <td>${a.msg}</td><td>${statusBadge(a.status)}</td>
-  </tr>`;
-});
-
-// Draw simple NAV chart on canvas
+/* ── NAV Chart ── */
 function drawNavChart() {
-  const c = document.getElementById('navCanvas');
+  var c = document.getElementById('navCanvas');
   if (!c) return;
-  const ctx = c.getContext('2d');
-  const W = c.parentElement.clientWidth; const H = c.parentElement.clientHeight;
+  var ctx = c.getContext('2d');
+  var W = c.parentElement.clientWidth, H = c.parentElement.clientHeight;
   c.width = W; c.height = H;
-  const points = [100,101,99.5,102,104,103,105,107,106,108,110,109,111,113,112,115,114,116,118,120,119,121,123,122,125];
-  const min = Math.min(...points); const max = Math.max(...points);
-  const padX = 40, padY = 20;
-  ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#3b82f6';
-  ctx.lineWidth = 2; ctx.beginPath();
-  points.forEach((v, i) => {
-    const x = padX + (i / (points.length - 1)) * (W - padX * 2);
-    const y = H - padY - ((v - min) / (max - min)) * (H - padY * 2);
+  var points = [100,101,99.5,102,104,103,105,107,106,108,110,109,111,113,112,115,114,116,118,120,119,121,123,122,125];
+  var min = Math.min.apply(null,points), max = Math.max.apply(null,points);
+  var padX = 40, padY = 20;
+  ctx.strokeStyle = '#3b82f6'; ctx.lineWidth = 2; ctx.beginPath();
+  points.forEach(function(v,i) {
+    var x = padX + (i / (points.length - 1)) * (W - padX * 2);
+    var y = H - padY - ((v - min) / (max - min)) * (H - padY * 2);
     i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
   });
   ctx.stroke();
-  // Fill area
-  const lastX = padX + (1) * (W - padX * 2);
+  var lastX = padX + 1 * (W - padX * 2);
   ctx.lineTo(lastX, H - padY); ctx.lineTo(padX, H - padY); ctx.closePath();
-  ctx.fillStyle = (ctx.strokeStyle || '#3b82f6') + '18'; ctx.fill();
+  ctx.fillStyle = '#3b82f618'; ctx.fill();
 }
 
+/* ── Pie Chart (donut) ── */
 function drawPieChart() {
-  const c = document.getElementById('pieCanvas');
+  var c = document.getElementById('pieCanvas');
   if (!c) return;
-  const ctx = c.getContext('2d');
-  const W = c.parentElement.clientWidth; const H = c.parentElement.clientHeight;
+  var ctx = c.getContext('2d');
+  var W = c.parentElement.clientWidth, H = c.parentElement.clientHeight;
   c.width = W; c.height = H;
-  const data = [
-    { label: 'Guizhou Moutai', value: 185600, color: '#3b82f6' },
+  var data = [
+    { label: 'Kweichow Moutai', value: 185600, color: '#3b82f6' },
     { label: 'Wuliangye', value: 78150, color: '#10b981' },
-    { label: 'LONGi Green Energy', value: 22180, color: '#ef4444' },
-    { label: 'Cash', value: 970870, color: '#6b7280' },
+    { label: 'LONGi Green Energy', value: 22180, color: '#f59e0b' },
+    { label: 'Cash', value: 970870, color: '#6b7280' }
   ];
-  const total = data.reduce((s, d) => s + d.value, 0);
-  let angle = -Math.PI / 2;
-  const cx = W / 2, cy = H / 2, r = Math.min(W, H) / 2 - 30;
-  data.forEach(d => {
-    const slice = (d.value / total) * Math.PI * 2;
-    ctx.beginPath(); ctx.moveTo(cx, cy);
-    ctx.arc(cx, cy, r, angle, angle + slice);
-    ctx.fillStyle = d.color; ctx.fill();
-    // label
-    const mid = angle + slice / 2;
-    const lx = cx + (r * 0.65) * Math.cos(mid);
-    const ly = cy + (r * 0.65) * Math.sin(mid);
+  var total = 0; data.forEach(function(d){ total += d.value; });
+  var angle = -Math.PI / 2;
+  var cx = W / 2, cy = H / 2, r = Math.min(W, H) / 2 - 30, inner = r * 0.55;
+  data.forEach(function(d) {
+    var slice = (d.value / total) * Math.PI * 2;
+    ctx.beginPath(); ctx.arc(cx, cy, r, angle, angle + slice);
+    ctx.arc(cx, cy, inner, angle + slice, angle, true);
+    ctx.closePath(); ctx.fillStyle = d.color; ctx.fill();
     if (slice > 0.3) {
-      ctx.fillStyle = '#fff'; ctx.font = '12px system-ui'; ctx.textAlign = 'center';
+      var mid = angle + slice / 2;
+      var lx = cx + ((r + inner) / 2) * Math.cos(mid);
+      var ly = cy + ((r + inner) / 2) * Math.sin(mid);
+      ctx.fillStyle = '#fff'; ctx.font = '11px system-ui'; ctx.textAlign = 'center';
       ctx.fillText(d.label, lx, ly);
-      ctx.fillText((d.value / total * 100).toFixed(1) + '%', lx, ly + 14);
+      ctx.fillText((d.value / total * 100).toFixed(1) + '%', lx, ly + 13);
     }
     angle += slice;
   });
 }
 
-window.addEventListener('load', () => { drawNavChart(); drawPieChart(); });
-window.addEventListener('resize', () => { drawNavChart(); drawPieChart(); });
+/* ── NAV Period Toggle ── */
+function setNavPeriod(btn) {
+  document.querySelectorAll('.nav-period').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  drawNavChart();
+}
+
+window.addEventListener('load', function() { drawNavChart(); drawPieChart(); });
+window.addEventListener('resize', function() { drawNavChart(); drawPieChart(); });
 </script>
 </body>
 </html>

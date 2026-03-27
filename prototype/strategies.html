@@ -7,694 +7,588 @@
   <link rel="stylesheet" href="shared.css">
   <script src="https://cdn.tailwindcss.com?v=3.4"></script>
   <style>
-    .strategies-shell {
-      display: grid;
-      grid-template-columns: minmax(320px, 420px) minmax(0, 1fr);
-      gap: 16px;
-      align-items: start;
-    }
-    .strategy-list-card,
-    .strategy-detail-card,
-    .strategy-template-grid .card {
-      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
-    }
-    .strategy-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .strategy-item {
-      border: 1px solid hsl(var(--border));
-      border-radius: 10px;
-      padding: 14px 16px;
-      background: hsl(var(--background));
-      transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
-      cursor: pointer;
-    }
-    .strategy-item:hover {
-      background: hsl(var(--accent) / 0.5);
-      border-color: hsl(var(--ring) / 0.45);
-    }
-    .strategy-item.active {
-      background: hsl(var(--primary) / 0.06);
-      border-color: hsl(var(--primary) / 0.35);
-      box-shadow: 0 0 0 1px hsl(var(--primary) / 0.15);
-    }
-    .strategy-item-header,
-    .strategy-detail-header,
-    .meta-row,
-    .template-actions,
-    .detail-toolbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-    .strategy-item-meta,
-    .strategy-detail-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 10px;
-      font-size: 12px;
-      color: hsl(var(--muted-foreground));
-    }
-    .detail-tabs {
-      margin-top: 18px;
-      margin-bottom: 18px;
-    }
-    .detail-panel {
-      display: none;
-    }
-    .detail-panel.active {
-      display: block;
-    }
-    .detail-panel.code-fullscreen {
-      position: fixed;
-      inset: 16px;
-      z-index: 120;
-      background: hsl(var(--card));
-      border: 1px solid hsl(var(--border));
-      border-radius: 14px;
-      box-shadow: 0 24px 60px rgba(15, 23, 42, 0.28);
-      padding: 20px;
-      overflow: auto;
-    }
-    .detail-panel.code-fullscreen .detail-code {
-      min-height: calc(100vh - 180px);
-    }
-    .fullscreen-backdrop {
-      position: fixed;
-      inset: 0;
-      z-index: 110;
-      background: rgba(2, 6, 23, 0.45);
-      display: none;
-    }
-    .fullscreen-backdrop.active {
-      display: block;
-    }
-    .detail-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 16px;
-    }
-    .detail-code {
-      min-height: 420px;
-      font-size: 13px;
-      line-height: 1.6;
-      margin: 0;
-    }
-    .detail-section-title {
-      margin: 0 0 14px;
-      font-size: 1rem;
-      font-weight: 600;
-    }
-    .empty-spot {
-      border: 1px dashed hsl(var(--border));
-      border-radius: 12px;
-      padding: 36px 24px;
-      text-align: center;
-      color: hsl(var(--muted-foreground));
-      background: hsl(var(--muted) / 0.35);
-    }
-    .version-table td:last-child {
-      min-width: 180px;
-    }
-    .strategy-filter-bar {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      flex-wrap: nowrap;
-      margin-bottom: 16px;
-    }
-    .strategy-filter-bar .search-wrap {
-      position: relative;
-      flex: 1;
-      min-width: 0;
-    }
-    .strategy-filter-bar .search-wrap svg {
-      position: absolute;
-      left: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 16px;
-      height: 16px;
-      color: hsl(var(--muted-foreground));
-    }
-    .strategy-filter-bar .search-wrap input {
-      padding-left: 36px;
-    }
-    .strategy-filter-bar select {
-      width: 160px;
-      flex: 0 0 160px;
-    }
-    .strategy-template-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 16px;
-    }
-    @media (max-width: 1024px) {
-      .strategies-shell {
-        grid-template-columns: 1fr;
-      }
-    }
-    @media (max-width: 640px) {
-      .strategy-filter-bar {
-        flex-wrap: wrap;
-      }
-      .strategy-filter-bar select,
-      .strategy-filter-bar .search-wrap {
-        width: 100%;
-        flex: 1 1 100%;
-      }
-    }
+    .strategies-shell { display: grid; grid-template-columns: 360px minmax(0,1fr); gap: 16px; align-items: start; }
+    .strategy-list { display: flex; flex-direction: column; gap: 10px; }
+    .strategy-item { border: 1px solid hsl(var(--border)); border-radius: 12px; padding: 16px; background: hsl(var(--background)); transition: border-color .15s, background .15s, box-shadow .15s; cursor: pointer; text-align: left; width: 100%; }
+    .strategy-item:hover { background: hsl(var(--accent)/.4); border-color: hsl(var(--ring)/.4); }
+    .strategy-item.active { background: hsl(var(--primary)/.05); border-color: hsl(var(--primary)); box-shadow: 0 0 0 1px hsl(var(--primary)/.15); }
+    .detail-toolbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .detail-panel { display: none; }
+    .detail-panel.active { display: block; }
+    .detail-panel.code-fullscreen { position: fixed; inset: 16px; z-index: 120; background: hsl(var(--card)); border: 1px solid hsl(var(--border)); border-radius: 14px; box-shadow: 0 24px 60px rgba(15,23,42,.28); padding: 20px; overflow: auto; }
+    .detail-panel.code-fullscreen .detail-code { min-height: calc(100vh - 180px); }
+    .fullscreen-backdrop { position: fixed; inset: 0; z-index: 110; background: rgba(2,6,23,.45); display: none; }
+    .fullscreen-backdrop.active { display: block; }
+    .detail-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap: 12px; }
+    .detail-code { min-height: 420px; font-size: 13px; line-height: 1.6; margin: 0; }
+    .empty-spot { border: 1px dashed hsl(var(--border)); border-radius: 12px; padding: 36px 24px; text-align: center; color: hsl(var(--muted-foreground)); background: hsl(var(--muted)/.2); }
+    .filter-bar { display: flex; gap: 12px; align-items: center; flex-wrap: nowrap; }
+    .filter-bar .search-wrap { position: relative; flex: 1; min-width: 0; }
+    .filter-bar .search-wrap svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: hsl(var(--muted-foreground)); pointer-events: none; }
+    .filter-bar .search-wrap input { padding-left: 36px; }
+    .filter-bar select { width: 180px; flex: 0 0 180px; }
+    .template-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(280px,1fr)); gap: 16px; }
+    .template-preview { min-height: 320px; }
+    .param-card { border: 1px solid hsl(var(--border)); border-radius: 12px; padding: 16px; background: hsl(var(--background)); }
+    .param-card .param-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: hsl(var(--muted-foreground)); }
+    .scope-toggle { display: flex; gap: 8px; }
+    .rating-stars { color: #eab308; }
+    @media (max-width:1024px) { .strategies-shell { grid-template-columns: 1fr; } .filter-bar { flex-wrap: wrap; } .filter-bar select { width: 100%; flex: 1 1 100%; } }
   </style>
 </head>
 <body>
 <div class="app-layout">
   <aside class="sidebar" id="sidebar"></aside>
   <main class="main-content" id="main">
+
+    <!-- Page Header -->
     <div class="page-header">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">
         <div>
           <h1 class="page-title">Strategy Research</h1>
-          <p class="page-subtitle">Edit, manage, and version control strategies</p>
+          <p class="page-subtitle">Research, create, and manage trading strategies</p>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn btn-secondary" onclick="openModal('importModal')">Import strategy</button>
-          <button class="btn btn-primary" onclick="openModal('createModal')">+ New strategy</button>
+          <button class="btn btn-secondary" onclick="openModal('importModal')">${icon('upload')} Import</button>
+          <button class="btn btn-primary" onclick="openModal('createModal')">${icon('plus')} New Strategy</button>
         </div>
       </div>
     </div>
 
+    <!-- Main Tabs: Workspace | Templates -->
     <div class="tabs" data-group="strat-main">
-      <button class="tab-btn active" data-tab="list">Strategy list</button>
+      <button class="tab-btn active" data-tab="workspace">Workspace</button>
       <button class="tab-btn" data-tab="templates">Templates</button>
     </div>
 
-    <div class="tab-panel active" data-group="strat-main" data-panel="list">
-      <div class="strategy-filter-bar">
-        <div class="search-wrap">
-          <span id="strategySearchIcon"></span>
-          <input id="strategySearch" type="text" class="form-input" placeholder="Search strategy name...">
-        </div>
+    <!-- ═══════════ Workspace Tab ═══════════ -->
+    <div class="tab-panel active" data-group="strat-main" data-panel="workspace">
+      <!-- Filter Bar -->
+      <div class="filter-bar" style="margin-bottom:16px">
+        <div class="search-wrap"><span id="searchIcon"></span><input id="stratSearch" type="text" class="form-input" placeholder="Search strategies..."></div>
         <select id="typeFilter" class="form-select">
-          <option value="all">All types</option>
+          <option value="all">All Types</option>
           <option value="CTA">CTA</option>
-          <option value="Custom">Custom</option>
+          <option value="Alpha">Alpha</option>
+          <option value="StatArb">StatArb</option>
+          <option value="Grid">Grid</option>
           <option value="AI">AI</option>
+          <option value="Custom">Custom</option>
         </select>
-        <select id="statusFilter" class="form-select">
-          <option value="all">All status</option>
-          <option value="active">active</option>
-          <option value="draft">draft</option>
+        <select id="statusFilter" class="form-select" style="width:160px;flex:0 0 160px">
+          <option value="all">All Status</option>
+          <option value="active">Active</option>
+          <option value="draft">Draft</option>
         </select>
       </div>
 
       <div class="strategies-shell">
-        <section class="card strategy-list-card">
-          <div class="meta-row" style="margin-bottom:14px">
+        <!-- Left: Strategy List -->
+        <section class="card" style="padding:20px">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px">
             <div>
-              <h3 class="card-title" style="margin:0">Strategies</h3>
-              <div class="text-muted" style="font-size:13px;margin-top:4px">Pick one strategy first, then work on code, params, or history.</div>
+              <h2 style="font-size:18px;font-weight:600;margin:0">Strategy Library</h2>
+              <p class="text-muted" style="font-size:13px;margin:4px 0 0">Select a strategy to view details</p>
             </div>
-            <span id="strategyCount" class="badge badge-muted">0 items</span>
+            <span id="stratCount" class="badge badge-muted">0</span>
           </div>
-          <div id="strategyList" class="strategy-list"></div>
+          <div id="stratList" class="strategy-list"></div>
         </section>
 
-        <section class="card strategy-detail-card">
-          <div id="strategyDetailEmpty" class="empty-spot">
-            <div style="font-size:15px;font-weight:600;color:hsl(var(--foreground));margin-bottom:6px">No strategy selected</div>
-            <div style="font-size:13px">Code editor and version history are child capabilities of a selected strategy, not peer modules.</div>
+        <!-- Right: Detail Panel -->
+        <section class="card" style="padding:20px">
+          <div id="detailEmpty" class="empty-spot" style="min-height:520px;display:flex;flex-direction:column;align-items:center;justify-content:center">
+            <div style="margin-bottom:16px">${icon('file-code')}</div>
+            <div style="font-size:18px;font-weight:600;color:hsl(var(--foreground))">No strategy selected</div>
+            <p style="font-size:14px;max-width:400px;margin:8px 0 0">Select a strategy from the list to view its code, parameters, and version history.</p>
           </div>
-
-          <div id="strategyDetail" style="display:none">
-            <div class="strategy-detail-header" style="align-items:flex-start">
+          <div id="detailContent" style="display:none">
+            <!-- Detail Header -->
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">
               <div>
                 <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-                  <h3 id="detailName" class="card-title" style="margin:0"></h3>
-                  <span id="detailType"></span>
-                  <span id="detailStatus"></span>
+                  <h2 id="dName" style="font-size:20px;font-weight:600;margin:0"></h2>
+                  <span id="dCategory"></span>
+                  <span id="dStatus"></span>
                 </div>
-                <p id="detailDescription" class="text-muted" style="font-size:13px;margin:8px 0 0"></p>
-                <div id="detailMeta" class="strategy-detail-meta"></div>
               </div>
-              <div class="detail-toolbar" style="flex-wrap:wrap;justify-content:flex-end">
-                <button class="btn btn-ghost btn-sm" onclick="showToast('Strategy duplicated (prototype)','success')">Duplicate</button>
-                <button class="btn btn-ghost btn-sm" onclick="location.href='backtest.html'">Backtest</button>
-                <button class="btn btn-primary btn-sm" onclick="showToast('Strategy saved (prototype)','success')">Save</button>
+              <div class="detail-toolbar">
+                <button class="btn btn-primary btn-sm" onclick="showToast('Strategy saved','success')">${icon('check')} Save</button>
+                <button class="btn btn-secondary btn-sm" onclick="showToast('Saved as template','success')">${icon('plus')} Save as Template</button>
+                <button class="btn btn-ghost btn-sm" onclick="showToast('Duplicated','success')">${icon('copy')} Duplicate</button>
+                <button class="btn btn-ghost btn-sm" onclick="showConfirm('Delete this strategy?',function(){showToast('Deleted','success')})">${icon('trash')} Delete</button>
               </div>
             </div>
 
-            <div class="tabs detail-tabs" data-group="strat-detail">
-              <button class="tab-btn active" data-tab="code">Code editor</button>
-              <button class="tab-btn" data-tab="params">Parameters</button>
-              <button class="tab-btn" data-tab="versions">Version history</button>
+            <!-- Detail Sub-Tabs -->
+            <div class="tabs" data-group="strat-detail" style="margin:18px 0">
+              <button class="tab-btn active" data-tab="code">Code</button>
+              <button class="tab-btn" data-tab="profile">Profile</button>
+              <button class="tab-btn" data-tab="parameters">Parameters</button>
+              <button class="tab-btn" data-tab="history">History</button>
             </div>
 
+            <!-- Code Tab -->
             <div class="detail-panel active" data-group="strat-detail" data-panel="code">
-              <div class="detail-toolbar" style="margin-bottom:12px;justify-content:flex-end">
-                <button id="codeFullscreenBtn" class="btn btn-ghost btn-sm" onclick="toggleCodeFullscreen()">Full screen</button>
-                <button class="btn btn-ghost btn-sm" onclick="showToast('Code formatted','success')">Format</button>
-                <button class="btn btn-ghost btn-sm" onclick="showToast('Syntax check passed','success')">Validate</button>
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px">
+                <div style="display:flex;gap:8px;align-items:center">
+                  <span class="badge badge-success">Syntax OK</span>
+                  <span id="dUnsaved" class="badge badge-warning" style="display:none">Unsaved changes</span>
+                </div>
+                <div class="detail-toolbar">
+                  <button class="btn btn-ghost btn-sm" onclick="showToast('Code formatted','success')">Format</button>
+                  <button class="btn btn-ghost btn-sm" onclick="showToast('Syntax OK','success')">Validate</button>
+                  <button id="codeFullscreenBtn" class="btn btn-ghost btn-sm" onclick="toggleCodeFullscreen()">Fullscreen</button>
+                </div>
               </div>
-              <pre id="detailCode" class="code-block detail-code"></pre>
-              <div style="display:flex;gap:12px;margin-top:12px;align-items:center;flex-wrap:wrap">
-                <span class="badge badge-success">Syntax OK</span>
-                <span id="detailUpdated" class="text-muted" style="font-size:13px"></span>
+              <div>
+                <label class="form-label">Code</label>
+                <pre id="dCode" class="code-block detail-code"></pre>
+              </div>
+              <div id="dCodeMeta" class="text-muted" style="font-size:13px;margin-top:12px"></div>
+            </div>
+
+            <!-- Profile Tab -->
+            <div class="detail-panel" data-group="strat-detail" data-panel="profile">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                <div><label class="form-label">Strategy Name</label><input id="dProfName" class="form-input" type="text"></div>
+                <div><label class="form-label">Class Name</label><input id="dProfClass" class="form-input" type="text"></div>
+              </div>
+              <div style="margin-top:16px"><label class="form-label">Description</label><textarea id="dProfDesc" class="form-textarea" rows="3"></textarea></div>
+            </div>
+
+            <!-- Parameters Tab -->
+            <div class="detail-panel" data-group="strat-detail" data-panel="parameters">
+              <div>
+                <h3 style="font-size:16px;font-weight:600;margin:0 0 4px">Strategy Parameters</h3>
+                <p class="text-muted" style="font-size:13px;margin:0 0 16px">Configure parameters as JSON or use the visual editor.</p>
+              </div>
+              <div id="dParamCards" class="detail-grid" style="margin-bottom:20px"></div>
+              <div>
+                <label class="form-label">Parameters (JSON)</label>
+                <textarea id="dParamJson" class="form-textarea" rows="10" style="font-family:monospace;font-size:12px;line-height:1.6"></textarea>
               </div>
             </div>
 
-            <div class="detail-panel" data-group="strat-detail" data-panel="params">
-              <h4 class="detail-section-title">Strategy parameters</h4>
-              <div id="detailParams" class="detail-grid"></div>
-            </div>
-
-            <div class="detail-panel" data-group="strat-detail" data-panel="versions">
-              <h4 class="detail-section-title">Version history</h4>
-              <div class="table-wrap version-table">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Version</th>
-                      <th>Time</th>
-                      <th>Author</th>
-                      <th>Note</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody id="detailVersions"></tbody>
-                </table>
+            <!-- History Tab -->
+            <div class="detail-panel" data-group="strat-detail" data-panel="history">
+              <div>
+                <h3 style="font-size:16px;font-weight:600;margin:0 0 4px">Version History</h3>
+                <p class="text-muted" style="font-size:13px;margin:0 0 16px">View past versions and rollback if needed.</p>
               </div>
+              <div class="table-wrap"><table><thead><tr><th>Version</th><th>Time</th><th>Author</th><th>Note</th><th>Actions</th></tr></thead><tbody id="dVersions"></tbody></table></div>
             </div>
           </div>
         </section>
       </div>
     </div>
 
+    <!-- ═══════════ Templates Tab ═══════════ -->
     <div class="tab-panel" data-group="strat-main" data-panel="templates">
-      <div class="strategy-template-grid" id="templateGrid"></div>
+      <div class="strategies-shell">
+        <!-- Left: Template Grid -->
+        <section class="card" style="padding:20px;grid-column:1/2">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+            <div>
+              <h2 style="font-size:18px;font-weight:600;margin:0">Strategy Templates</h2>
+              <p class="text-muted" style="font-size:13px;margin:4px 0 0">Browse and use strategy templates</p>
+            </div>
+            <div class="scope-toggle">
+              <button class="btn btn-primary btn-sm" id="scopeMarketplace" onclick="setTemplateScope('marketplace')">Marketplace</button>
+              <button class="btn btn-secondary btn-sm" id="scopeMine" onclick="setTemplateScope('mine')">My Templates</button>
+            </div>
+          </div>
+          <div id="templateGrid" class="template-grid"></div>
+        </section>
+
+        <!-- Right: Template Preview -->
+        <aside class="card template-preview" style="padding:20px;grid-column:2/3">
+          <div id="tplPreviewEmpty" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:320px" class="empty-spot">
+            <div style="margin-bottom:16px">${icon('eye')}</div>
+            <div style="font-size:16px;font-weight:600;color:hsl(var(--foreground))">Template Preview</div>
+            <p style="font-size:14px;margin:8px 0 0">Click "Preview" on a template to see its code and details.</p>
+          </div>
+          <div id="tplPreviewContent" style="display:none">
+            <h3 id="tplName" style="font-size:18px;font-weight:600;margin:0 0 4px"></h3>
+            <p id="tplDesc" class="text-muted" style="font-size:13px;margin:0 0 12px"></p>
+            <div id="tplBadges" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px"></div>
+            <pre id="tplCode" class="code-block" style="max-height:440px;overflow:auto;font-size:12px;line-height:1.6"></pre>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px">
+              <button class="btn btn-primary btn-sm" onclick="showToast('Strategy created from template','success')">Use Template</button>
+              <button class="btn btn-secondary btn-sm" onclick="showToast('Cloned to My Templates','success')">${icon('copy')} Clone to Mine</button>
+            </div>
+
+            <!-- Rating & Comments -->
+            <div class="card" style="margin-top:20px;padding:16px;border:1px solid hsl(var(--border))">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+                <span style="font-size:14px;font-weight:500">Ratings</span>
+                <span class="text-muted" style="font-size:13px"><span class="rating-stars">★</span> 4.20 / 5 (15)</span>
+              </div>
+              <div style="font-size:12px;color:hsl(var(--muted-foreground));margin-bottom:8px">
+                <div style="padding:8px;border:1px solid hsl(var(--border));border-radius:8px;margin-bottom:6px;background:hsl(var(--muted)/.2)">
+                  <div style="font-weight:500;color:hsl(var(--foreground))">★ 5</div>
+                  <div>Excellent template, easy to customize</div>
+                </div>
+                <div style="padding:8px;border:1px solid hsl(var(--border));border-radius:8px;background:hsl(var(--muted)/.2)">
+                  <div style="font-weight:500;color:hsl(var(--foreground))">★ 4</div>
+                  <div>Good starting point for CTA strategies</div>
+                </div>
+              </div>
+            </div>
+            <div class="card" style="margin-top:12px;padding:16px;border:1px solid hsl(var(--border))">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+                <span style="font-size:14px;font-weight:500">Comments</span>
+                <span>${icon('message-square')}</span>
+              </div>
+              <div id="tplComments" style="font-size:12px;margin-bottom:12px"></div>
+              <textarea class="form-textarea" rows="3" placeholder="Write a comment..." style="font-size:13px"></textarea>
+              <button class="btn btn-primary btn-sm" style="margin-top:8px" onclick="showToast('Feedback submitted','success')">Submit Feedback</button>
+            </div>
+          </div>
+        </aside>
+      </div>
     </div>
+
   </main>
 </div>
 <div id="codeFullscreenBackdrop" class="fullscreen-backdrop" onclick="exitCodeFullscreen()"></div>
 
+<!-- Create Strategy Modal -->
 <div class="modal-overlay" id="createModal">
   <div class="modal" style="max-width:560px">
-    <div class="modal-header">
-      <h3 class="modal-title">Create strategy</h3>
-      <button class="btn btn-ghost btn-icon" onclick="closeModal('createModal')">x</button>
-    </div>
+    <div class="modal-header"><h3 class="modal-title">Create New Strategy</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('createModal')">×</button></div>
     <div class="modal-body">
+      <p class="text-muted" style="font-size:13px;margin:0 0 16px">Choose a name, category, and optional template to get started.</p>
       <div style="display:flex;flex-direction:column;gap:16px">
-        <div><label class="form-label">Strategy name</label><input type="text" class="form-input" placeholder="Example: MyStrategy_v1"></div>
-        <div><label class="form-label">Strategy type</label><select class="form-select"><option>CTA</option><option>Alpha</option><option>Arbitrage</option><option>Custom</option></select></div>
-        <div><label class="form-label">Description</label><textarea class="form-textarea" rows="3" placeholder="Short strategy note..."></textarea></div>
-        <div><label class="form-label">From template</label><select class="form-select"><option>Blank strategy</option><option>Dual MA Cross</option><option>RSI Reversal</option><option>Bollinger Breakout</option><option>Multi-Factor Alpha</option></select></div>
+        <div><label class="form-label">Strategy Name</label><input type="text" class="form-input" placeholder="e.g. MyMomentumStrategy"></div>
+        <div><label class="form-label">Description</label><textarea class="form-textarea" rows="3" placeholder="Short description"></textarea></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div><label class="form-label">Category</label>
+            <select class="form-select">
+              <option value="cta">CTA</option>
+              <option value="alpha">Alpha</option>
+              <option value="statArb">StatArb</option>
+              <option value="grid">Grid</option>
+              <option value="ai">AI</option>
+              <option value="custom">Custom</option>
+            </select>
+          </div>
+          <div><label class="form-label">Template</label>
+            <select class="form-select">
+              <option value="blank">Blank strategy</option>
+              <option>Dual MA Cross (Marketplace)</option>
+              <option>RSI Reversal (Marketplace)</option>
+              <option>Grid Trader (Marketplace)</option>
+            </select>
+          </div>
+        </div>
       </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('createModal')">Cancel</button>
-      <button class="btn btn-primary" onclick="submitModal('createModal','Draft strategy created','success')">Create</button>
+      <button class="btn btn-primary" onclick="submitModal('createModal','Strategy created','success')">Create</button>
     </div>
   </div>
 </div>
 
+<!-- Import Strategy Modal -->
 <div class="modal-overlay" id="importModal">
   <div class="modal" style="max-width:480px">
-    <div class="modal-header">
-      <h3 class="modal-title">Import strategy</h3>
-      <button class="btn btn-ghost btn-icon" onclick="closeModal('importModal')">x</button>
-    </div>
+    <div class="modal-header"><h3 class="modal-title">Import Strategy</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('importModal')">×</button></div>
     <div class="modal-body">
-      <div style="border:2px dashed hsl(var(--border));border-radius:10px;padding:40px;text-align:center;color:hsl(var(--muted-foreground))">
-        <p style="font-size:14px">Drop a .py file here or click upload</p>
-        <button class="btn btn-secondary" style="margin-top:12px" onclick="showToast('File chooser opened (prototype)','info')">Choose file</button>
+      <p class="text-muted" style="font-size:13px;margin:0 0 16px">Upload a Python (.py) file to import a strategy.</p>
+      <div style="border:2px dashed hsl(var(--border));border-radius:12px;padding:40px;text-align:center;cursor:pointer;transition:border-color .15s" onmouseover="this.style.borderColor='hsl(var(--primary)/.4)'" onmouseout="this.style.borderColor='hsl(var(--border))'">
+        <div style="margin-bottom:12px">${icon('upload')}</div>
+        <p style="font-size:14px;font-weight:600;color:hsl(var(--foreground))">Drop a file here or click to upload</p>
+        <p class="text-muted" style="font-size:13px;margin:4px 0 0">Supports .py files</p>
       </div>
-      <p class="text-muted" style="font-size:12px;margin-top:8px">Supports Python (.py), max 500KB</p>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('importModal')">Cancel</button>
-      <button class="btn btn-primary" onclick="submitModal('importModal','Strategy file imported','success')">Import</button>
+      <button class="btn btn-primary" onclick="submitModal('importModal','Strategy imported','success')">Select File</button>
+    </div>
+  </div>
+</div>
+
+<!-- History Preview Modal -->
+<div class="modal-overlay" id="historyPreviewModal">
+  <div class="modal" style="max-width:900px">
+    <div class="modal-header"><h3 id="hpTitle" class="modal-title">Version Preview</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('historyPreviewModal')">×</button></div>
+    <div class="modal-body">
+      <p class="text-muted" style="font-size:13px;margin:0 0 16px">Read-only snapshot of this version.</p>
+      <div style="display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px">
+        <pre id="hpCode" class="code-block" style="font-size:12px;line-height:1.6;overflow:auto"></pre>
+        <div>
+          <div style="font-size:14px;font-weight:500;margin-bottom:8px">Parameters (JSON)</div>
+          <pre id="hpParams" class="code-block" style="font-size:12px;line-height:1.6;overflow:auto"></pre>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
 <script src="shared.js"></script>
 <script>
-const STRATEGY_DATA = [
-  {
-    id: 1,
-    name: 'DualMA_Cross',
-    type: 'CTA',
-    status: 'active',
-    version: 3,
-    source: 'Built-in',
-    author: 'demo_user',
-    description: 'Classic dual moving average crossover strategy.',
-    createdAt: '2026-02-18 09:20',
-    updatedAt: '2026-03-13 10:24',
-    code: `# DualMA_Cross Strategy v3
-import pandas as pd
-
-class DualMACross:
-    def __init__(self, short_window=5, long_window=20):
-        self.short_window = short_window
-        self.long_window = long_window
-
-    def generate_signals(self, df: pd.DataFrame) -> pd.DataFrame:
-        df['ma_short'] = df['close'].rolling(self.short_window).mean()
-        df['ma_long'] = df['close'].rolling(self.long_window).mean()
-        df['signal'] = 0
-        df.loc[df['ma_short'] > df['ma_long'], 'signal'] = 1
-        df.loc[df['ma_short'] < df['ma_long'], 'signal'] = -1
-        return df
-`,
-    parameters: [
-      { label: 'short_window', value: '5' },
-      { label: 'long_window', value: '20' },
-      { label: 'initial_capital', value: '1000000' },
-      { label: 'fee_rate', value: '0.03' }
-    ],
-    versions: [
-      { version: 'v3', time: '2026-03-13 10:24', author: 'demo_user', note: 'Optimized MA periods and stop-loss rules' },
-      { version: 'v2', time: '2026-03-10 16:05', author: 'demo_user', note: 'Added dynamic position sizing' },
-      { version: 'v1', time: '2026-03-05 09:30', author: 'demo_user', note: 'Initial version' }
+/* ── Strategy Data ── */
+var STRATEGY_DATA = [
+  { id:1, name:'DualMA_Cross', className:'DualMaCross', type:'CTA', status:'active', version:3,
+    description:'Classic dual moving average crossover — buy/sell signals on MA crossover.',
+    createdAt:'2026-02-18 09:20', updatedAt:'2026-03-13 10:24',
+    code:'# DualMA_Cross — CTA Strategy\nfrom vnpy_ctastrategy import CtaTemplate, BarData\n\nclass DualMaCross(CtaTemplate):\n    short_window = 5\n    long_window = 20\n    parameters = ["short_window", "long_window"]\n\n    def on_bar(self, bar: BarData):\n        am = self.am\n        am.update_bar(bar)\n        if not am.inited:\n            return\n        ma_short = am.sma(self.short_window)\n        ma_long = am.sma(self.long_window)\n        if ma_short > ma_long and self.pos <= 0:\n            self.buy(bar.close_price, 1)\n        elif ma_short < ma_long and self.pos >= 0:\n            self.sell(bar.close_price, 1)\n',
+    parameters:{ short_window:5, long_window:20, initial_capital:1000000, fee_rate:0.0003 },
+    versions:[
+      {v:'v3',time:'2026-03-13 10:24',author:'demo_user',note:'Optimized MA periods'},
+      {v:'v2',time:'2026-03-10 16:05',author:'demo_user',note:'Added dynamic position sizing'},
+      {v:'v1',time:'2026-03-05 09:30',author:'demo_user',note:'Initial version'}
     ]
   },
-  {
-    id: 2,
-    name: 'RSI_Reversal',
-    type: 'CTA',
-    status: 'active',
-    version: 2,
-    source: 'Built-in',
-    author: 'demo_user',
-    description: 'RSI based reversal strategy for oversold and overbought zones.',
-    createdAt: '2026-02-20 14:10',
-    updatedAt: '2026-03-11 09:42',
-    code: `# RSI_Reversal Strategy
-class RSIReversal:
-    def __init__(self, rsi_window=14, overbought=70, oversold=30):
-        self.rsi_window = rsi_window
-        self.overbought = overbought
-        self.oversold = oversold
-`,
-    parameters: [
-      { label: 'rsi_window', value: '14' },
-      { label: 'overbought', value: '70' },
-      { label: 'oversold', value: '30' },
-      { label: 'max_holding_days', value: '8' }
-    ],
-    versions: [
-      { version: 'v2', time: '2026-03-11 09:42', author: 'demo_user', note: 'Tuned reversal confirmation' },
-      { version: 'v1', time: '2026-03-02 18:10', author: 'demo_user', note: 'Initial version' }
+  { id:2, name:'RSI_Reversal', className:'RsiReversal', type:'CTA', status:'active', version:2,
+    description:'RSI reversal strategy for oversold and overbought zones.',
+    createdAt:'2026-02-20 14:10', updatedAt:'2026-03-11 09:42',
+    code:'# RSI_Reversal — CTA Strategy\nclass RsiReversal(CtaTemplate):\n    rsi_window = 14\n    overbought = 70\n    oversold = 30\n\n    def on_bar(self, bar):\n        am = self.am\n        am.update_bar(bar)\n        if not am.inited: return\n        rsi = am.rsi(self.rsi_window)\n        if rsi < self.oversold and self.pos <= 0:\n            self.buy(bar.close_price, 1)\n        elif rsi > self.overbought and self.pos >= 0:\n            self.sell(bar.close_price, 1)\n',
+    parameters:{ rsi_window:14, overbought:70, oversold:30 },
+    versions:[
+      {v:'v2',time:'2026-03-11 09:42',author:'demo_user',note:'Tuned reversal confirmation'},
+      {v:'v1',time:'2026-03-02 18:10',author:'demo_user',note:'Initial version'}
     ]
   },
-  {
-    id: 3,
-    name: 'BollingerBand',
-    type: 'CTA',
-    status: 'active',
-    version: 1,
-    source: 'Built-in',
-    author: 'demo_user',
-    description: 'Breakout strategy based on Bollinger Bands.',
-    createdAt: '2026-02-21 11:00',
-    updatedAt: '2026-03-08 16:18',
-    code: `# BollingerBand Strategy
-class BollingerBreakout:
-    def __init__(self, window=20, std=2):
-        self.window = window
-        self.std = std
-`,
-    parameters: [
-      { label: 'window', value: '20' },
-      { label: 'std_multiplier', value: '2' },
-      { label: 'take_profit', value: '6%' },
-      { label: 'stop_loss', value: '3%' }
-    ],
-    versions: [
-      { version: 'v1', time: '2026-03-08 16:18', author: 'demo_user', note: 'First runnable version' }
+  { id:3, name:'MyAlpha01', className:'MyAlpha01', type:'Alpha', status:'active', version:5,
+    description:'Multi-factor stock selection with momentum, quality, and low-vol factors.',
+    createdAt:'2026-01-29 09:45', updatedAt:'2026-03-14 11:36',
+    code:'# MyAlpha01 — Alpha Strategy\n# Multi-factor stock selection\n\nclass MyAlpha01:\n    quality_weight = 0.35\n    momentum_weight = 0.40\n    volatility_weight = -0.25\n    top_n = 30\n    rebalance = "weekly"\n\n    def select(self, date, market_data):\n        scores = (\n            self.quality_weight * market_data["roe_rank"] +\n            self.momentum_weight * market_data["momentum_20d_rank"] +\n            self.volatility_weight * market_data["vol_60d_rank"]\n        )\n        return scores.nlargest(self.top_n).index.tolist()\n',
+    parameters:{ quality_weight:0.35, momentum_weight:0.40, volatility_weight:-0.25, top_n:30, rebalance:'weekly' },
+    versions:[
+      {v:'v5',time:'2026-03-14 11:36',author:'demo_user',note:'Added risk exposure limits'},
+      {v:'v4',time:'2026-03-09 14:12',author:'demo_user',note:'Normalized factor scores'},
+      {v:'v3',time:'2026-03-04 17:08',author:'demo_user',note:'Added momentum factor'}
     ]
   },
-  {
-    id: 4,
-    name: 'MyAlpha01',
-    type: 'Custom',
-    status: 'active',
-    version: 5,
-    source: 'User-defined',
-    author: 'demo_user',
-    description: 'Multi-factor stock selection with momentum overlay.',
-    createdAt: '2026-01-29 09:45',
-    updatedAt: '2026-03-14 11:36',
-    code: `# MyAlpha01
-class MultiFactorAlpha:
-    def score(self, factors):
-        return 0.35 * factors['quality'] + 0.4 * factors['momentum'] - 0.25 * factors['volatility']
-`,
-    parameters: [
-      { label: 'quality_weight', value: '0.35' },
-      { label: 'momentum_weight', value: '0.40' },
-      { label: 'volatility_weight', value: '-0.25' },
-      { label: 'rebalance', value: 'weekly' }
-    ],
-    versions: [
-      { version: 'v5', time: '2026-03-14 11:36', author: 'demo_user', note: 'Added risk exposure limits' },
-      { version: 'v4', time: '2026-03-09 14:12', author: 'demo_user', note: 'Normalized factor scores' },
-      { version: 'v3', time: '2026-03-04 17:08', author: 'demo_user', note: 'Added momentum factor' }
+  { id:4, name:'PairTrading_v1', className:'PairTrading', type:'StatArb', status:'active', version:1,
+    description:'Statistical arbitrage pair trading based on cointegration.',
+    createdAt:'2026-03-01 10:00', updatedAt:'2026-03-10 15:30',
+    code:'# PairTrading — StatArb Strategy\n\nclass PairTrading:\n    lookback = 60\n    entry_z = 2.0\n    exit_z = 0.5\n    hedge_ratio = "dynamic"\n\n    def on_bar(self, bar_a, bar_b):\n        spread = bar_a.close - self.hedge_ratio * bar_b.close\n        z = (spread - self.mean) / self.std\n        if abs(z) > self.entry_z:\n            self.enter_trade(z)\n        elif abs(z) < self.exit_z:\n            self.exit_trade()\n',
+    parameters:{ lookback:60, entry_z:2.0, exit_z:0.5, hedge_ratio:'dynamic' },
+    versions:[
+      {v:'v1',time:'2026-03-10 15:30',author:'demo_user',note:'Initial pair trading implementation'}
     ]
   },
-  {
-    id: 5,
-    name: 'MeanRevert_v2',
-    type: 'Custom',
-    status: 'draft',
-    version: 2,
-    source: 'User-defined',
-    author: 'demo_user',
-    description: 'Mean reversion draft under parameter validation.',
-    createdAt: '2026-03-01 10:20',
-    updatedAt: '2026-03-12 08:56',
-    code: `# MeanRevert_v2
-class MeanRevert:
-    def __init__(self, lookback=10, z_entry=2.0, z_exit=0.5):
-        self.lookback = lookback
-        self.z_entry = z_entry
-        self.z_exit = z_exit
-`,
-    parameters: [
-      { label: 'lookback', value: '10' },
-      { label: 'z_entry', value: '2.0' },
-      { label: 'z_exit', value: '0.5' },
-      { label: 'status', value: 'draft' }
-    ],
-    versions: [
-      { version: 'v2', time: '2026-03-12 08:56', author: 'demo_user', note: 'Testing entry and exit thresholds' },
-      { version: 'v1', time: '2026-03-06 11:24', author: 'demo_user', note: 'Initial draft' }
+  { id:5, name:'QlibTopK', className:'QlibTopK', type:'AI', status:'active', version:2,
+    description:'Qlib Alpha158 model-based stock ranking. Outputs top-K predicted stocks.',
+    createdAt:'2026-02-15 08:00', updatedAt:'2026-03-12 14:20',
+    code:'# QlibTopK — AI Strategy\n\nclass QlibTopK:\n    factor_set = "Alpha158"\n    top_k = 20\n    drop_k = 5\n\n    def select(self, date, market_data):\n        predictions = self.model.predict(\n            market_data.features[self.factor_set]\n        )\n        ranked = predictions.sort_values(ascending=False)\n        return ranked.head(self.top_k).index.tolist()\n',
+    parameters:{ factor_set:'Alpha158', top_k:20, drop_k:5 },
+    versions:[
+      {v:'v2',time:'2026-03-12 14:20',author:'demo_user',note:'Retrained on 2025 data'},
+      {v:'v1',time:'2026-02-15 08:00',author:'demo_user',note:'Initial Qlib integration'}
+    ]
+  },
+  { id:6, name:'GridTrader', className:'GridTrader', type:'Grid', status:'active', version:1,
+    description:'Dynamic grid trading for range-bound markets.',
+    createdAt:'2026-03-08 11:00', updatedAt:'2026-03-12 09:30',
+    code:'# GridTrader — Grid Strategy\nclass GridTrader(CtaTemplate):\n    grid_levels = 10\n    grid_spacing = 0.02\n    base_qty = 100\n\n    def on_bar(self, bar):\n        mid = (bar.high_price + bar.low_price) / 2\n        for i in range(-self.grid_levels//2, self.grid_levels//2+1):\n            level = mid * (1 + i * self.grid_spacing)\n            if bar.close_price < level and self.pos < self.grid_levels:\n                self.buy(level, self.base_qty)\n            elif bar.close_price > level and self.pos > -self.grid_levels:\n                self.sell(level, self.base_qty)\n',
+    parameters:{ grid_levels:10, grid_spacing:0.02, base_qty:100 },
+    versions:[
+      {v:'v1',time:'2026-03-12 09:30',author:'demo_user',note:'Initial grid strategy'}
+    ]
+  },
+  { id:7, name:'MeanRevert_v2', className:'MeanRevertV2', type:'Custom', status:'draft', version:2,
+    description:'Mean reversion draft strategy — experimental.',
+    createdAt:'2026-03-05 09:00', updatedAt:'2026-03-13 16:00',
+    code:'# MeanRevert_v2 — Custom Strategy (Draft)\n\nclass MeanRevertV2:\n    window = 20\n    threshold = 1.5\n\n    def on_bar(self, bar):\n        mean = self.am.sma(self.window)\n        std = self.am.std(self.window)\n        z = (bar.close_price - mean) / std\n        if z < -self.threshold:\n            self.buy(bar.close_price, 1)\n        elif z > self.threshold:\n            self.sell(bar.close_price, 1)\n',
+    parameters:{ window:20, threshold:1.5 },
+    versions:[
+      {v:'v2',time:'2026-03-13 16:00',author:'demo_user',note:'Adjusted threshold'},
+      {v:'v1',time:'2026-03-05 09:00',author:'demo_user',note:'Initial draft'}
     ]
   }
 ];
 
-const TEMPLATE_DATA = [
-  { name: 'Dual MA Cross', category: 'CTA', desc: 'Classic moving average crossover starter template.' },
-  { name: 'RSI Reversal', category: 'CTA', desc: 'Starter template for RSI mean reversion logic.' },
-  { name: 'Bollinger Breakout', category: 'CTA', desc: 'Band breakout template for trend following.' },
-  { name: 'Multi-Factor Alpha', category: 'Alpha', desc: 'Factor scoring framework with custom weights.' },
-  { name: 'Pair Trading', category: 'Stat Arb', desc: 'Cointegration based spread trading skeleton.' },
-  { name: 'Grid Trading', category: 'Grid', desc: 'Grid execution template for range markets.' }
-];
+var TEMPLATE_DATA = {
+  marketplace: [
+    { name:'Dual MA Crossover', type:'CTA', desc:'Classic moving average crossover signal generator.', visibility:'public', downloads:342, updated:'2026-03-10', code:'# Dual MA Crossover Template\nclass DualMaCross(CtaTemplate):\n    short_window = 5\n    long_window = 20\n    ...\n' },
+    { name:'RSI Reversal', type:'CTA', desc:'RSI oversold/overbought reversal signals.', visibility:'public', downloads:218, updated:'2026-03-08', code:'# RSI Reversal Template\nclass RsiReversal(CtaTemplate):\n    rsi_window = 14\n    overbought = 70\n    oversold = 30\n    ...\n' },
+    { name:'Factor Alpha', type:'Alpha', desc:'Multi-factor scoring template for stock selection.', visibility:'public', downloads:156, updated:'2026-03-12', code:'# Factor Alpha Template\nclass FactorAlpha:\n    factors = ["momentum", "quality", "value"]\n    ...\n' },
+    { name:'Grid Trading', type:'Grid', desc:'Grid execution template for range-bound markets.', visibility:'public', downloads:98, updated:'2026-03-11', code:'# Grid Trading Template\nclass GridTrader(CtaTemplate):\n    grid_levels = 10\n    ...\n' },
+    { name:'Pair Trading', type:'StatArb', desc:'Cointegration-based spread trading skeleton.', visibility:'public', downloads:87, updated:'2026-03-09', code:'# Pair Trading Template\nclass PairTrading:\n    lookback = 60\n    entry_z = 2.0\n    ...\n' },
+    { name:'Qlib AI Picker', type:'AI', desc:'Qlib Alpha158 model-based stock ranking template.', visibility:'public', downloads:134, updated:'2026-03-13', code:'# Qlib AI Picker Template\nclass QlibPicker:\n    factor_set = "Alpha158"\n    top_k = 20\n    ...\n' },
+  ],
+  mine: [
+    { name:'My CTA Template', type:'CTA', desc:'Personal CTA template derived from Dual MA.', visibility:'private', downloads:0, updated:'2026-03-14', code:'# My CTA Template\nclass MyCta(CtaTemplate):\n    ...\n' },
+    { name:'Volatility Breakout', type:'Custom', desc:'Custom breakout strategy template.', visibility:'team', downloads:5, updated:'2026-03-12', code:'# Volatility Breakout Template\nclass VolBreakout:\n    ...\n' },
+  ]
+};
 
-let currentStrategyId = null;
-let codeFullscreen = false;
+var currentId = null;
+var currentScope = 'marketplace';
+var codeFullscreen = false;
 
-function inferVariant(category) {
-  if (category === 'Alpha' || category === 'Stat Arb') return 'badge-warning';
-  if (category === 'Grid') return 'badge-muted';
-  return 'badge-primary';
-}
+var CATEGORY_BADGES = {
+  CTA: 'badge-primary', Alpha: 'badge-success', StatArb: 'badge-warning',
+  Grid: 'badge-muted', AI: 'badge-destructive', Custom: 'badge-muted'
+};
+function categoryBadge(t) { return '<span class="badge '+(CATEGORY_BADGES[t]||'badge-muted')+'">'+t+'</span>'; }
 
 function renderStrategyList() {
-  const root = document.getElementById('strategyList');
-  const count = document.getElementById('strategyCount');
-  const q = (document.getElementById('strategySearch').value || '').toLowerCase().trim();
-  const type = document.getElementById('typeFilter').value;
-  const status = document.getElementById('statusFilter').value;
-
-  const list = STRATEGY_DATA.filter(item => {
-    const matchQ = !q || item.name.toLowerCase().includes(q) || item.description.toLowerCase().includes(q);
-    const matchType = type === 'all' || item.type === type;
-    const matchStatus = status === 'all' || item.status === status;
-    return matchQ && matchType && matchStatus;
+  var root = document.getElementById('stratList'), count = document.getElementById('stratCount');
+  var q = (document.getElementById('stratSearch').value||'').toLowerCase().trim();
+  var tf = document.getElementById('typeFilter').value;
+  var sf = document.getElementById('statusFilter').value;
+  var list = STRATEGY_DATA.filter(function(s) {
+    return (!q || s.name.toLowerCase().indexOf(q)>=0 || s.description.toLowerCase().indexOf(q)>=0)
+      && (tf==='all' || s.type===tf)
+      && (sf==='all' || s.status===sf);
   });
-
-  count.textContent = `${list.length} items`;
-
-  if (!list.length) {
-    root.innerHTML = `<div class="empty-spot" style="padding:28px 18px">No strategies match the current filters.</div>`;
-    renderStrategyDetail(null);
-    return;
-  }
-
-  if (!currentStrategyId || !list.some(item => item.id === currentStrategyId)) {
-    currentStrategyId = list[0].id;
-  }
-
-  root.innerHTML = list.map(item => `
-    <article class="strategy-item ${item.id === currentStrategyId ? 'active' : ''}" data-id="${item.id}">
-      <div class="strategy-item-header">
-        <div>
-          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-            <strong style="font-size:15px">${item.name}</strong>
-            <span class="badge ${inferVariant(item.type)}">${item.type}</span>
-            ${statusBadge(item.status)}
-          </div>
-          <div class="text-muted" style="font-size:13px;margin-top:6px">${item.description}</div>
-        </div>
-        <span class="badge badge-muted">v${item.version}</span>
-      </div>
-      <div class="strategy-item-meta">
-        <span>Source: ${item.source}</span>
-        <span>ID: ${item.id}</span>
-      </div>
-    </article>
-  `).join('');
-
-  root.querySelectorAll('.strategy-item').forEach(node => {
-    node.addEventListener('click', function (event) {
-      currentStrategyId = Number(node.dataset.id);
-      renderStrategyList();
-      renderStrategyDetail(currentStrategyId);
-    });
+  count.textContent = list.length + ' strategies';
+  if (!list.length) { root.innerHTML='<div class="empty-spot" style="padding:24px">No strategies match your filters.</div>'; renderDetail(null); return; }
+  if (!currentId || !list.some(function(s){return s.id===currentId})) currentId = list[0].id;
+  root.innerHTML = list.map(function(s) {
+    var sel = s.id===currentId;
+    return '<button class="strategy-item'+(sel?' active':'')+'" data-id="'+s.id+'">'
+      +'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">'
+        +'<div>'
+          +'<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'
+            +'<strong style="font-size:15px">'+s.name+'</strong>'
+          +'</div>'
+          +'<div class="text-muted" style="font-size:13px;margin-top:4px">'+s.description+'</div>'
+        +'</div>'
+        +statusBadge(s.status)
+      +'</div>'
+      +'<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;font-size:12px;color:hsl(var(--muted-foreground));align-items:center">'
+        +categoryBadge(s.type)
+        +'<span>v'+s.version+'</span>'
+        +'<span>'+s.updatedAt+'</span>'
+      +'</div>'
+    +'</button>';
+  }).join('');
+  root.querySelectorAll('.strategy-item').forEach(function(el) {
+    el.addEventListener('click', function() { currentId=Number(el.dataset.id); renderStrategyList(); });
   });
-
-  renderStrategyDetail(currentStrategyId);
+  renderDetail(currentId);
 }
 
-function renderStrategyDetail(id) {
-  const empty = document.getElementById('strategyDetailEmpty');
-  const detail = document.getElementById('strategyDetail');
-  const strategy = STRATEGY_DATA.find(item => item.id === id);
+function renderDetail(id) {
+  var empty = document.getElementById('detailEmpty'), content = document.getElementById('detailContent');
+  var s = STRATEGY_DATA.find(function(i){return i.id===id});
+  if (!s) { empty.style.display='flex'; content.style.display='none'; return; }
+  empty.style.display='none'; content.style.display='block';
+  document.getElementById('dName').textContent = s.name;
+  document.getElementById('dCategory').innerHTML = categoryBadge(s.type);
+  document.getElementById('dStatus').innerHTML = statusBadge(s.status);
+  document.getElementById('dCode').textContent = s.code;
+  document.getElementById('dCodeMeta').textContent = 'Last modified: ' + s.updatedAt;
+  document.getElementById('dProfName').value = s.name;
+  document.getElementById('dProfClass').value = s.className;
+  document.getElementById('dProfDesc').value = s.description;
+  var params = s.parameters;
+  document.getElementById('dParamJson').value = JSON.stringify(params, null, 2);
+  var keys = Object.keys(params);
+  document.getElementById('dParamCards').innerHTML = keys.map(function(k) {
+    var v = params[k];
+    var input = typeof v === 'number'
+      ? '<input type="number" class="form-input" value="'+v+'" style="margin-top:10px">'
+      : '<div style="margin-top:10px;padding:8px 12px;border-radius:8px;background:hsl(var(--muted)/.4);font-size:13px">'+v+'</div>';
+    return '<div class="param-card"><div class="param-label">'+k+'</div>'+input+'</div>';
+  }).join('');
+  document.getElementById('dVersions').innerHTML = s.versions.map(function(v,i) {
+    return '<tr>'
+      +'<td>'+v.v+'</td><td class="text-muted">'+v.time+'</td><td class="text-muted">'+v.author+'</td><td class="text-muted">'+(i===0?'Latest version':v.note)+'</td>'
+      +'<td><button class="btn btn-ghost btn-sm" onclick="previewHistory('+s.id+','+i+')">'+icon('eye')+' View</button> '
+      +'<button class="btn btn-ghost btn-sm" onclick="showToast(\'Rolled back to '+v.v+'\',\'success\')">'+icon('refresh-cw')+' Rollback</button></td>'
+      +'</tr>';
+  }).join('');
+}
 
-  if (!strategy) {
-    empty.style.display = 'block';
-    detail.style.display = 'none';
-    return;
-  }
+function previewHistory(sId, vIdx) {
+  var s = STRATEGY_DATA.find(function(i){return i.id===sId});
+  if (!s) return;
+  var v = s.versions[vIdx];
+  document.getElementById('hpTitle').textContent = s.name + ' — ' + v.v;
+  document.getElementById('hpCode').textContent = s.code;
+  document.getElementById('hpParams').textContent = JSON.stringify(s.parameters, null, 2);
+  openModal('historyPreviewModal');
+}
 
-  empty.style.display = 'none';
-  detail.style.display = 'block';
-
-  document.getElementById('detailName').textContent = strategy.name;
-  document.getElementById('detailType').innerHTML = `<span class="badge ${inferVariant(strategy.type)}">${strategy.type}</span>`;
-  document.getElementById('detailStatus').innerHTML = statusBadge(strategy.status);
-  document.getElementById('detailDescription').textContent = strategy.description;
-  document.getElementById('detailMeta').innerHTML = `
-    <span>Version: v${strategy.version}</span>
-    <span>Source: ${strategy.source}</span>
-    <span>Author: ${strategy.author}</span>
-    <span>Created: ${strategy.createdAt}</span>
-  `;
-  document.getElementById('detailCode').textContent = strategy.code;
-  document.getElementById('detailUpdated').textContent = `Python 3.11 - Last updated ${strategy.updatedAt}`;
-  document.getElementById('detailParams').innerHTML = strategy.parameters.map(item => `
-    <div>
-      <label class="form-label">${item.label}</label>
-      <input class="form-input" value="${item.value}" readonly>
-    </div>
-  `).join('');
-  document.getElementById('detailVersions').innerHTML = strategy.versions.map((item, index) => `
-    <tr>
-      <td><span class="badge ${index === 0 ? 'badge-primary' : 'badge-muted'}">${item.version}</span></td>
-      <td>${item.time}</td>
-      <td>${item.author}</td>
-      <td>${item.note}</td>
-      <td>
-        <button class="btn btn-ghost btn-sm" onclick="showToast('Viewing ${item.version} (prototype)','info')">View</button>
-        <button class="btn btn-ghost btn-sm" onclick="showToast('Rolled back to ${item.version} (prototype)','success')">Rollback</button>
-      </td>
-    </tr>
-  `).join('');
+/* ── Templates ── */
+function setTemplateScope(scope) {
+  currentScope = scope;
+  document.getElementById('scopeMarketplace').className = 'btn btn-sm ' + (scope==='marketplace' ? 'btn-primary' : 'btn-secondary');
+  document.getElementById('scopeMine').className = 'btn btn-sm ' + (scope==='mine' ? 'btn-primary' : 'btn-secondary');
+  renderTemplates();
 }
 
 function renderTemplates() {
-  const root = document.getElementById('templateGrid');
-  root.innerHTML = TEMPLATE_DATA.map(item => `
-    <div class="card">
-      <div class="card-header" style="margin-bottom:8px">
-        <h3 class="card-title" style="margin:0">${item.name}</h3>
-        <span class="badge ${inferVariant(item.category)}">${item.category}</span>
-      </div>
-      <p class="text-muted" style="font-size:13px;margin:0 0 12px">${item.desc}</p>
-      <div class="template-actions" style="justify-content:flex-start">
-        <button class="btn btn-primary btn-sm" onclick="useTemplate('${item.name}')">Use template</button>
-        <button class="btn btn-ghost btn-sm" onclick="showToast('Preview: ${item.name}','info')">Preview</button>
-      </div>
-    </div>
-  `).join('');
+  var list = TEMPLATE_DATA[currentScope] || [];
+  var grid = document.getElementById('templateGrid');
+  if (!list.length) { grid.innerHTML='<div class="empty-spot" style="padding:28px">No templates available.</div>'; return; }
+  grid.innerHTML = list.map(function(t,i) {
+    return '<article class="card" style="padding:16px;min-width:0">'
+      +'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">'
+        +'<div style="min-width:0;flex:1">'
+          +'<div style="font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+t.name+'</div>'
+          +'<div class="text-muted" style="font-size:13px;margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">'+t.desc+'</div>'
+        +'</div>'
+        +categoryBadge(t.type)
+      +'</div>'
+      +'<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">'
+        +'<span class="badge '+(currentScope==='marketplace'?'badge-success':'badge-muted')+'">'+(currentScope==='marketplace'?'Marketplace':'Mine')+'</span>'
+        +'<span class="badge badge-muted">'+t.visibility+'</span>'
+      +'</div>'
+      +'<div class="text-muted" style="font-size:12px;margin-top:8px">'+t.downloads+' downloads | '+t.updated+'</div>'
+      +'<div style="display:flex;gap:8px;margin-top:12px">'
+        +'<button class="btn btn-ghost btn-sm" onclick="previewTemplate(\''+currentScope+'\','+i+')">'+icon('eye')+' Preview</button>'
+        +'<button class="btn btn-primary btn-sm" onclick="showToast(\'Strategy created from template\',\'success\')">Use Template</button>'
+      +'</div>'
+    +'</article>';
+  }).join('');
 }
 
-function useTemplate(name) {
-  activateTab('strat-main', 'list');
-  currentStrategyId = 1;
-  renderStrategyList();
-  renderStrategyDetail(currentStrategyId);
-  activateTab('strat-detail', 'code');
-  showToast(`Template ${name} loaded into the workspace (prototype)`, 'success');
+function previewTemplate(scope, idx) {
+  var t = TEMPLATE_DATA[scope][idx];
+  if (!t) return;
+  document.getElementById('tplPreviewEmpty').style.display = 'none';
+  document.getElementById('tplPreviewContent').style.display = 'block';
+  document.getElementById('tplName').textContent = t.name;
+  document.getElementById('tplDesc').textContent = t.desc;
+  document.getElementById('tplBadges').innerHTML = '<span class="badge '+(scope==='marketplace'?'badge-success':'badge-muted')+'">'+(scope==='marketplace'?'Marketplace':'Mine')+'</span> <span class="badge badge-muted">'+t.visibility+'</span>';
+  document.getElementById('tplCode').textContent = t.code;
+  document.getElementById('tplComments').innerHTML = '<div style="padding:8px;border:1px solid hsl(var(--border));border-radius:8px;margin-bottom:6px;background:hsl(var(--muted)/.2)"><div>Great template, saved me hours of work!</div><div class="text-muted" style="margin-top:4px">2026-03-12 14:30</div></div>';
 }
 
-function updateCodeFullscreenButton() {
-  const btn = document.getElementById('codeFullscreenBtn');
-  if (btn) {
-    btn.textContent = codeFullscreen ? 'Exit full screen' : 'Full screen';
-  }
-}
-
+/* ── Code Fullscreen ── */
 function toggleCodeFullscreen() {
-  if (codeFullscreen) {
-    exitCodeFullscreen();
-    return;
-  }
-  const panel = document.querySelector('.detail-panel[data-panel="code"]');
-  const backdrop = document.getElementById('codeFullscreenBackdrop');
-  if (!panel || !backdrop) return;
+  if (codeFullscreen) { exitCodeFullscreen(); return; }
+  var p = document.querySelector('.detail-panel[data-panel="code"]');
+  var b = document.getElementById('codeFullscreenBackdrop');
+  if (!p||!b) return;
   codeFullscreen = true;
-  panel.classList.add('code-fullscreen');
-  backdrop.classList.add('active');
+  p.classList.add('code-fullscreen');
+  b.classList.add('active');
   document.body.style.overflow = 'hidden';
-  updateCodeFullscreenButton();
+  document.getElementById('codeFullscreenBtn').textContent = 'Exit Fullscreen';
 }
-
 function exitCodeFullscreen() {
-  const panel = document.querySelector('.detail-panel[data-panel="code"]');
-  const backdrop = document.getElementById('codeFullscreenBackdrop');
+  var p = document.querySelector('.detail-panel[data-panel="code"]');
+  var b = document.getElementById('codeFullscreenBackdrop');
   codeFullscreen = false;
-  if (panel) panel.classList.remove('code-fullscreen');
-  if (backdrop) backdrop.classList.remove('active');
+  if (p) p.classList.remove('code-fullscreen');
+  if (b) b.classList.remove('active');
   document.body.style.overflow = '';
-  updateCodeFullscreenButton();
+  var btn = document.getElementById('codeFullscreenBtn');
+  if (btn) btn.textContent = 'Fullscreen';
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  const iconRoot = document.getElementById('strategySearchIcon');
-  if (iconRoot) iconRoot.innerHTML = icon('search');
-  document.getElementById('strategySearch').addEventListener('input', renderStrategyList);
+/* ── Init ── */
+document.addEventListener('DOMContentLoaded', function() {
+  var si = document.getElementById('searchIcon');
+  if (si) si.innerHTML = icon('search');
+  document.getElementById('stratSearch').addEventListener('input', renderStrategyList);
   document.getElementById('typeFilter').addEventListener('change', renderStrategyList);
   document.getElementById('statusFilter').addEventListener('change', renderStrategyList);
-  renderTemplates();
-  currentStrategyId = 1;
+  currentId = 1;
   renderStrategyList();
-  renderStrategyDetail(currentStrategyId);
-  updateCodeFullscreenButton();
+  renderTemplates();
 });
-
-document.addEventListener('keydown', (event) => {
-  if (event.key === 'Escape' && codeFullscreen) {
-    exitCodeFullscreen();
-  }
-});
+document.addEventListener('keydown', function(e) { if(e.key==='Escape'&&codeFullscreen) exitCodeFullscreen(); });
 </script>
 </body>
 </html>

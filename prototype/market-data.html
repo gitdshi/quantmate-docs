@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>QuantMate - Market Data</title>
+  <title>QuantMate — Market Data</title>
   <link rel="stylesheet" href="shared.css">
   <script src="https://cdn.tailwindcss.com?v=3.4"></script>
 </head>
@@ -11,203 +11,519 @@
   <aside class="sidebar" id="sidebar"></aside>
   <main class="main-content" id="main">
 
+    <!-- Header -->
     <div class="page-header">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
-        <div>
-          <h1 class="page-title">Market data</h1>
-          <p class="page-subtitle">Real-time Market Quotes · Data Synchronization Management · Multidimensional Market Analysis</p>
-        </div>
-        <div style="display:flex;gap:8px">
-          <button class="btn btn-secondary" onclick="activateTab('md','sync');showToast('Switched to data sync','info')">Data synchronization</button>
-          <button class="btn btn-secondary" onclick="showToast('Data has been exported to CSV file', 'success')">Export Data</button>
-        </div>
+      <div>
+        <h1 class="page-title">Market Data</h1>
+        <p class="page-subtitle">View real-time market data and technical indicators</p>
       </div>
     </div>
 
+    <!-- Tabs -->
     <div class="tabs" data-group="md">
-      <button class="tab-btn active" data-tab="quotes">Real-time market quotes</button>
-      <button class="tab-btn" data-tab="kline">K-line chart</button>
-      <button class="tab-btn" data-tab="sync">Data synchronization</button>
-      <button class="tab-btn" data-tab="calendar">Financial Calendar</button>
-      <button class="tab-btn" data-tab="sentiment">Market sentiment</button>
+      <button class="tab-btn active" data-tab="quotes">${icon('list')} Realtime Quotes</button>
+      <button class="tab-btn" data-tab="kline">${icon('activity')} K-Line Chart</button>
+      <button class="tab-btn" data-tab="sync">${icon('refresh-cw')} Data Sync</button>
+      <button class="tab-btn" data-tab="calendar">${icon('calendar')} Economic Calendar</button>
+      <button class="tab-btn" data-tab="sentiment">${icon('gauge')} Market Sentiment</button>
     </div>
 
-    <!-- Tab: Real-time Quotes -->
+    <!-- ============================================================ -->
+    <!-- Tab: Realtime Quotes                                         -->
+    <!-- ============================================================ -->
     <div class="tab-panel active" data-group="md" data-panel="quotes">
-      <div class="filter-bar">
-        <input type="text" class="form-input" placeholder="🔍 Code/Name..." style="max-width:220px">
-        <select class="form-select" style="max-width:140px"><option>All industries</option><option>Baijiu</option><option>Bank</option><option>insurance</option><option>Photovoltaic</option><option>Security</option><option>Electricity</option></select>
-        <select class="form-select" style="max-width:120px"><option>Increase ranking</option><option>Decline Ranking</option><option>Trading volume</option></select>
-        <span class="text-muted" style="font-size:12px;margin-left:auto">Data source: Tushare · Delay < 3s</span>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Code</th><th>Name</th><th>Industry</th><th>Latest Price</th><th>Price fluctuation range</th><th>Trading Volume (Ten Thousand)</th><th>Transaction Amount (Billion)</th><th>Turnover rate</th><th>Operation</th></tr></thead>
-          <tbody id="quoteTable"></tbody>
-        </table>
-      </div>
-    </div>
 
-    <!-- Tab: K-Line Chart -->
-    <div class="tab-panel" data-group="md" data-panel="kline">
-      <div class="card">
-        <div class="card-header">
-          <div style="display:flex;align-items:center;gap:12px">
-            <select class="form-select" style="max-width:180px">
-              <option>600519.SH Kweichow Moutai</option>
-              <option>000858.SZ Wuliangye</option>
-              <option>601318.SH Ping An of China</option>
-            </select>
-            <div class="tabs" data-group="kp" style="border:none">
-              <button class="tab-btn active" data-tab="d">Daily K</button>
-              <button class="tab-btn" data-tab="w">Weekly K</button>
-              <button class="tab-btn" data-tab="m">Monthly K</button>
-              <button class="tab-btn" data-tab="m5">5 minutes</button>
-              <button class="tab-btn" data-tab="m15">15 minutes</button>
-            </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <h3 style="font-weight:600;font-size:1.1rem">Realtime Market Overview</h3>
+        <button class="btn btn-secondary btn-sm" onclick="showToast('Quotes refreshed','success')">${icon('refresh-cw')} Refresh</button>
+      </div>
+
+      <div class="stat-grid cols-4">
+        <!-- A-Share Index -->
+        <div class="stat-card">
+          <div class="stat-label">A-Share Index (000300.SH)</div>
+          <div class="stat-value text-success" style="font-size:1.4rem">3,842.56</div>
+          <div style="display:flex;gap:8px;font-size:13px;margin-top:4px">
+            <span class="text-success">+28.35</span>
+            <span class="text-success">+0.74%</span>
           </div>
-          <div style="display:flex;gap:8px">
-            <button class="btn btn-ghost btn-sm" onclick="this.classList.toggle('active'); showToast('MA indicator has been toggled', 'info')">MA</button>
-            <button class="btn btn-ghost btn-sm" onclick="this.classList.toggle('active');showToast('MACD indicator has been toggled','info')">MACD</button>
-            <button class="btn btn-ghost btn-sm" onclick="this.classList.toggle('active'); showToast('KDJ indicator has been toggled', 'info')">KDJ</button>
-            <button class="btn btn-ghost btn-sm" onclick="this.classList.toggle('active'); showToast('VOL indicator has been toggled','info')">VOL</button>
+          <div style="display:flex;gap:12px;font-size:12px;color:hsl(var(--muted-foreground));margin-top:6px">
+            <span>H 3,858.12</span>
+            <span>L 3,820.44</span>
+            <span>Vol 285.6B</span>
           </div>
         </div>
-        <div class="chart-placeholder" style="height:360px">
+        <!-- HK Market -->
+        <div class="stat-card">
+          <div class="stat-label">HK Market (00700)</div>
+          <div class="stat-value text-destructive" style="font-size:1.4rem">368.20</div>
+          <div style="display:flex;gap:8px;font-size:13px;margin-top:4px">
+            <span class="text-destructive">-4.80</span>
+            <span class="text-destructive">-1.29%</span>
+          </div>
+          <div style="display:flex;gap:12px;font-size:12px;color:hsl(var(--muted-foreground));margin-top:6px">
+            <span>H 375.00</span>
+            <span>L 366.60</span>
+            <span>Vol 18.2M</span>
+          </div>
+        </div>
+        <!-- US Market -->
+        <div class="stat-card">
+          <div class="stat-label">US Market (AAPL)</div>
+          <div class="stat-value text-success" style="font-size:1.4rem">185.60</div>
+          <div style="display:flex;gap:8px;font-size:13px;margin-top:4px">
+            <span class="text-success">+2.35</span>
+            <span class="text-success">+1.28%</span>
+          </div>
+          <div style="display:flex;gap:12px;font-size:12px;color:hsl(var(--muted-foreground));margin-top:6px">
+            <span>H 186.40</span>
+            <span>L 182.90</span>
+            <span>Vol 52.8M</span>
+          </div>
+        </div>
+        <!-- Crypto -->
+        <div class="stat-card">
+          <div class="stat-label">Crypto (BTCUSDT)</div>
+          <div class="stat-value text-success" style="font-size:1.4rem">67,842.50</div>
+          <div style="display:flex;gap:8px;font-size:13px;margin-top:4px">
+            <span class="text-success">+1,250.30</span>
+            <span class="text-success">+1.88%</span>
+          </div>
+          <div style="display:flex;gap:12px;font-size:12px;color:hsl(var(--muted-foreground));margin-top:6px">
+            <span>H 68,200.00</span>
+            <span>L 66,100.00</span>
+            <span>Vol 32.1B</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- Tab: K-Line Chart                                            -->
+    <!-- ============================================================ -->
+    <div class="tab-panel" data-group="md" data-panel="kline">
+
+      <!-- Market selector + symbol input + range -->
+      <div class="filter-bar" style="flex-wrap:wrap;gap:8px;margin-bottom:16px">
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-primary btn-sm" id="mktCN" onclick="selectMarket('CN')">CN</button>
+          <button class="btn btn-secondary btn-sm" id="mktHK" onclick="selectMarket('HK')">HK</button>
+          <button class="btn btn-secondary btn-sm" id="mktUS" onclick="selectMarket('US')">US</button>
+          <button class="btn btn-secondary btn-sm" id="mktCrypto" onclick="selectMarket('Crypto')">Crypto</button>
+        </div>
+        <input type="text" class="form-input" placeholder="Enter symbol..." value="000300.SH" style="max-width:180px">
+        <div style="display:flex;gap:4px;margin-left:auto">
+          <button class="btn btn-ghost btn-sm" onclick="showToast('Range: 1Y','info')">1Y</button>
+          <button class="btn btn-ghost btn-sm" onclick="showToast('Range: 2Y','info')">2Y</button>
+          <button class="btn btn-ghost btn-sm active" onclick="showToast('Range: 5Y','info')">5Y</button>
+          <button class="btn btn-ghost btn-sm" onclick="showToast('Range: 10Y','info')">10Y</button>
+        </div>
+      </div>
+
+      <!-- Stat cards -->
+      <div class="stat-grid cols-5" style="margin-bottom:16px">
+        <div class="stat-card">
+          <div class="stat-label">Last Price</div>
+          <div class="stat-value">3,842.56</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Change%</div>
+          <div class="stat-value text-success">+0.74%</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">High</div>
+          <div class="stat-value">3,858.12</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Low</div>
+          <div class="stat-value">3,820.44</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Volume</div>
+          <div class="stat-value">285.6B</div>
+        </div>
+      </div>
+
+      <!-- Overlay checkboxes -->
+      <div style="display:flex;gap:16px;margin-bottom:12px;font-size:14px">
+        <label style="display:flex;align-items:center;gap:4px;cursor:pointer">
+          <input type="checkbox" checked onchange="showToast('Moving Averages toggled','info')"> Moving Averages
+        </label>
+        <label style="display:flex;align-items:center;gap:4px;cursor:pointer">
+          <input type="checkbox" checked onchange="showToast('Volume toggled','info')"> Volume
+        </label>
+      </div>
+
+      <!-- Chart -->
+      <div class="card">
+        <div class="chart-placeholder" style="height:400px">
           <canvas id="klineCanvas"></canvas>
         </div>
-        <div class="chart-placeholder" style="height:100px;margin-top:4px;border-top:1px solid var(--border)">
-          <div style="padding:8px;text-align:center;color:var(--muted-foreground);font-size:12px">Trading Volume Histogram</div>
-        </div>
       </div>
+
     </div>
 
-    <!-- Tab: Data Sync -->
+    <!-- ============================================================ -->
+    <!-- Tab: Data Sync                                               -->
+    <!-- ============================================================ -->
     <div class="tab-panel" data-group="md" data-panel="sync">
-      <div class="stat-grid cols-4">
-        <div class="stat-card"><div class="stat-label">Sync Status</div><div class="stat-value"><span class="status-dot online"></span> Normal</div></div>
-        <div class="stat-card"><div class="stat-label">Last sync</div><div class="stat-value" style="font-size:18px">14:30:02</div></div>
-        <div class="stat-card"><div class="stat-label">Total Number of Shares</div><div class="stat-value">5,128</div></div>
-        <div class="stat-card"><div class="stat-label">Data Coverage</div><div class="stat-value">2010 ~ Present</div></div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div>
+          <h3 style="font-weight:600;font-size:1.1rem">Data Sync Status</h3>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-secondary btn-sm" onclick="showToast('Sync status refreshed','success')">${icon('refresh-cw')} Refresh</button>
+          <button class="btn btn-primary btn-sm" onclick="showToast('Manual sync triggered','success')">Trigger Manual Sync</button>
+        </div>
       </div>
 
+      <!-- Summary stats -->
+      <div class="stat-grid cols-5" style="margin-bottom:16px">
+        <div class="stat-card">
+          <div class="stat-label">Latest Sync Date</div>
+          <div class="stat-value" style="font-size:1rem">2026-03-26</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Success</div>
+          <div class="stat-value text-success">12</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Error</div>
+          <div class="stat-value text-destructive">1</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Pending</div>
+          <div class="stat-value text-warning">2</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Running</div>
+          <div class="stat-value" style="color:hsl(var(--primary))">1</div>
+        </div>
+      </div>
+
+      <!-- Sync table -->
       <div class="card">
-        <div class="card-header"><h3 class="card-title">Sync Task</h3><button class="btn btn-primary btn-sm" onclick="showToast('Task creation feature (prototype demonstration)','info')">Create Task</button></div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Task Name</th><th>Type</th><th>Frequency</th><th>Run last</th><th>State</th><th>Number of records</th><th>Operation</th></tr></thead>
+            <thead>
+              <tr>
+                <th>Source</th>
+                <th>Interface</th>
+                <th>Status</th>
+                <th>Rows</th>
+                <th>Retries</th>
+                <th>Finished</th>
+                <th>Error Message</th>
+              </tr>
+            </thead>
             <tbody>
-              <tr><td>Daily data</td><td>daily</td><td>Every day at 16:30</td><td>2026-03-14 16:30</td><td><span class="badge badge-success">Success</span></td><td>5,128</td><td><button class="btn btn-ghost btn-sm" onclick="showToast('The daily synchronization task has been started','success'")">Run</button><button class="btn btn-ghost btn-sm" onclick="showToast('Log: Last sync 5,128 records, took 42s','info')">Log</button></td></tr>
-              <tr><td>Minute data</td><td>minute</td><td>Every 5 minutes</td><td>2026-03-14 14:30</td><td><span class="badge badge-success">Success</span></td><td>12,560</td><td><button class="btn btn-ghost btn-sm" onclick="showToast('Minute-level synchronization task has started','success'")">Run</button><button class="btn btn-ghost btn-sm" onclick="showToast('Log: Last sync 12,560 records','info')">Log</button></td></tr>
-              <tr><td>Fundamental data</td><td>fundamental</td><td>Every Monday</td><td>2026-03-10 08:00</td><td><span class="badge badge-success">Success</span></td><td>5,128</td><td><button class="btn btn-ghost btn-sm" onclick="showToast('The fundamental synchronization task has been started','success'")">Run</button><button class="btn btn-ghost btn-sm" onclick="showToast('Log: Data complete, 5,128 entries','info')">Log</button></td></tr>
-              <tr><td>Financial data</td><td>financial</td><td>After the quarterly report is released</td><td>2026-01-31 20:00</td><td><span class="badge badge-warning">Part</span></td><td>4,850</td><td><button class="btn btn-ghost btn-sm" onclick="showToast('The financial synchronization task has been started','success'")">Run</button><button class="btn btn-ghost btn-sm" onclick="showToast('Log: Some data missing, 278 items not retrieved','warning')">Log</button></td></tr>
+              <tr>
+                <td>tushare</td>
+                <td>daily_quotes</td>
+                <td><span class="badge badge-success">Success</span></td>
+                <td>5,128</td>
+                <td>0</td>
+                <td>2026-03-26 16:32</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td>tushare</td>
+                <td>adj_factor</td>
+                <td><span class="badge badge-success">Success</span></td>
+                <td>5,128</td>
+                <td>0</td>
+                <td>2026-03-26 16:33</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td>tushare</td>
+                <td>income_statement</td>
+                <td><span class="badge badge-success">Success</span></td>
+                <td>4,850</td>
+                <td>0</td>
+                <td>2026-03-26 16:35</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td>tushare</td>
+                <td>balance_sheet</td>
+                <td><span class="badge badge-success">Success</span></td>
+                <td>4,850</td>
+                <td>0</td>
+                <td>2026-03-26 16:36</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td>akshare</td>
+                <td>macro_china</td>
+                <td><span class="badge badge-success">Success</span></td>
+                <td>320</td>
+                <td>0</td>
+                <td>2026-03-26 16:30</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td>akshare</td>
+                <td>stock_zh_a_spot</td>
+                <td><span class="badge badge-success">Success</span></td>
+                <td>5,128</td>
+                <td>0</td>
+                <td>2026-03-26 16:31</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td>akshare</td>
+                <td>crypto_hist</td>
+                <td><span class="badge badge-primary">Running</span></td>
+                <td>—</td>
+                <td>0</td>
+                <td>—</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td>vnpy</td>
+                <td>bar_1min</td>
+                <td><span class="badge badge-success">Success</span></td>
+                <td>128,560</td>
+                <td>0</td>
+                <td>2026-03-26 16:40</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td>vnpy</td>
+                <td>bar_1d</td>
+                <td><span class="badge badge-success">Success</span></td>
+                <td>12,560</td>
+                <td>0</td>
+                <td>2026-03-26 16:38</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td>vnpy</td>
+                <td>tick_data</td>
+                <td><span class="badge badge-warning">Pending</span></td>
+                <td>—</td>
+                <td>0</td>
+                <td>—</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td>qlib</td>
+                <td>cn_data</td>
+                <td><span class="badge badge-success">Success</span></td>
+                <td>5,128</td>
+                <td>0</td>
+                <td>2026-03-26 16:42</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td>qlib</td>
+                <td>features</td>
+                <td><span class="badge badge-success">Success</span></td>
+                <td>42,800</td>
+                <td>0</td>
+                <td>2026-03-26 16:45</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td>tushare</td>
+                <td>hk_daily</td>
+                <td><span class="badge badge-destructive">Error</span></td>
+                <td>0</td>
+                <td>3</td>
+                <td>2026-03-26 16:34</td>
+                <td>API rate limit exceeded, retry after 60s</td>
+              </tr>
+              <tr>
+                <td>akshare</td>
+                <td>us_stock_daily</td>
+                <td><span class="badge badge-success">Success</span></td>
+                <td>3,200</td>
+                <td>1</td>
+                <td>2026-03-26 16:37</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td>vnpy</td>
+                <td>option_data</td>
+                <td><span class="badge badge-warning">Pending</span></td>
+                <td>—</td>
+                <td>0</td>
+                <td>—</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td>tushare</td>
+                <td>fund_nav</td>
+                <td><span class="badge badge-success">Success</span></td>
+                <td>8,640</td>
+                <td>0</td>
+                <td>2026-03-26 16:39</td>
+                <td>—</td>
+              </tr>
             </tbody>
           </table>
         </div>
       </div>
 
-      <!-- Progress bar -->
-      <div class="card">
-        <div class="card-header"><h3 class="card-title">Current Synchronization Progress</h3><span class="badge badge-success">Free</span></div>
-        <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div>
-        <p class="text-muted" style="font-size:12px;margin-top:4px">Last sync took 2 minutes 18 seconds · Next scheduled at 16:30</p>
-      </div>
     </div>
 
-    <!-- Tab: Calendar -->
+    <!-- ============================================================ -->
+    <!-- Tab: Economic Calendar                                       -->
+    <!-- ============================================================ -->
     <div class="tab-panel" data-group="md" data-panel="calendar">
-      <div class="card">
-        <div class="card-header"><h3 class="card-title">Financial Calendar - March 2026</h3>
-          <div style="display:flex;gap:8px">
-            <button class="btn btn-ghost btn-sm" onclick="showToast('Switched to last month','info')">← Previous Month</button>
-            <button class="btn btn-ghost btn-sm" onclick="showToast('Switched to next month','info')">Next month →</button>
-          </div>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px">
-          <div class="card" style="border-left:3px solid var(--warning)">
-            <div style="font-size:12px;color:var(--muted-foreground)">Friday, March 15</div>
-            <div style="font-weight:600;margin-top:4px">Federal Reserve Interest Rate Decision</div>
-            <span class="badge badge-warning">Important</span>
-          </div>
-          <div class="card" style="border-left:3px solid var(--primary)">
-            <div style="font-size:12px;color:var(--muted-foreground)">Monday, March 17</div>
-            <div style="font-weight:600;margin-top:4px">China LPR Announcement</div>
-            <span class="badge badge-primary">general</span>
-          </div>
-          <div class="card" style="border-left:3px solid var(--destructive)">
-            <div style="font-size:12px;color:var(--muted-foreground)">Thursday, March 20</div>
-            <div style="font-weight:600;margin-top:4px">A-share options expiration date</div>
-            <span class="badge badge-destructive">High impact</span>
-          </div>
-          <div class="card" style="border-left:3px solid var(--primary)">
-            <div style="font-size:12px;color:var(--muted-foreground)">Tuesday, March 25</div>
-            <div style="font-weight:600;margin-top:4px">PMI data release</div>
-            <span class="badge badge-primary">general</span>
-          </div>
-          <div class="card" style="border-left:3px solid var(--warning)">
-            <div style="font-size:12px;color:var(--muted-foreground)">Monday, March 31</div>
-            <div style="font-weight:600;margin-top:4px">End-of-quarter settlement date</div>
-            <span class="badge badge-warning">Important</span>
-          </div>
+
+      <!-- Trade day badges -->
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px">
+        <span class="badge badge-primary">2026-03-23 Mon</span>
+        <span class="badge badge-primary">2026-03-24 Tue</span>
+        <span class="badge badge-primary">2026-03-25 Wed</span>
+        <span class="badge badge-primary">2026-03-26 Thu</span>
+        <span class="badge badge-primary">2026-03-27 Fri</span>
+        <span class="badge badge-muted">2026-03-28 Sat</span>
+        <span class="badge badge-muted">2026-03-29 Sun</span>
+        <span class="badge badge-primary">2026-03-30 Mon</span>
+        <span class="badge badge-primary">2026-03-31 Tue</span>
+      </div>
+
+      <!-- Macro Calendar -->
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header"><h3 class="card-title">Macro Calendar</h3></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Date</th><th>Country</th><th>Event</th></tr></thead>
+            <tbody>
+              <tr><td>2026-03-26</td><td>US</td><td>Initial Jobless Claims</td></tr>
+              <tr><td>2026-03-26</td><td>US</td><td>GDP Q4 Final</td></tr>
+              <tr><td>2026-03-27</td><td>US</td><td>Core PCE Price Index</td></tr>
+              <tr><td>2026-03-27</td><td>CN</td><td>Industrial Profits YoY</td></tr>
+              <tr><td>2026-03-31</td><td>CN</td><td>Manufacturing PMI</td></tr>
+              <tr><td>2026-03-31</td><td>EU</td><td>CPI Flash Estimate YoY</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
+
+      <!-- IPO Calendar -->
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header"><h3 class="card-title">IPO Calendar</h3></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Date</th><th>Symbol</th><th>Name</th><th>Price</th></tr></thead>
+            <tbody>
+              <tr><td>2026-03-27</td><td>301680.SZ</td><td>GreenTech Solar</td><td>¥28.50</td></tr>
+              <tr><td>2026-03-28</td><td>688520.SH</td><td>ChipMaster Semi</td><td>¥52.80</td></tr>
+              <tr><td>2026-03-31</td><td>301692.SZ</td><td>AI Vision Tech</td><td>¥36.20</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Dividend Calendar -->
+      <div class="card">
+        <div class="card-header"><h3 class="card-title">Dividend Calendar</h3></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Date</th><th>Symbol</th><th>Name</th><th>Detail</th></tr></thead>
+            <tbody>
+              <tr><td>2026-03-27</td><td>601318.SH</td><td>Ping An Insurance</td><td>¥1.50 per share</td></tr>
+              <tr><td>2026-03-28</td><td>600036.SH</td><td>China Merchants Bank</td><td>¥1.82 per share</td></tr>
+              <tr><td>2026-03-31</td><td>000858.SZ</td><td>Wuliangye</td><td>¥3.60 per share + 2:10 bonus</td></tr>
+              <tr><td>2026-03-31</td><td>600519.SH</td><td>Kweichow Moutai</td><td>¥27.52 per share</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
     </div>
 
-    <!-- Tab: Sentiment -->
+    <!-- ============================================================ -->
+    <!-- Tab: Market Sentiment                                        -->
+    <!-- ============================================================ -->
     <div class="tab-panel" data-group="md" data-panel="sentiment">
-      <div class="stat-grid cols-3">
-        <div class="stat-card">
-          <div class="stat-label">Market Sentiment Index</div>
-          <div class="gauge-container">
-            <div style="width:120px;height:60px;border-radius:120px 120px 0 0;background:conic-gradient(from 180deg,var(--destructive) 0deg,var(--warning) 90deg,var(--success) 180deg);position:relative;overflow:hidden">
-              <div style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:80px;height:40px;background:var(--card);border-radius:80px 80px 0 0"></div>
-            </div>
-            <div style="font-size:24px;font-weight:700;margin-top:4px">68</div>
-            <div class="text-muted" style="font-size:12px">Slightly over · Greedy zone</div>
+
+      <!-- Fear & Greed Gauge -->
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header"><h3 class="card-title">Fear &amp; Greed Index</h3></div>
+        <div style="display:flex;flex-direction:column;align-items:center;padding:24px 0">
+          <div style="font-size:48px;font-weight:700;color:hsl(var(--foreground))">68</div>
+          <div style="font-size:14px;color:hsl(var(--muted-foreground));margin-bottom:12px">Greed</div>
+          <div style="width:320px;height:16px;border-radius:8px;background:linear-gradient(to right,#ef4444,#f59e0b,#22c55e);position:relative">
+            <div style="position:absolute;top:-4px;left:68%;transform:translateX(-50%);width:4px;height:24px;background:hsl(var(--foreground));border-radius:2px"></div>
           </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Number of daily limit-up stocks</div>
-          <div class="stat-value text-success">85</div>
-          <div class="text-muted" style="font-size:12px">Limit down 12</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Total turnover of the two markets</div>
-          <div class="stat-value">1.28 trillion</div>
-          <div class="text-muted" style="font-size:12px">8.5% compared to yesterday</div>
+          <div style="display:flex;justify-content:space-between;width:320px;margin-top:4px;font-size:11px;color:hsl(var(--muted-foreground))">
+            <span>Extreme Fear (0)</span>
+            <span>Neutral (50)</span>
+            <span>Extreme Greed (100)</span>
+          </div>
         </div>
       </div>
 
-      <div class="grid-2">
-        <div class="card">
-          <div class="card-header"><h3 class="card-title">Industry Heat Map</h3></div>
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px">
-            <div class="heatmap-cell positive" style="padding:12px;text-align:center"><b>Baijiu</b><br><span style="font-size:12px">+3.2%</span></div>
-            <div class="heatmap-cell positive" style="padding:12px;text-align:center"><b>AI</b><br><span style="font-size:12px">+2.8%</span></div>
-            <div class="heatmap-cell positive" style="padding:12px;text-align:center"><b>New Energy</b><br><span style="font-size:12px">+1.5%</span></div>
-            <div class="heatmap-cell negative" style="padding:12px;text-align:center"><b>Bank</b><br><span style=""font-size:12px">-0.3%</span></div>
-            <div class="heatmap-cell positive" style="padding:12px;text-align:center"><b>Semiconductor</b><br><span style="font-size:12px">+2.1%</span></div>
-            <div class="heatmap-cell negative" style="padding:12px;text-align:center"><b>Real Estate</b><br><span style="font-size:12px">-1.8%</span></div>
-            <div class="heatmap-cell positive" style="padding:12px;text-align:center"><b>Medicine</b><br><span style="font-size:12px">+0.8%</span></div>
-            <div class="heatmap-cell neutral" style="padding:12px;text-align:center"><b>Steel</b><br><span style="font-size:12px">+0.1%</span></div>
+      <!-- Sentiment metrics -->
+      <div class="stat-grid cols-3">
+
+        <!-- Advance / Decline -->
+        <div class="stat-card">
+          <div class="stat-label">Advance / Decline</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
+            <span class="text-success" style="font-weight:700;font-size:1.2rem">2,856</span>
+            <span style="color:hsl(var(--muted-foreground))">vs</span>
+            <span class="text-destructive" style="font-weight:700;font-size:1.2rem">1,942</span>
+          </div>
+          <div style="display:flex;height:8px;border-radius:4px;overflow:hidden;margin-top:8px">
+            <div style="width:59.5%;background:#22c55e"></div>
+            <div style="width:40.5%;background:#ef4444"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:hsl(var(--muted-foreground));margin-top:4px">
+            <span>Advancers 59.5%</span>
+            <span>Decliners 40.5%</span>
           </div>
         </div>
-        <div class="card">
-          <div class="card-header"><h3 class="card-title">Capital flow</h3></div>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>Industry</th><th>Net Inflow (100 million)</th><th>5-day net inflow</th></tr></thead>
-              <tbody>
-                <tr><td>Baijiu</td><td class="text-success">+28.5</td><td class="text-success">+65.2</td></tr>
-                <tr><td>AI Concept</td><td class="text-success">+22.1</td><td class="text-success">+48.7</td></tr>
-                <tr><td>Semiconductor</td><td class="text-success">+15.3</td><td class="text-success">+31.0</td></tr>
-                <tr><td>Bank</td><td class="text-destructive">-8.2</td><td class="text-destructive">-12.5</td></tr>
-                <tr><td>real estate</td><td class="text-destructive">-18.6</td><td class="text-destructive">-45.8</td></tr>
-              </tbody>
-            </table>
+
+        <!-- Volume Trend -->
+        <div class="stat-card">
+          <div class="stat-label">Volume Trend</div>
+          <div class="stat-value" style="font-size:1.4rem">1.28T</div>
+          <div style="font-size:13px;margin-top:4px">
+            <span class="text-success">+8.5% vs yesterday</span>
+          </div>
+          <div style="display:flex;align-items:flex-end;gap:3px;height:40px;margin-top:8px">
+            <div style="width:14%;height:55%;background:hsl(var(--primary));border-radius:2px 2px 0 0;opacity:0.5"></div>
+            <div style="width:14%;height:65%;background:hsl(var(--primary));border-radius:2px 2px 0 0;opacity:0.6"></div>
+            <div style="width:14%;height:50%;background:hsl(var(--primary));border-radius:2px 2px 0 0;opacity:0.5"></div>
+            <div style="width:14%;height:75%;background:hsl(var(--primary));border-radius:2px 2px 0 0;opacity:0.7"></div>
+            <div style="width:14%;height:85%;background:hsl(var(--primary));border-radius:2px 2px 0 0;opacity:0.8"></div>
+            <div style="width:14%;height:100%;background:hsl(var(--primary));border-radius:2px 2px 0 0"></div>
           </div>
         </div>
+
+        <!-- Index Momentum -->
+        <div class="stat-card">
+          <div class="stat-label">Index Momentum</div>
+          <div style="margin-top:8px">
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
+              <span>CSI 300</span>
+              <span class="text-success">+0.74%</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
+              <span>SSE 50</span>
+              <span class="text-success">+0.52%</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
+              <span>ChiNext</span>
+              <span class="text-success">+1.18%</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:13px">
+              <span>STAR 50</span>
+              <span class="text-destructive">-0.35%</span>
+            </div>
+          </div>
+        </div>
+
       </div>
+
     </div>
 
   </main>
@@ -215,74 +531,56 @@
 
 <script src="shared.js"></script>
 <script>
-const quoteBody = document.getElementById('quoteTable');
-MOCK.stocks.forEach(s => {
-  const vol = (Math.random()*5000+500).toFixed(0);
-  const amt = (Math.random()*50+5).toFixed(1);
-  const turn = (Math.random()*5+0.5).toFixed(2);
-  quoteBody.innerHTML += `<tr>
-    <td class="font-mono">${s.code}</td><td>${s.name}</td><td>${s.industry}</td>
-    <td style="font-weight:600">¥${s.price.toFixed(2)}</td>
-    <td class="${pnlColor(s.change)}" style="font-weight:600">${pnlSign(s.change)}${s.change.toFixed(2)}%</td>
-    <td>${Number(vol).toLocaleString()}</td><td>${amt}</td><td>${turn}%</td>
-    <td><button class="btn btn-ghost btn-sm" onclick="showToast('View ${s.name} details','info')>Details</button><button class="btn btn-ghost btn-sm" onclick="showToast("'${s.name} has been added to favorites','success'">Add Optional</button></td>
-  </tr>`;
-});
+/* --- Market selector --- */
+function selectMarket(mkt) {
+  var btns = ['CN','HK','US','Crypto'];
+  for (var i = 0; i < btns.length; i++) {
+    var el = document.getElementById('mkt' + btns[i]);
+    if (el) {
+      el.className = btns[i] === mkt ? 'btn btn-primary btn-sm' : 'btn btn-secondary btn-sm';
+    }
+  }
+  showToast('Switched to ' + mkt + ' market', 'info');
+}
 
-// Draw simple candlestick placeholder
+/* --- K-Line chart placeholder --- */
 function drawKline() {
-  const c = document.getElementById('klineCanvas');
+  var c = document.getElementById('klineCanvas');
   if (!c || !c.parentElement.offsetWidth) return;
-  const ctx = c.getContext('2d');
-  const W = c.parentElement.clientWidth, H = c.parentElement.clientHeight;
-  c.width = W; c.height = H;
-  const pad = 40;
-  const bars = 30;
-  const barW = (W - pad*2) / bars;
-  let prev = 1850;
-  for (let i = 0; i < bars; i++) {
-    const open = prev + (Math.random()-0.48)*20;
-    const close = open + (Math.random()-0.48)*25;
-    const high = Math.max(open,close) + Math.random()*10;
-    const low = Math.min(open,close) - Math.random()*10;
+  var ctx = c.getContext('2d');
+  var W = c.parentElement.clientWidth;
+  var H = c.parentElement.clientHeight;
+  c.width = W;
+  c.height = H;
+  var pad = 40;
+  var bars = 40;
+  var barW = (W - pad * 2) / bars;
+  var prev = 3840;
+  var minP = 3750;
+  var maxP = 3920;
+  for (var i = 0; i < bars; i++) {
+    var open = prev + (Math.random() - 0.48) * 20;
+    var close = open + (Math.random() - 0.48) * 25;
+    var high = Math.max(open, close) + Math.random() * 10;
+    var low = Math.min(open, close) - Math.random() * 10;
     prev = close;
-    const minP = 1800, maxP = 1920;
-    const x = pad + i*barW;
-    const yO = H - pad - ((open-minP)/(maxP-minP))*(H-pad*2);
-    const yC = H - pad - ((close-minP)/(maxP-minP))*(H-pad*2);
-    const yH = H - pad - ((high-minP)/(maxP-minP))*(H-pad*2);
-    const yL = H - pad - ((low-minP)/(maxP-minP))*(H-pad*2);
-    const color = close >= open ? '#ef4444' : '#10b981';
-    ctx.strokeStyle = color; ctx.fillStyle = color;
-    // wick
-    ctx.beginPath(); ctx.moveTo(x+barW/2, yH); ctx.lineTo(x+barW/2, yL); ctx.stroke();
-    // body
-    ctx.fillRect(x+2, Math.min(yO,yC), barW-4, Math.abs(yC-yO)||1);
+    var x = pad + i * barW;
+    var yO = H - pad - ((open - minP) / (maxP - minP)) * (H - pad * 2);
+    var yC = H - pad - ((close - minP) / (maxP - minP)) * (H - pad * 2);
+    var yH = H - pad - ((high - minP) / (maxP - minP)) * (H - pad * 2);
+    var yL = H - pad - ((low - minP) / (maxP - minP)) * (H - pad * 2);
+    var color = close >= open ? '#ef4444' : '#10b981';
+    ctx.strokeStyle = color;
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(x + barW / 2, yH);
+    ctx.lineTo(x + barW / 2, yL);
+    ctx.stroke();
+    ctx.fillRect(x + 2, Math.min(yO, yC), barW - 4, Math.abs(yC - yO) || 1);
   }
 }
 window.addEventListener('load', drawKline);
 window.addEventListener('resize', drawKline);
-
-// Quote filters
-(function(){
-  var search=document.querySelector('.filter-bar .form-input');
-  var selInd=document.querySelectorAll('.filter-bar .form-select')[0];
-  function filterQ(){
-    var q=(search?search.value:'').toLowerCase();
-    var ind=selInd?selInd.value:'';
-    document.getElementById('quoteTable').querySelectorAll('tr').forEach(function(row){
-      var code=row.cells[0].textContent.toLowerCase();
-      var name=row.cells[1].textContent.toLowerCase();
-      var industry=row.cells[2].textContent;
-      var show=true;
-      if(q&&code.indexOf(q)<0&&name.indexOf(q)<0)show=false;
-      if(ind&&ind!=='All industries'&&industry!==ind)show=false;
-      row.style.display=show?'':'none';
-    });
-  }
-  if(search) search.addEventListener('input',filterQ);
-  if(selInd) selInd.addEventListener('change',filterQ);
-})();
 </script>
 </body>
 </html>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>QuantMate - Report Review</title>
+  <title>QuantMate &mdash; Reports &amp; Review</title>
   <link rel="stylesheet" href="shared.css">
   <script src="https://cdn.tailwindcss.com?v=3.4"></script>
 </head>
@@ -11,48 +11,58 @@
   <aside class="sidebar" id="sidebar"></aside>
   <main class="main-content" id="main">
 
+    <!-- Header -->
     <div class="page-header">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
         <div>
-          <h1 class="page-title">Report Review</h1>
-          <p class="page-subtitle">Performance Report · Trade Review · Strategy Attribution Analysis</p>
+          <h1 class="page-title">Reports &amp; Review</h1>
+          <p class="page-subtitle">Performance reports, trade review, and attribution analysis</p>
         </div>
         <div style="display:flex;gap:8px">
-          <button class="btn btn-secondary" onclick="showToast('Report PDF exporting...','info')">Export PDF</button>
-          <button class="btn btn-primary" onclick="openModal('newReport')">Generate Report</button>
+          <button class="btn btn-secondary" onclick="showToast('Exporting report PDF&hellip;','info')">${icon('download')} Export PDF</button>
+          <button class="btn btn-primary" onclick="openModal('newReport')">${icon('plus')} Generate Report</button>
         </div>
       </div>
     </div>
 
+    <!-- Tabs -->
     <div class="tabs" data-group="rp">
-      <button class="tab-btn active" data-tab="perf">Performance Report</button>
-      <button class="tab-btn" data-tab="review">Trade Review</button>
-      <button class="tab-btn" data-tab="attribution">Attribution Analysis</button>
-      <button class="tab-btn" data-tab="list">Report List</button>
+      <button class="tab-btn active" data-tab="perf">${icon('trending-up')} Performance</button>
+      <button class="tab-btn" data-tab="review">${icon('file-text')} Trade Review</button>
+      <button class="tab-btn" data-tab="attribution">${icon('pie-chart')} Attribution</button>
+      <button class="tab-btn" data-tab="list">${icon('list')} Reports</button>
     </div>
 
     <!-- Tab: Performance -->
     <div class="tab-panel active" data-group="rp" data-panel="perf">
       <div class="card">
         <div class="card-header">
-          <h3 class="card-title">Performance Overview - March 2026</h3>
+          <h3 class="card-title">Performance Overview &mdash; March 2026</h3>
           <div style="display:flex;gap:8px">
-            <select class="form-select" style="max-width:120px"><option>March 2026</option><option>February 2026</option><option>January 2026</option></select>
-            <select class="form-select" style="max-width:120px"><option>All strategies</option><option>DualMA_Cross</option></select>
+            <select class="form-select" style="max-width:140px">
+              <option>March 2026</option>
+              <option>February 2026</option>
+              <option>January 2026</option>
+            </select>
+            <select class="form-select" style="max-width:140px">
+              <option>All Strategies</option>
+              <option>DualMA_Cross</option>
+              <option>RSI_Reversal</option>
+            </select>
           </div>
         </div>
       </div>
 
       <div class="stat-grid cols-4">
-        <div class="stat-card"><div class="stat-label">Monthly Rate of Return</div><div class="stat-value text-success">+8.42%</div></div>
+        <div class="stat-card"><div class="stat-label">Monthly Return</div><div class="stat-value text-success">+8.42%</div></div>
         <div class="stat-card"><div class="stat-label">Benchmark Return</div><div class="stat-value text-success">+3.15%</div></div>
         <div class="stat-card"><div class="stat-label">Excess Return</div><div class="stat-value text-success">+5.27%</div></div>
-        <div class="stat-card"><div class="stat-label">Maximum Drawdown</div><div class="stat-value text-destructive">-4.2%</div></div>
+        <div class="stat-card"><div class="stat-label">Max Drawdown</div><div class="stat-value text-destructive">-4.2%</div></div>
       </div>
 
       <div class="grid-2">
         <div class="card">
-          <div class="card-header"><h3 class="card-title">Daily Income Distribution</h3></div>
+          <div class="card-header"><h3 class="card-title">Daily Return Distribution</h3></div>
           <div class="chart-placeholder" style="height:200px">
             <div style="display:flex;align-items:flex-end;gap:3px;height:100%;padding:20px">
               <div style="flex:1;background:var(--success);height:45%;border-radius:2px 2px 0 0" title="+1.2%"></div>
@@ -69,11 +79,20 @@
           </div>
         </div>
         <div class="card">
-          <div class="card-header"><h3 class="card-title">Strategic Contribution</h3></div>
+          <div class="card-header"><h3 class="card-title">Strategy Contribution</h3></div>
           <div style="display:flex;flex-direction:column;gap:10px;padding-top:8px">
-            <div><div style="display:flex;justify-content:space-between;font-size:13px"><span>DualMA_Cross</span><span class="text-success">+4.8%</span></div><div class="progress-bar"><div class="progress-fill" style="width:57%;background:var(--primary)"></div></div></div>
-            <div><div style="display:flex;justify-content:space-between;font-size:13px"><span>RSI_Reversal</span><span class="text-success">+3.2%</span></div><div class="progress-bar"><div class="progress-fill" style="width:38%;background:var(--success)"></div></div></div>
-            <div><div style="display:flex;justify-content:space-between;font-size:13px"><span>MyAlpha01</span><span class="text-success">+0.42%</span></div><div class="progress-bar"><div class="progress-fill" style="width:5%;background:var(--warning)"></div></div></div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:13px"><span>DualMA_Cross</span><span class="text-success">+4.8%</span></div>
+              <div class="progress-bar"><div class="progress-fill" style="width:57%;background:var(--primary)"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:13px"><span>RSI_Reversal</span><span class="text-success">+3.2%</span></div>
+              <div class="progress-bar"><div class="progress-fill" style="width:38%;background:var(--success)"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:13px"><span>MyAlpha01</span><span class="text-success">+0.42%</span></div>
+              <div class="progress-bar"><div class="progress-fill" style="width:5%;background:var(--warning)"></div></div>
+            </div>
           </div>
         </div>
       </div>
@@ -82,45 +101,45 @@
     <!-- Tab: Trade Review -->
     <div class="tab-panel" data-group="rp" data-panel="review">
       <div class="card">
-        <div class="card-header"><h3 class="card-title">Trade Review - 2026-03-13</h3></div>
+        <div class="card-header"><h3 class="card-title">Trade Review &mdash; 2026-03-13</h3></div>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px">
-          <div class="stat-card"><div class="stat-label">Same-day trading</div><div class="stat-value">5</div></div>
-          <div class="stat-card"><div class="stat-label">Profitable Trade</div><div class="stat-value text-success">3</div></div>
-          <div class="stat-card"><div class="stat-label">Today's Profit and Loss</div><div class="stat-value text-success">+¥28,960</div></div>
+          <div class="stat-card"><div class="stat-label">Trades Today</div><div class="stat-value">5</div></div>
+          <div class="stat-card"><div class="stat-label">Winning Trades</div><div class="stat-value text-success">3</div></div>
+          <div class="stat-card"><div class="stat-label">Daily P&amp;L</div><div class="stat-value text-success">+$28,960</div></div>
         </div>
 
-        <h4 style="font-weight:600;margin:16px 0 8px">Transaction timeline</h4>
+        <h4 style="font-weight:600;margin:16px 0 8px">Trade Timeline</h4>
         <div style="display:flex;flex-direction:column;gap:12px;border-left:2px solid var(--border);padding-left:20px;margin-left:8px">
           <div style="position:relative">
             <div style="position:absolute;left:-27px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--success);border:2px solid var(--card)"></div>
             <div style="font-size:12px;color:var(--muted-foreground)">09:31:02</div>
-            <div>Buy <b>Guizhou Moutai</b> 100 shares @ ¥1,820.00</div>
-            <div class="text-muted" style="font-size:12px">Strategy: DualMA_Cross · Signal: Golden Cross</div>
+            <div>Buy <b>AAPL</b> 100 shares @ $182.00</div>
+            <div class="text-muted" style="font-size:12px">Strategy: DualMA_Cross &middot; Signal: Golden Cross</div>
           </div>
           <div style="position:relative">
             <div style="position:absolute;left:-27px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--success);border:2px solid var(--card)"></div>
             <div style="font-size:12px;color:var(--muted-foreground)">09:35:15</div>
-            <div>Buy <b>Wuliangye</b> 500 shares @ ¥148.50</div>
-            <div class="text-muted" style="font-size:12px">Strategy: RSI_Reversal · Signal: RSI Oversold Rebound</div>
+            <div>Buy <b>MSFT</b> 500 shares @ $415.50</div>
+            <div class="text-muted" style="font-size:12px">Strategy: RSI_Reversal &middot; Signal: RSI Oversold Rebound</div>
           </div>
           <div style="position:relative">
             <div style="position:absolute;left:-27px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--success);border:2px solid var(--card)"></div>
             <div style="font-size:12px;color:var(--muted-foreground)">10:02:30</div>
-            <div>Buy <b>LONGi Green Energy</b> 1000 shares @ ¥24.60</div>
-            <div class="text-muted" style="font-size:12px">Strategy: MyAlpha01 · Signal: Multi-factor score 85</div>
+            <div>Buy <b>NVDA</b> 200 shares @ $124.60</div>
+            <div class="text-muted" style="font-size:12px">Strategy: MyAlpha01 &middot; Signal: Multi-factor score 85</div>
           </div>
           <div style="position:relative">
             <div style="position:absolute;left:-27px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--warning);border:2px solid var(--card)"></div>
             <div style="font-size:12px;color:var(--muted-foreground)">14:25:00</div>
-            <div>Pending order to sell <b>Hikvision</b> 200 shares @ ¥35.00 <span class="badge badge-warning">Pending transaction</span></div>
+            <div>Limit sell <b>TSLA</b> 200 shares @ $175.00 <span class="badge badge-warning">Pending</span></div>
           </div>
         </div>
       </div>
 
       <div class="card">
         <div class="card-header"><h3 class="card-title">Review Notes</h3></div>
-        <textarea class="form-textarea" rows="4" placeholder="Record today's trading insights, strategy execution status, and areas that need improvement...">Today, the double moving average strategy performed well on Maotai, entering after the golden cross signal was confirmed, with a daily return of 2.35%. The RSI strategy also performed well on Wuliangye. Attention needs to be paid to the decline in LONGi Green Energy, considering whether a stop loss is necessary.</textarea>
-        <button class="btn btn-primary btn-sm" style="margin-top:8px" onclick="showToast('Review notes have been saved','success')">Save Note</button>
+        <textarea class="form-textarea" rows="4" placeholder="Record today&#39;s trading observations, strategy execution quality, and areas for improvement&hellip;">DualMA_Cross performed well on AAPL, entering after the golden cross signal was confirmed with a daily return of 2.35%. RSI_Reversal also captured a strong bounce on MSFT. Need to monitor the NVDA position &mdash; consider setting a stop-loss if momentum fades.</textarea>
+        <button class="btn btn-primary btn-sm" style="margin-top:8px" onclick="showToast('Review notes saved','success')">Save Note</button>
       </div>
     </div>
 
@@ -130,12 +149,12 @@
         <div class="card-header"><h3 class="card-title">Return Attribution Analysis</h3></div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Attribution item</th><th>Contribution</th><th>Proportion</th><th>Explanation</th></tr></thead>
+            <thead><tr><th>Component</th><th>Contribution</th><th>Weight</th><th>Description</th></tr></thead>
             <tbody>
-              <tr><td>Stock selection returns</td><td class="text-success">+5.8%</td><td>68.9%</td><td>Excess returns brought by individual stock selection</td></tr>
-              <tr><td>Timing return</td><td class="text-success">+1.2%</td><td>14.3%</td><td>Timing of Entry and Exit</td></tr>
-              <tr><td>Industry Allocation</td><td class="text-success">+0.8%</td><td>9.5%</td><td>Industry weight deviation from the benchmark</td></tr>
-              <tr><td>Interaction effect</td><td class="text-success">+0.62%</td><td>7.3%</td><td>Stock Selection and Market Timing Interaction</td></tr>
+              <tr><td>Stock Selection</td><td class="text-success">+5.80%</td><td>68.9%</td><td>Excess return from individual stock picks</td></tr>
+              <tr><td>Market Timing</td><td class="text-success">+1.20%</td><td>14.3%</td><td>Gains from entry/exit timing decisions</td></tr>
+              <tr><td>Sector Allocation</td><td class="text-success">+0.80%</td><td>9.5%</td><td>Sector weight deviation from benchmark</td></tr>
+              <tr><td>Interaction Effect</td><td class="text-success">+0.62%</td><td>7.3%</td><td>Combined selection and timing interaction</td></tr>
               <tr style="font-weight:700"><td>Total Excess Return</td><td class="text-success">+8.42%</td><td>100%</td><td></td></tr>
             </tbody>
           </table>
@@ -144,25 +163,31 @@
 
       <div class="grid-2">
         <div class="card">
-          <div class="card-header"><h3 class="card-title">Alpha decay</h3></div>
+          <div class="card-header"><h3 class="card-title">Alpha Decomposition</h3></div>
           <div style="display:flex;align-items:center;gap:16px;padding:16px 0">
-            <div style="text-align:center"><div style="font-size:36px;font-weight:700;color:var(--success)">α = 5.27%</div><div class="text-muted">Annualized Excess Return</div></div>
+            <div style="text-align:center"><div style="font-size:36px;font-weight:700;color:var(--success)">&alpha; = 5.27%</div><div class="text-muted">Annualized Excess Return</div></div>
           </div>
           <div style="display:flex;flex-direction:column;gap:8px">
-            <div><div style="display:flex;justify-content:space-between;font-size:13px"<span>> factor alpha</span> <span>3.1%</span></div> < Divklaas ="progress-bar"><div class="progress-fill" style="width:59%;background:var(--primary)"></div></div></div>
-            <div><div style="display:flex;justify-content:space-between;font-size:13px"<span>> Residual Alpha</span><span> 2.17%</span></div><div class="progress-bar"><div class="progress-fill" style="width:41%;background:var(--success)"></div></div></div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:13px"><span>Factor Alpha</span><span>3.10%</span></div>
+              <div class="progress-bar"><div class="progress-fill" style="width:59%;background:var(--primary)"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:13px"><span>Residual Alpha</span><span>2.17%</span></div>
+              <div class="progress-bar"><div class="progress-fill" style="width:41%;background:var(--success)"></div></div>
+            </div>
           </div>
         </div>
         <div class="card">
           <div class="card-header"><h3 class="card-title">Risk Attribution</h3></div>
           <div class="table-wrap">
             <table>
-              <thead><tr><th>Risk factor</th><th>Contribution rate</th><th>Direction</th></tr></thead>
+              <thead><tr><th>Risk Factor</th><th>Contribution</th><th>Category</th></tr></thead>
               <tbody>
                 <tr><td>Market Risk</td><td>52.3%</td><td><span class="badge badge-muted">Systematic</span></td></tr>
-                <tr><td>Industry Risk</td><td>18.5%</td><td><span class="badge badge-warning">concentrate</span></td></tr>
-                <tr><td>Individual stock risk</td><td>22.1%</td><td><span class="badge badge-primary">peculiar</span></td></tr>
-                <tr><td>Liquidity risk</td><td>7.1%</td><td><span class="badge badge-success">Low</span></td></tr>
+                <tr><td>Sector Risk</td><td>18.5%</td><td><span class="badge badge-warning">Concentrated</span></td></tr>
+                <tr><td>Idiosyncratic Risk</td><td>22.1%</td><td><span class="badge badge-primary">Stock-Specific</span></td></tr>
+                <tr><td>Liquidity Risk</td><td>7.1%</td><td><span class="badge badge-success">Low</span></td></tr>
               </tbody>
             </table>
           </div>
@@ -170,16 +195,37 @@
       </div>
     </div>
 
-    <!-- Tab: Report List -->
+    <!-- Tab: Reports List -->
     <div class="tab-panel" data-group="rp" data-panel="list">
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Report Name</th><th>Type</th><th>Cycle</th><th>Generation Time</th><th>State</th><th>Operation</th></tr></thead>
+          <thead><tr><th>Report Name</th><th>Type</th><th>Created At</th></tr></thead>
           <tbody>
-            <tr><td>Monthly Performance Report - March 2026</td><td>Monthly Report</td><td>2026-03</td><td>2026-03-14 08:00</td><td><span class="badge badge-success">Generated</span></td><td><button class="btn btn-ghost btn-sm" onclick="activateTab('rp','perf');showToast('March 2026 report loaded','info')">View</button><button class="btn btn-ghost btn-sm" onclick="showToast('Downloading report...','info')">Download</button></td></tr>
-            <tr><td>Monthly Performance Report - February 2026</td><td>Monthly Report</td><td>2026-02</td><td>2026-03-01 08:00</td><td><span class="badge badge-success">Generated</span></td><td><button class="btn btn-ghost btn-sm" onclick="activateTab('rp','perf');showToast('February 2026 report loaded','info')">View</button><button class="btn btn-ghost btn-sm" onclick="showToast('Downloading report...','info')">Download</button></td></tr>
-            <tr><td>Weekly Report - Week 11</td><td>Weekly Report</td><td>W11</td><td>2026-03-14 08:00</td><td><span class="badge badge-success">Generated</span></td><td><button class="btn btn-ghost btn-sm" onclick="activateTab('rp','perf');showToast('Weekly report loaded','info')">View</button><button class="btn btn-ghost btn-sm" onclick="showToast('Downloading report...','info')">Download</button></td></tr>
-            <tr><td>Strategy Comparison Report</td><td>Special Report</td><td>Custom</td><td>2026-03-13 15:00</td><td><span class="badge badge-success">Generated</span></td><td><button class="btn btn-ghost btn-sm" onclick="activateTab('rp','perf');showToast('Comparison report loaded','info')">View</button><button class="btn btn-ghost btn-sm" onclick="showToast('Downloading report...','info')">Download</button></td></tr>
+            <tr>
+              <td>Monthly Performance &mdash; March 2026</td>
+              <td><span class="badge badge-primary">Monthly</span></td>
+              <td>2026-03-14 08:00</td>
+            </tr>
+            <tr>
+              <td>Monthly Performance &mdash; February 2026</td>
+              <td><span class="badge badge-primary">Monthly</span></td>
+              <td>2026-03-01 08:00</td>
+            </tr>
+            <tr>
+              <td>Weekly Report &mdash; Week 11</td>
+              <td><span class="badge badge-muted">Weekly</span></td>
+              <td>2026-03-14 08:00</td>
+            </tr>
+            <tr>
+              <td>Strategy Comparison Report</td>
+              <td><span class="badge badge-warning">Comparison</span></td>
+              <td>2026-03-13 15:00</td>
+            </tr>
+            <tr>
+              <td>Attribution Analysis &mdash; Q1 2026</td>
+              <td><span class="badge badge-success">Attribution</span></td>
+              <td>2026-03-10 09:30</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -188,18 +234,46 @@
   </main>
 </div>
 
-<!-- New Report Modal -->
+<!-- Generate Report Modal -->
 <div class="modal-overlay" id="newReport">
   <div class="modal" style="max-width:480px">
-    <div class="modal-header"><h3 class="modal-title">Generate Report</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('newReport')">✕</button></div>
+    <div class="modal-header">
+      <h3 class="modal-title">Generate Report</h3>
+      <button class="btn btn-ghost btn-icon" onclick="closeModal('newReport')">&#10005;</button>
+    </div>
     <div class="modal-body">
       <div style="display:flex;flex-direction:column;gap:16px">
-        <div><label class="form-label">Report Type</label><select class="form-select"><option>Monthly Performance</option><option>Weekly Report</option><option>Strategy Comparison</option><option>Attribution Analysis</option></select></div>
-        <div><label class="form-label">Time Range</label><div style="display:flex;gap:8px"><input type="date" class="form-input" value="2026-03-01"><span style="line-height:38px">~</span><input type="date" class="form-input" value="2026-03-14"></div></div>
-        <div><label class="form-label">Include Strategy</label><select class="form-select"><option>All strategies</option><option>DualMA_Cross</option><option>RSI_Reversal</option></select></div>
+        <div>
+          <label class="form-label">Report Type</label>
+          <select class="form-select">
+            <option>Monthly Performance</option>
+            <option>Weekly Report</option>
+            <option>Strategy Comparison</option>
+            <option>Attribution Analysis</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">Start Date</label>
+          <input type="date" class="form-input" value="2026-03-01">
+        </div>
+        <div>
+          <label class="form-label">End Date</label>
+          <input type="date" class="form-input" value="2026-03-14">
+        </div>
+        <div>
+          <label class="form-label">Include Strategies</label>
+          <select class="form-select">
+            <option>All Strategies</option>
+            <option>DualMA_Cross</option>
+            <option>RSI_Reversal</option>
+          </select>
+        </div>
       </div>
     </div>
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('newReport')>Cancel</button><button class="btn btn-primary" onclick="submitModal('newReport','The report generation task has been submitted','success')">Generate report</button></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('newReport')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitModal('newReport','Report generation task submitted','success')">Generate Report</button>
+    </div>
   </div>
 </div>
 

@@ -5,6 +5,19 @@
   <title>QuantMate - Factor Lab</title>
   <link rel="stylesheet" href="shared.css">
   <script src="https://cdn.tailwindcss.com?v=3.4"></script>
+  <style>
+    .combine-row { display:flex; align-items:center; gap:12px; padding:8px 12px; border-radius:8px; background:hsl(var(--muted)/.3); border:1px solid hsl(var(--border)); }
+    .combine-row .factor-name { font-weight:500; font-size:14px; width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .combine-row label { font-size:12px; color:hsl(var(--muted-foreground)); }
+    .combine-row input[type=number] { width:72px; }
+    .combine-row select { width:100px; }
+    .combine-row .btn-remove { margin-left:auto; color:hsl(var(--destructive)); cursor:pointer; background:none; border:none; }
+    .combine-row .btn-remove:hover { opacity:.7; }
+    .code-block { padding:16px; border-radius:8px; background:hsl(var(--muted)); border:1px solid hsl(var(--border)); overflow:auto; font-size:12px; max-height:400px; white-space:pre; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
+    .info-bar { padding:10px 14px; border-radius:8px; background:hsl(var(--muted)/.5); font-size:14px; }
+    .info-bar .factor-expr { margin-left:12px; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12px; color:hsl(var(--muted-foreground)); }
+    .empty-state { text-align:center; color:hsl(var(--muted-foreground)); padding:48px 24px; }
+  </style>
 </head>
 <body>
 <div class="app-layout">
@@ -14,347 +27,516 @@
     <div class="page-header">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
         <div>
-          <h1 class="page-title">Factor Laboratory</h1>
-          <p class="page-subtitle">Factor Research · IC/IR Analysis · Factor Portfolio · Attribution Analysis</p>
+          <h1 class="page-title">Factor Lab</h1>
+          <p class="page-subtitle">Factor library, IC/IR analysis, factor combination, and factor backtest</p>
         </div>
-        <button class="btn btn-primary" onclick="openModal('newFactor')">Create factor</button>
+        <button class="btn btn-primary" onclick="openModal('createFactor')">+ New Factor</button>
       </div>
     </div>
 
     <div class="tabs" data-group="fl">
-      <button class="tab-btn active" data-tab="library">Factor library</button>
-      <button class="tab-btn" data-tab="icir">IC/IR Analysis</button>
-      <button class="tab-btn" data-tab="combine">Factor combination</button>
-      <button class="tab-btn" data-tab="backtest">Factor Backtesting</button>
+      <button class="tab-btn active" data-tab="library"><span id="ico-library"></span> Factor Library</button>
+      <button class="tab-btn" data-tab="icir"><span id="ico-linechart"></span> IC/IR Analysis</button>
+      <button class="tab-btn" data-tab="mining"><span id="ico-pickaxe"></span> Factor Mining</button>
+      <button class="tab-btn" data-tab="combine"><span id="ico-gitcompare"></span> Factor Combine</button>
+      <button class="tab-btn" data-tab="backtest"><span id="ico-trendingup"></span> Factor Backtest</button>
     </div>
 
-    <!-- Factor Library -->
+    <!-- ═══════════ Factor Library ═══════════ -->
     <div class="tab-panel active" data-group="fl" data-panel="library">
-      <div class="filter-bar" style="margin-bottom:16px">
-        <input type="text" class="form-input" style="width:200px" placeholder="Searching for factors...">
-        <select class="form-select" style="width:140px"><option>All categories</option><option>Value</option><option>Momentum</option><option>Quality</option><option>Volatility</option><option>Technology</option></select>
-        <select class="form-select" style="width:120px"><option>Sort by IC</option><option>Sort by IR</option><option>Sort by name</option></select>
+      <div class="filter-bar" style="margin-bottom:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <input type="text" id="libSearch" class="form-input" style="width:240px" placeholder="Search factors...">
+        <span id="libCount" class="text-muted" style="font-size:13px;margin-left:auto"></span>
       </div>
-
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Factor Name</th><th>Category</th><th>Description</th><th>IC mean</th><th>IC_IR</th><th>Win rate</th><th>State</th><th>Operation</th></tr></thead>
+          <thead><tr><th>Factor Name</th><th>Category</th><th>Expression</th><th>Status</th><th></th></tr></thead>
           <tbody id="factorTable"></tbody>
         </table>
       </div>
-
-      <div class="card" style="margin-top:16px">
-        <div class="card-header"><h3 class="card-title">Overview of Factor Distribution</h3></div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px">
-          <div style="text-align:center"><div style="font-size:24px;font-weight:700;color:var(--primary)">32</div><div class="text-muted" style="font-size:13px">Total number of factors</div></div>
-          <div style="text-align:center"><div style="font-size:24px;font-weight:700;color:var(--success)">18</div><div class="text-muted" style="font-size:13px">Active ingredient</div></div>
-          <div style="text-align:center"><div style="font-size:24px;font-weight:700;color:var(--warning)">8</div><div class="text-muted" style="font-size:13px">To be verified</div></div>
-          <div style="text-align:center"><div style="font-size:24px;font-weight:700;color:var(--destructive)">6</div><div class="text-muted" style="font-size:13px">Expired</div></div>
-        </div>
-      </div>
     </div>
 
-    <!-- IC/IR Analysis -->
+    <!-- ═══════════ IC/IR Analysis ═══════════ -->
     <div class="tab-panel" data-group="fl" data-panel="icir">
-      <div class="card">
-        <div class="card-header">
-          <h3 class="card-title">Factor IC / IR Analysis</h3>
-          <select class="form-select" style="width:200px"><option>EP (Earnings Yield)</option><option>BP (Price-to-Book Ratio Inverse)</option><option>MOM_20 (20-day Momentum)</option><option>VOL_20 (20-day volatility)</option><option>ROE_TTM</option></select>
+      <div style="display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:16px">
+        <div>
+          <label class="form-label">Factor Name</label>
+          <select id="icirFactor" class="form-select" style="min-width:180px">
+            <option value="">--</option>
+          </select>
         </div>
-
-        <div class="stat-grid cols-4" style="margin-bottom:16px">
-          <div class="stat-card"><div class="stat-label">IC Mean</div><div class="stat-value" style="color:var(--success)">0.048</div></div>
-          <div class="stat-card"><div class="stat-label">IC Standard Deviation</div><div class="stat-value">0.112</div></div>
-          <div class="stat-card"><div class="stat-label">IC_IR</div><div class="stat-value" style="color:var(--primary)">0.429</div></div>
-          <div class="stat-card"><div class="stat-label">IC > 0 Proportion</div><div class="stat-value">62.5%</div></div>
+        <div>
+          <label class="form-label">Start Date</label>
+          <input type="date" id="icirStart" class="form-input" value="2023-01-01">
         </div>
-
-        <div class="card-header"><h3 class="card-title">IC time series</h3></div>
-        <canvas id="icChart" height="200"></canvas>
+        <div>
+          <label class="form-label">End Date</label>
+          <input type="date" id="icirEnd" class="form-input" value="2024-12-31">
+        </div>
+        <button class="btn btn-primary" id="icirRunBtn" onclick="runEvaluation()">Run Evaluation</button>
       </div>
-
-      <div class="card" style="margin-top:16px">
-        <div class="card-header"><h3 class="card-title">Layered Backtesting (Long-Short Portfolio)</h3></div>
-        <div class="stat-grid cols-4" style="margin-bottom:16px">
-          <div class="stat-card"><div class="stat-label">Bull Annualized</div><div class="stat-value" style="color:var(--success)">+18.3%</div></div>
-          <div class="stat-card"><div class="stat-label">Short Annualized</div><div class="stat-value" style="color:var(--destructive)">-5.2%</div></div>
-          <div class="stat-card"><div class="stat-label">Long and short returns</div><div class="stat-value" style="color:var(--success)">+23.5%</div></div>
-          <div class="stat-card"><div class="stat-label">Monotonicity</div><div class="stat-value">0.89</div></div>
-        </div>
-
-        <div class="card-header"><h3 class="card-title">Cumulative earnings of five groups</h3></div>
-        <canvas id="quintileChart" height="200"></canvas>
+      <div id="icirInfoBar" class="info-bar" style="display:none;margin-bottom:16px"></div>
+      <div id="icirEmpty" class="empty-state">Select a factor to view IC/IR evaluations</div>
+      <div class="table-wrap" id="icirTableWrap" style="display:none">
+        <table>
+          <thead><tr><th>Start Date</th><th>End Date</th><th>IC</th><th>ICIR</th><th>L/S Return</th><th>Turnover</th><th>Date</th></tr></thead>
+          <tbody id="icirTable"></tbody>
+        </table>
       </div>
     </div>
 
-    <!-- Factor Combination -->
+    <!-- ═══════════ Factor Mining ═══════════ -->
+    <div class="tab-panel" data-group="fl" data-panel="mining">
+      <h3 style="font-size:18px;font-weight:600;margin-bottom:4px">Factor Mining</h3>
+      <p class="text-muted" style="font-size:13px;margin-bottom:16px">Automatically discover alpha factors from data</p>
+      <div style="display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:16px">
+        <div>
+          <label class="form-label">Instruments</label>
+          <input type="text" id="mineInstruments" class="form-input" value="csi300" style="width:120px">
+        </div>
+        <div>
+          <label class="form-label">Start Date</label>
+          <input type="date" id="mineStart" class="form-input" value="2023-01-01">
+        </div>
+        <div>
+          <label class="form-label">End Date</label>
+          <input type="date" id="mineEnd" class="form-input" value="2024-12-31">
+        </div>
+        <button class="btn btn-primary" onclick="runMining()">Start Mining</button>
+      </div>
+      <div id="miningEmpty" class="empty-state">Run mining to discover new factors</div>
+      <div class="table-wrap" id="miningTableWrap" style="display:none">
+        <table>
+          <thead><tr><th>Factor Name</th><th>Factor Set</th><th>IC</th><th>ICIR</th><th>L/S Return</th><th>Turnover</th></tr></thead>
+          <tbody id="miningTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ═══════════ Factor Combine ═══════════ -->
     <div class="tab-panel" data-group="fl" data-panel="combine">
-      <div class="card">
-        <div class="card-header"><h3 class="card-title">Factor Combination Plan</h3><button class="btn btn-primary btn-sm" onclick="showToast('Please configure the new plan parameters','info')">New Project</button></div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px">
+      <h3 style="font-size:18px;font-weight:600;margin-bottom:4px">Factor Combine</h3>
+      <p class="text-muted" style="font-size:13px;margin-bottom:16px">Combine multiple factors into a multi-factor strategy</p>
 
-          <div class="card" style="border:1px solid var(--border)">
-            <h4 style="font-weight:600;margin-bottom:8px">Equal-weighted multi-factor portfolio</h4>
-            <p class="text-muted" style="font-size:13px;margin-bottom:12px">EP BP MOM_20 ROE_TTM equal-weighted</p>
-            <div style="display:flex;flex-direction:column;gap:6px;font-size:13px;margin-bottom:12px">
-              <div style="display:flex;justify-content:space-between"><span>EP</span><span>Weight: 25%</span></div>
-              <div style="display:flex;justify-content:space-between"><span>BP</span><span>Weight: 25%</span></div>
-              <div style="display:flex;justify-content:space-between"><span>MOM_20</span><span>Weight: 25%</span></div>
-              <div style="display:flex;justify-content:space-between"><span>ROE_TTM</span><span>Weight: 25%</span></div>
-            </div>
-            <div style="display:flex;gap:12px;font-size:13px;margin-bottom:12px">
-              <span>Synthetic IC: <b style="color:var(--success)">0.065</b></span>
-              <span>Synthetic IR: <b style="color:var(--primary)">0.58</b></span>
-            </div>
-            <div style="display:flex;gap:8px"><button class="btn btn-primary btn-sm">Backtest</button><button class="btn btn-ghost btn-sm">Edit</button></div>
-          </div>
+      <div id="combineList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px"></div>
+      <div id="combineEmpty" class="empty-state">No factors added yet. Use "+ Combine" in the Factor Library tab to add factors.</div>
 
-          <div class="card" style="border:1px solid var(--border)">
-            <h4 style="font-weight:600;margin-bottom:8px">IC Weighted Combination</h4>
-            <p class="text-muted" style="font-size:13px;margin-bottom:12px">Dynamically adjust weights based on historical IC</p>
-            <div style="display:flex;flex-direction:column;gap:6px;font-size:13px;margin-bottom:12px">
-              <div style="display:flex;justify-content:space-between"><span>EP</span><span>Weight: 32%</span></div>
-              <div style="display:flex;justify-content:space-between"><span>ROE_TTM</span><span>Weight: 28%</span></div>
-              <div style="display:flex;justify-content:space-between"><span>MOM_20</span><span>Weight: 22%</span></div>
-              <div style="display:flex;justify-content:space-between"><span>BP</span><span>Weight: 18%</span></div>
-            </div>
-            <div style="display:flex;gap:12px;font-size:13px;margin-bottom:12px">
-              <span>Synthetic IC: <b style="color:var(--success)">0.078</b></span>
-              <span>Synthetic IR: <b style="color:var(--primary)">0.72</b></span>
-            </div>
-            <div style="display:flex;gap:8px"><button class="btn btn-primary btn-sm">Backtest</button><button class="btn btn-ghost btn-sm">Edit</button></div>
+      <div id="combineControls" style="display:none">
+        <div style="display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:16px;padding-top:8px">
+          <div>
+            <label class="form-label">Strategy Name</label>
+            <input type="text" id="combineStratName" class="form-input" style="width:220px" placeholder="My Multi-Factor Strategy">
           </div>
-
-          <div class="card" style="border:1px solid var(--border)">
-            <h4 style="font-weight:600;margin-bottom:8px">Maximize IR combination</h4>
-            <p class="text-muted" style="font-size:13px;margin-bottom:12px">Optimize to solve for the weights that maximize IR</p>
-            <div style="display:flex;flex-direction:column;gap:6px;font-size:13px;margin-bottom:12px">
-              <div style="display:flex;justify-content:space-between"><span>EP</span><span>Weight: 38%</span></div>
-              <div style="display:flex;justify-content:space-between"><span>ROE_TTM</span><span>Weight: 35%</span></div>
-              <div style="display:flex;justify-content:space-between"><span>MOM_20</span><span>Weight: 15%</span></div>
-              <div style="display:flex;justify-content:space-between"><span>VOL_20</span><span>Weight: 12%</span></div>
-            </div>
-            <div style="display:flex;gap:12px;font-size:13px;margin-bottom:12px">
-              <span>Synthetic IC: <b style="color:var(--success)">0.082</b></span>
-              <span>Synthetic IR: <b style="color:var(--primary)">0.85</b></span>
-            </div>
-            <div style="display:flex;gap:8px"><button class="btn btn-primary btn-sm">Backtest</button><button class="btn btn-ghost btn-sm">Edit</button></div>
+          <div>
+            <label class="form-label">Class Name</label>
+            <input type="text" id="combineClassName" class="form-input" style="width:190px" placeholder="MultiFactorStrategy">
           </div>
+          <button class="btn btn-secondary" onclick="previewCode()">Preview Code</button>
+          <button class="btn btn-primary" onclick="createStrategy()">Create Strategy</button>
         </div>
-      </div>
-
-      <div class="card" style="margin-top:16px">
-        <div class="card-header"><h3 class="card-title">Factor Correlation Matrix</h3></div>
-        <div class="table-wrap">
-          <table style="text-align:center;font-size:13px">
-            <thead><tr><th></th><th>EP</th><th>BP</th><th>MOM_20</th><th>VOL_20</th><th>ROE_TTM</th><th>SIZE</th></tr></thead>
-            <tbody>
-              <tr><td style="font-weight:600;text-align:left">EP</td><td style="background:hsl(221,83%,53%,.2);font-weight:600">1.00</td><td>0.42</td><td>-0.15</td><td>-0.08</td><td>0.31</td><td>-0.22</td></tr>
-              <tr><td style="font-weight:600;text-align:left">BP</td><td>0.42</td><td style="background:hsl(221,83%,53%,.2);font-weight:600">1.00</td><td>-0.21</td><td>0.05</td><td>0.18</td><td>-0.35</td></tr>
-              <tr><td style="font-weight:600;text-align:left">MOM_20</td><td>-0.15</td><td>-0.21</td><td style="background:hsl(221,83%,53%,.2);font-weight:600">1.00</td><td>0.33</td><td>0.12</td><td>0.08</td></tr>
-              <tr><td style="font-weight:600;text-align:left">VOL_20</td><td>-0.08</td><td>0.05</td><td>0.33</td><td style="background:hsl(221,83%,53%,.2);font-weight:600">1.00</td><td>-0.11</td><td>-0.18</td></tr>
-              <tr><td style="font-weight:600;text-align:left">ROE_TTM</td><td>0.31</td><td>0.18</td><td>0.12</td><td>-0.11</td><td style="background:hsl(221,83%,53%,.2);font-weight:600">1.00</td><td>0.25</td></tr>
-              <tr><td style="font-weight:600;text-align:left">SIZE</td><td>-0.22</td><td>-0.35</td><td>0.08</td><td>-0.18</td><td>0.25</td><td style="background:hsl(221,83%,53%,.2);font-weight:600">1.00</td></tr>
-            </tbody>
-          </table>
+        <div id="codePreview" style="display:none">
+          <h4 style="font-size:14px;font-weight:500;margin-bottom:8px">Generated Code</h4>
+          <pre class="code-block" id="codeBlock"></pre>
         </div>
       </div>
     </div>
 
-    <!-- Factor Backtest -->
+    <!-- ═══════════ Factor Backtest ═══════════ -->
     <div class="tab-panel" data-group="fl" data-panel="backtest">
-      <div class="card">
-        <div class="card-header"><h3 class="card-title">Factor backtesting results</h3></div>
-        <div class="stat-grid cols-4" style="margin-bottom:16px">
-          <div class="stat-card"><div class="stat-label">Annualized Rate of Return</div><div class="stat-value" style="color:var(--success)">+24.8%</div></div>
-          <div class="stat-card"><div class="stat-label">Sharpe Ratio</div><div class="stat-value">1.85</div></div>
-          <div class="stat-card"><div class="stat-label">Maximum Drawdown</div><div class="stat-value" style="color:var(--destructive)">-12.6%</div></div>
-          <div class="stat-card"><div class="stat-label">Information Ratio</div><div class="stat-value">1.42</div></div>
-        </div>
-
-        <div class="card-header"><h3 class="card-title">Factor Combination vs Benchmark Net Value Curve</h3></div>
-        <canvas id="factorNavChart" height="220"></canvas>
-      </div>
-
-      <div class="card" style="margin-top:16px">
-        <div class="card-header"><h3 class="card-title">Factor Contribution Attribution</h3></div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Factor</th><th>weight</th><th>Factor return</th><th>Contribution</th><th>Contribution proportion</th></tr></thead>
-            <tbody>
-              <tr><td><b>EP</b></td><td>35%</td><td style="color:var(--success)">+8.2%</td><td style="color:var(--success)">+2.87%</td><td>
-                <div style="display:flex;align-items:center;gap:8px"><div class="progress-bar" style="width:100px;height:8px"><div class="progress-fill" style="width:35%"></div></div>35%</div>
-              </td></tr>
-              <tr><td><b>ROE_TTM</b></td><td>28%</td><td style="color:var(--success)">+6.5%</td><td style="color:var(--success)">+1.82%</td><td>
-                <div style="display:flex;align-items:center;gap:8px"><div class="progress-bar" style="width:100px;height:8px"><div class="progress-fill" style="width:22%"></div></div>22%</div>
-              </td></tr>
-              <tr><td><b>MOM_20</b></td><td>22%</td><td style="color:var(--success)">+12.1%</td><td style="color:var(--success)">+2.66%</td><td>
-                <div style="display:flex;align-items:center;gap:8px"><div class="progress-bar" style="width:100px;height:8px"><div class="progress-fill" style="width:32%"></div></div>32%</div>
-              </td></tr>
-              <tr><td><b>VOL_20</b></td><td>15%</td><td style="color:var(--destructive)">-3.8%</td><td style="color:var(--destructive)">-0.57%</td><td>
-                <div style="display:flex;align-items:center;gap:8px"><div class="progress-bar" style="width:100px;height:8px"><div class="progress-fill" style="width:7%;background:var(--destructive)"></div></div>-7%</div>
-              </td></tr>
-            </tbody>
-          </table>
-        </div>
+      <div class="empty-state">
+        <p style="font-size:15px;font-weight:500;margin-bottom:4px">No backtest results yet</p>
+        <p style="font-size:13px">Create a combined factor strategy and run a backtest to see results here.</p>
       </div>
     </div>
 
   </main>
 </div>
 
-<!-- New Factor Modal -->
-<div class="modal-overlay" id="newFactor">
+<!-- ═══════════ Create Factor Modal ═══════════ -->
+<div class="modal-overlay" id="createFactor">
   <div class="modal" style="max-width:560px">
-    <div class="modal-header"><h3 class="modal-title">Create Factor</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('newFactor')">✕</button></div>
+    <div class="modal-header">
+      <h3 class="modal-title">Create Factor</h3>
+      <button class="btn btn-ghost btn-icon" onclick="closeModal('createFactor')">✕</button>
+    </div>
     <div class="modal-body">
       <div style="display:flex;flex-direction:column;gap:16px">
-        <div><label class="form-label">Factor Name</label><input type="text" class="form-input" placeholder="For example: Revenue Growth_TTM"></div>
-        <div><label class="form-label">Category</label><select class="form-select"><option>Value</option><option>Momentum</option><option>Quality</option><option>Volatility</option><option>Growth</option><option>Technology</option><option>Custom</option></select></div>
-        <div><label class="form-label">Factor Formula / Description</label><textarea class="form-textarea" rows="4" placeholder="revenue_growth = (revenue_ttm - revenue_ttm_lag4) / abs(revenue_ttm_lag4)"></textarea></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-          <div><label class="form-label">Data Frequency</label><select class="form-select"><option>daily frequency</option><option>Weekly frequency</option><option>monthly frequency</option><option>Quarterly</option></select></div>
-          <div><label class="form-label">Review Window</label><input type="number" class="form-input" value="20" min="1"></div>
+        <div>
+          <label class="form-label">Factor Name</label>
+          <input type="text" id="modalFactorName" class="form-input" placeholder="e.g. momentum_20d">
         </div>
-        <div><label class="form-label">Standardization Method</label><select class="form-select"><option>Z-Score Standardization</option><option>Ranking percentile</option><option>MAD Outlier Removal Z-Score</option><option>Do not process</option></select></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div>
+            <label class="form-label">Category</label>
+            <select id="modalCategory" class="form-select">
+              <option value="technical">Technical</option>
+              <option value="fundamental">Fundamental</option>
+              <option value="style">Style</option>
+              <option value="custom" selected>Custom</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Frequency</label>
+            <select id="modalFrequency" class="form-select">
+              <option value="daily">Daily</option>
+              <option value="weekly">Weekly</option>
+              <option value="monthly">Monthly</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="form-label">Factor Formula</label>
+          <textarea id="modalFormula" class="form-textarea" rows="4" placeholder="e.g. close / delay(close, 20) - 1"></textarea>
+        </div>
       </div>
     </div>
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('newFactor')>Cancel</button><button class="btn btn-primary" onclick="submitModal('newFactor', 'The factor has been created and is being calculated...', 'success')">Create and calculate</button></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('createFactor')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitCreateFactor()">Create Factor</button>
+    </div>
   </div>
 </div>
 
 <script src="shared.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded',function(){
-  // Populate factor table
-  var factors=[
-    {name:'EP',cat:'Value',desc:'Earnings/Price (E/P) ratio',ic:0.048,ir:0.429,win:'62.5%',st:'Effective'},
-    {name:'BP',cat:'Value',desc:'Price-to-Book Ratio (Book/Price)',ic:0.035,ir:0.312,win:'58.3%',st:'Effective'},
-    {name:'MOM_20',cat:'Momentum',desc:'20-Day Yield Momentum',ic:0.041,ir:0.385,win:'60.8%',st:'Effective'},
-    {name:'VOL_20',cat:'Volatility',desc:'20-day return standard deviation',ic:-0.022,ir:-0.198,win:'43.2%',st:'Invalid'},
-    {name:'ROE_TTM',cat:'Quality',desc:'Return on equity over the past 12 months',ic:0.055,ir:0.510,win:'65.0%',st:'Effective'},
-    {name:'SIZE',cat:'Scale',desc:'Logarithm of total market value',ic:-0.032,ir:-0.280,win:'45.8%',st:'To be verified'},
-    {name:'TURNOVER',cat:'Technology',desc:'20-day average turnover rate',ic:0.018,ir:0.162,win:'53.3%',st:'To be verified'},
-    {name:'REV_GROWTH',cat:'Growth',desc:'Revenue Growth TTM',ic:0.038,ir:0.355,win:'59.2%',st:'Effective'},
-  ];
-  var tb=document.getElementById('factorTable');
-  factors.forEach(function(f){
-    var icColor=f.ic>=0?'var(--success)':'var(--destructive)';
-    var irColor=f.ir>=0.3?'var(--primary)':f.ir>=0?'var(--muted-foreground)':'var(--destructive)';
-    var stBadge=f.st==='Effective'?'badge-success':f.st==='Invalid'?'badge-destructive':'badge-warning';
-    tb.innerHTML+='<tr><td><b>'+f.name+'</b></td><td><span class="badge badge-muted">'+f.cat+'</span></td><td style="font-size:13px">'+f.desc+'</td><td style="color:'+icColor+';font-weight:600">'+f.ic.toFixed(3)+'</td><td style="color:'+irColor+';font-weight:600">'+f.ir.toFixed(3)+'</td><td>'+f.win+'</td><td><span class="badge '+stBadge+'">'+f.st+'</span></td><td><button class="btn btn-ghost btn-sm">Details</button></td></tr>';
+/* ── Register extra icons ── */
+(function(){
+  if(typeof ICONS!=='undefined'){
+    ICONS['library']='<path d="M16 6l3 3-3 3"/><path d="M8 6L5 9l3 3"/><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M4 15h16"/><path d="M4 9h16"/>';
+    ICONS['line-chart']='<path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/>';
+    ICONS['pickaxe']='<path d="M14.531 12.469 6.619 20.38a1 1 0 1 1-3-3l7.912-7.912"/><path d="M15.686 4.314A12.5 12.5 0 0 0 5.461 2.958 1 1 0 0 0 5.58 4.71a22 22 0 0 1 6.318 3.393"/><path d="M17.7 3.7a1 1 0 0 0-1.4 0l-4.6 4.6a1 1 0 0 0 0 1.4l2.6 2.6a1 1 0 0 0 1.4 0l4.6-4.6a1 1 0 0 0 0-1.4Z"/><path d="M19.686 8.314a12.5 12.5 0 0 1 1.356 10.225 1 1 0 0 1-1.751-.119 22 22 0 0 0-3.393-6.318"/>';
+    ICONS['git-compare']='<circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><path d="M11 18H8a2 2 0 0 1-2-2V9"/>';
+  }
+})();
+
+/* ── Mock data ── */
+var FACTORS = [
+  { id:1, name:'momentum_20d', category:'Technical', expression:'close/delay(close,20)-1', status:'validated' },
+  { id:2, name:'value_pe', category:'Fundamental', expression:'1/pe_ttm', status:'validated' },
+  { id:3, name:'quality_roe', category:'Fundamental', expression:'roe_ttm', status:'validated' },
+  { id:4, name:'size_ln_mv', category:'Style', expression:'log(market_cap)', status:'testing' },
+  { id:5, name:'volatility_60d', category:'Technical', expression:'std(close/delay(close,1)-1,60)', status:'testing' },
+  { id:6, name:'turnover_20d', category:'Technical', expression:'mean(turnover,20)', status:'validated' },
+  { id:7, name:'bp_ratio', category:'Fundamental', expression:'1/pb', status:'validated' },
+  { id:8, name:'earnings_growth', category:'Fundamental', expression:'(eps_ttm-delay(eps_ttm,4))/abs(delay(eps_ttm,4))', status:'testing' },
+  { id:9, name:'rsi_14d', category:'Technical', expression:'rsi(close,14)', status:'validated' },
+  { id:10, name:'custom_alpha_01', category:'Custom', expression:'rank(momentum_20d)*rank(value_pe)', status:'testing' }
+];
+
+var EVALUATIONS = [
+  { factor_id:1, start_date:'2023-01-01', end_date:'2023-06-30', ic:0.0521, icir:1.23, ls_ret:0.085, turnover:0.312, date:'2024-08-15' },
+  { factor_id:1, start_date:'2023-07-01', end_date:'2023-12-31', ic:0.0438, icir:1.05, ls_ret:0.062, turnover:0.298, date:'2024-08-15' },
+  { factor_id:1, start_date:'2024-01-01', end_date:'2024-06-30', ic:0.0612, icir:1.41, ls_ret:0.098, turnover:0.325, date:'2024-09-01' },
+  { factor_id:2, start_date:'2023-01-01', end_date:'2023-12-31', ic:0.0385, icir:0.95, ls_ret:0.062, turnover:0.245, date:'2024-07-20' },
+  { factor_id:3, start_date:'2023-01-01', end_date:'2023-12-31', ic:0.0452, icir:1.10, ls_ret:0.078, turnover:0.268, date:'2024-07-20' }
+];
+
+var combineFactors = [];
+
+/* ── Render factor library ── */
+function renderFactorTable(query) {
+  var tb = document.getElementById('factorTable');
+  var filtered = FACTORS.filter(function(f) {
+    if (!query) return true;
+    var q = query.toLowerCase();
+    return f.name.toLowerCase().indexOf(q) !== -1 || f.category.toLowerCase().indexOf(q) !== -1;
   });
-
-  // IC time series chart
-  var c1=document.getElementById('icChart');
-  if(c1){
-    var ctx=c1.getContext('2d');
-    c1.width=c1.parentElement.offsetWidth-40; c1.height=200;
-    var w=c1.width,h=c1.height;
-    var ics=[];for(var i=0;i<24;i++)ics.push((Math.random()-0.42)*0.25);
-    ctx.strokeStyle='hsl(221,83%,53%)';ctx.lineWidth=2;ctx.beginPath();
-    for(var i=0;i<ics.length;i++){
-      var x=30+i*(w-50)/(ics.length-1), y=h/2-ics[i]*(h*1.5);
-      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
-    }
-    ctx.stroke();
-    // zero line
-    ctx.strokeStyle='var(--border)';ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(30,h/2);ctx.lineTo(w-20,h/2);ctx.stroke();ctx.setLineDash([]);
-    // bars
-    ctx.globalAlpha=0.5;
-    for(var i=0;i<ics.length;i++){
-      var x=30+i*(w-50)/(ics.length-1), bh=ics[i]*(h*1.5);
-      ctx.fillStyle=ics[i]>=0?'hsl(142,76%,36%)':'hsl(0,84%,60%)';
-      ctx.fillRect(x-6,h/2,12,-bh);
-    }
-    ctx.globalAlpha=1;
-  }
-
-  // Quintile chart
-  var c2=document.getElementById('quintileChart');
-  if(c2){
-    var ctx=c2.getContext('2d'); c2.width=c2.parentElement.offsetWidth-40; c2.height=200;
-    var w=c2.width,h=c2.height;
-    var colors=['hsl(221,83%,53%)','hsl(221,83%,63%)','hsl(0,0%,60%)','hsl(0,60%,60%)','hsl(0,84%,50%)'];
-    var labels=['Q1 (Multiple)','Q2','Q3','Q4','Q5 (blank)'];
-    var returns=[0.183,0.124,0.072,0.018,-0.052];
-    for(var q=0;q<5;q++){
-      var pts=[];var v=1;
-      for(var m=0;m<24;m++){v*=(1+returns[q]/12+(Math.random()-0.5)*0.02);pts.push(v);}
-      ctx.strokeStyle=colors[q];ctx.lineWidth=2;ctx.beginPath();
-      for(var m=0;m<pts.length;m++){
-        var x=40+m*(w-60)/(pts.length-1), y=h-20-(pts[m]-0.9)/(1.5-0.9)*(h-40);
-        m===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
-      }
-      ctx.stroke();
-      // label at end
-      ctx.fillStyle=colors[q];ctx.font='11px sans-serif';
-      ctx.fillText(labels[q],w-55,h-20-(pts[pts.length-1]-0.9)/(1.5-0.9)*(h-40)+4);
-    }
-  }
-
-  // Factor NAV chart
-  var c3=document.getElementById('factorNavChart');
-  if(c3){
-    var ctx=c3.getContext('2d'); c3.width=c3.parentElement.offsetWidth-40; c3.height=220;
-    var w=c3.width,h=c3.height;
-    // Strategy line
-    var pts=[],v=1;for(var i=0;i<60;i++){v*=(1+0.248/252+(Math.random()-0.45)*0.015);pts.push(v);}
-    ctx.strokeStyle='hsl(221,83%,53%)';ctx.lineWidth=2;ctx.beginPath();
-    for(var i=0;i<pts.length;i++){var x=40+i*(w-60)/(pts.length-1),y=h-30-(pts[i]-0.95)/(1.6-0.95)*(h-50);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}
-    ctx.stroke();
-    // Benchmark
-    var bpts=[],bv=1;for(var i=0;i<60;i++){bv*=(1+0.08/252+(Math.random()-0.48)*0.012);bpts.push(bv);}
-    ctx.strokeStyle='hsl(0,0%,60%)';ctx.lineWidth=1.5;ctx.setLineDash([4,4]);ctx.beginPath();
-    for(var i=0;i<bpts.length;i++){var x=40+i*(w-60)/(bpts.length-1),y=h-30-(bpts[i]-0.95)/(1.6-0.95)*(h-50);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}
-    ctx.stroke();ctx.setLineDash([]);
-    ctx.font='12px sans-serif';ctx.fillStyle='hsl(221,83%,53%)';ctx.fillText('Factor combination',w-80,30);
-    ctx.fillStyle='hsl(0,0%,60%)';ctx.fillText('CSI 300',w-80,48);
-  }
-
-  // Factor table detail buttons
-  document.querySelectorAll('#factorTable .btn-ghost').forEach(function(btn){
-    if(btn.textContent.trim()==='Details'){
-      var name=(btn.closest('tr').querySelector('b')||{}).textContent||'';
-      btn.onclick=function(){activateTab('fl','icir');showToast('Load factor "'+name+'IC/IR Analysis','info')};
-    }
+  var html = '';
+  filtered.forEach(function(f) {
+    var catMap = { Technical:'badge-primary', Fundamental:'badge-success', Style:'badge-warning', Custom:'badge-muted' };
+    var catBadge = catMap[f.category] || 'badge-muted';
+    var statusLabel = f.status === 'validated' ? 'Active' : 'Testing';
+    var statusBadge = f.status === 'validated' ? 'badge-success' : 'badge-warning';
+    html += '<tr>'
+      + '<td><span style="font-weight:500;color:hsl(var(--primary));cursor:pointer" onclick="selectFactorForICIR(' + f.id + ')">' + f.name + '</span></td>'
+      + '<td><span class="badge ' + catBadge + '">' + f.category + '</span></td>'
+      + '<td><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;color:hsl(var(--muted-foreground))">' + f.expression + '</span></td>'
+      + '<td><span class="badge ' + statusBadge + '">' + statusLabel + '</span></td>'
+      + '<td><button class="btn btn-ghost btn-sm" onclick="addToCombine(' + f.id + ')">+ Combine</button></td>'
+      + '</tr>';
   });
+  tb.innerHTML = html;
+  document.getElementById('libCount').textContent = filtered.length + ' factors';
+}
 
-  // Combination card buttons
-  document.querySelectorAll('[data-panel="combine"] .card[style*="border:1px"]').forEach(function(card){
-    var title=(card.querySelector('h4')||{}).textContent||'';
-    card.querySelectorAll('.btn-sm').forEach(function(btn){
-      if(btn.textContent.trim()==='Backtesting') btn.onclick=function(){activateTab('fl','backtest');showToast('Start backtesting "'+title+'」','info')};
-      else if(btn.textContent.trim()==='Edit') btn.onclick=function(){showToast('Edit "'+title+'」','info')};
+/* ── Factor Library search ── */
+function initLibrarySearch() {
+  var input = document.getElementById('libSearch');
+  input.addEventListener('input', function() {
+    renderFactorTable(this.value);
+  });
+}
+
+/* ── IC/IR Analysis ── */
+function populateFactorDropdown() {
+  var sel = document.getElementById('icirFactor');
+  var existing = sel.querySelectorAll('option');
+  // keep only the first "--" option
+  for (var i = existing.length - 1; i > 0; i--) sel.removeChild(existing[i]);
+  FACTORS.forEach(function(f) {
+    var opt = document.createElement('option');
+    opt.value = f.id;
+    opt.textContent = f.name;
+    sel.appendChild(opt);
+  });
+}
+
+function selectFactorForICIR(id) {
+  document.getElementById('icirFactor').value = id;
+  activateTab('fl', 'icir');
+  renderEvaluations(id);
+}
+
+function renderEvaluations(factorId) {
+  var fid = parseInt(factorId);
+  var factor = null;
+  for (var i = 0; i < FACTORS.length; i++) {
+    if (FACTORS[i].id === fid) { factor = FACTORS[i]; break; }
+  }
+
+  var infoBar = document.getElementById('icirInfoBar');
+  var empty = document.getElementById('icirEmpty');
+  var tableWrap = document.getElementById('icirTableWrap');
+
+  if (!factor) {
+    infoBar.style.display = 'none';
+    empty.style.display = '';
+    tableWrap.style.display = 'none';
+    return;
+  }
+
+  infoBar.style.display = '';
+  infoBar.innerHTML = '<span style="font-weight:500">' + factor.name + '</span><span class="factor-expr">' + factor.expression + '</span>';
+  empty.style.display = 'none';
+  tableWrap.style.display = '';
+
+  var evals = EVALUATIONS.filter(function(e) { return e.factor_id === fid; });
+  var tb = document.getElementById('icirTable');
+  var html = '';
+  evals.forEach(function(e) {
+    var icColor = e.ic >= 0 ? 'var(--success)' : 'var(--destructive)';
+    var irColor = e.icir >= 0 ? 'var(--success)' : 'var(--destructive)';
+    var lsColor = e.ls_ret >= 0 ? 'var(--success)' : 'var(--destructive)';
+    html += '<tr>'
+      + '<td>' + e.start_date + '</td>'
+      + '<td>' + e.end_date + '</td>'
+      + '<td style="color:' + icColor + ';font-weight:600">' + e.ic.toFixed(4) + '</td>'
+      + '<td style="color:' + irColor + ';font-weight:600">' + e.icir.toFixed(3) + '</td>'
+      + '<td style="color:' + lsColor + ';font-weight:600">' + (e.ls_ret * 100).toFixed(2) + '%</td>'
+      + '<td>' + (e.turnover * 100).toFixed(1) + '%</td>'
+      + '<td>' + e.date + '</td>'
+      + '</tr>';
+  });
+  if (evals.length === 0) {
+    html = '<tr><td colspan="7" style="text-align:center;color:hsl(var(--muted-foreground));padding:24px">No evaluations yet. Click "Run Evaluation" to generate results.</td></tr>';
+  }
+  tb.innerHTML = html;
+}
+
+function runEvaluation() {
+  var fid = document.getElementById('icirFactor').value;
+  if (!fid) { showToast('Please select a factor first', 'warning'); return; }
+  var start = document.getElementById('icirStart').value;
+  var end = document.getElementById('icirEnd').value;
+
+  var factor = null;
+  for (var i = 0; i < FACTORS.length; i++) {
+    if (FACTORS[i].id === parseInt(fid)) { factor = FACTORS[i]; break; }
+  }
+  if (factor) {
+    EVALUATIONS.push({
+      factor_id: factor.id,
+      start_date: start,
+      end_date: end,
+      ic: +(Math.random() * 0.08 - 0.01).toFixed(4),
+      icir: +(Math.random() * 1.8 - 0.3).toFixed(3),
+      ls_ret: +(Math.random() * 0.12 - 0.02).toFixed(4),
+      turnover: +(Math.random() * 0.3 + 0.15).toFixed(3),
+      date: new Date().toISOString().slice(0, 10)
     });
+  }
+  renderEvaluations(fid);
+  showToast('Evaluation completed', 'success');
+}
+
+/* ── Factor Mining ── */
+function runMining() {
+  var instruments = document.getElementById('mineInstruments').value;
+  var start = document.getElementById('mineStart').value;
+  var end = document.getElementById('mineEnd').value;
+
+  var results = [
+    { name:'alpha_mom_5d', set:'momentum', ic:0.0415, icir:0.98, ls_ret:0.065, turnover:0.421 },
+    { name:'alpha_vol_adj', set:'volatility', ic:-0.0285, icir:-0.67, ls_ret:-0.031, turnover:0.352 },
+    { name:'alpha_ep_growth', set:'value', ic:0.0562, icir:1.35, ls_ret:0.091, turnover:0.218 },
+    { name:'alpha_turnover_shock', set:'liquidity', ic:0.0338, icir:0.82, ls_ret:0.048, turnover:0.512 },
+    { name:'alpha_rsi_divergence', set:'technical', ic:0.0481, icir:1.15, ls_ret:0.072, turnover:0.298 }
+  ];
+
+  document.getElementById('miningEmpty').style.display = 'none';
+  var wrap = document.getElementById('miningTableWrap');
+  wrap.style.display = '';
+
+  var tb = document.getElementById('miningTable');
+  var html = '';
+  results.forEach(function(r) {
+    var icColor = r.ic >= 0 ? 'var(--success)' : 'var(--destructive)';
+    var lsColor = r.ls_ret >= 0 ? 'var(--success)' : 'var(--destructive)';
+    html += '<tr>'
+      + '<td style="font-weight:500">' + r.name + '</td>'
+      + '<td><span class="badge badge-muted">' + r.set + '</span></td>'
+      + '<td style="color:' + icColor + ';font-weight:600">' + r.ic.toFixed(4) + '</td>'
+      + '<td style="font-weight:600">' + r.icir.toFixed(3) + '</td>'
+      + '<td style="color:' + lsColor + ';font-weight:600">' + (r.ls_ret * 100).toFixed(2) + '%</td>'
+      + '<td>' + (r.turnover * 100).toFixed(1) + '%</td>'
+      + '</tr>';
   });
+  tb.innerHTML = html;
+  showToast('Mining completed: ' + results.length + ' factors discovered', 'success');
+}
 
-  // IC/IR analysis select
-  var icSelect=document.querySelector('[data-panel="icir"] .form-select');
-  if(icSelect) icSelect.addEventListener('change',function(){showToast('Switched to factor '+this.value,'success')});
-
-  // Factor library filter
-  (function(){
-    var bar=document.querySelector('[data-panel="library"] .filter-bar');
-    if(!bar) return;
-    var search=bar.querySelector('.form-input');
-    var selects=bar.querySelectorAll('.form-select');
-    var rows=document.querySelectorAll('#factorTable tr');
-    function filter(){
-      var q=search.value.toLowerCase();
-      var cat=selects[0].value;
-      rows.forEach(function(r){
-        var txt=r.textContent.toLowerCase();
-        var badges=r.querySelectorAll('.badge-muted');
-        var rowCat=badges.length?badges[0].textContent:'';
-        var matchQ=!q||txt.includes(q);
-        var matchC=cat==='All categories'||rowCat===cat;
-        r.style.display=matchQ&&matchC?'':'none';
-      });
+/* ── Factor Combine ── */
+function addToCombine(factorId) {
+  var factor = null;
+  for (var i = 0; i < FACTORS.length; i++) {
+    if (FACTORS[i].id === factorId) { factor = FACTORS[i]; break; }
+  }
+  if (!factor) return;
+  for (var j = 0; j < combineFactors.length; j++) {
+    if (combineFactors[j].id === factorId) {
+      showToast('Factor already added', 'warning');
+      return;
     }
-    search.addEventListener('input',filter);
-    selects.forEach(function(s){s.addEventListener('change',filter)});
-  })();
+  }
+  combineFactors.push({ id:factor.id, name:factor.name, expression:factor.expression, weight:1.0, direction:1 });
+  renderCombineList();
+  activateTab('fl', 'combine');
+  showToast('Added "' + factor.name + '" to combine list', 'success');
+}
+
+function removeFromCombine(idx) {
+  combineFactors.splice(idx, 1);
+  renderCombineList();
+}
+
+function renderCombineList() {
+  var list = document.getElementById('combineList');
+  var empty = document.getElementById('combineEmpty');
+  var controls = document.getElementById('combineControls');
+
+  if (combineFactors.length === 0) {
+    list.innerHTML = '';
+    empty.style.display = '';
+    controls.style.display = 'none';
+    return;
+  }
+  empty.style.display = 'none';
+  controls.style.display = '';
+
+  var html = '';
+  combineFactors.forEach(function(cf, idx) {
+    html += '<div class="combine-row">'
+      + '<span class="factor-name">' + cf.name + '</span>'
+      + '<label>Weight</label>'
+      + '<input type="number" step="0.1" value="' + cf.weight + '" class="form-input" onchange="updateCombineWeight(' + idx + ',this.value)">'
+      + '<label>Direction</label>'
+      + '<select class="form-select" onchange="updateCombineDirection(' + idx + ',this.value)">'
+      + '<option value="1"' + (cf.direction === 1 ? ' selected' : '') + '>Long</option>'
+      + '<option value="-1"' + (cf.direction === -1 ? ' selected' : '') + '>Short</option>'
+      + '</select>'
+      + '<button class="btn-remove" onclick="removeFromCombine(' + idx + ')" title="Remove">' + icon('trash') + '</button>'
+      + '</div>';
+  });
+  list.innerHTML = html;
+}
+
+function updateCombineWeight(idx, val) {
+  combineFactors[idx].weight = parseFloat(val) || 0;
+}
+
+function updateCombineDirection(idx, val) {
+  combineFactors[idx].direction = parseInt(val);
+}
+
+function previewCode() {
+  var className = document.getElementById('combineClassName').value || 'MultiFactorStrategy';
+  var code = 'class ' + className + '(BaseStrategy):\n';
+  code += '    """Multi-factor strategy"""\n\n';
+  code += '    def init_factors(self):\n';
+  code += '        self.factors = [\n';
+  combineFactors.forEach(function(cf) {
+    var dir = cf.direction === 1 ? 'long' : 'short';
+    code += '            {"name": "' + cf.name + '", "weight": ' + cf.weight + ', "direction": "' + dir + '"},\n';
+  });
+  code += '        ]\n\n';
+  code += '    def generate_signal(self, data):\n';
+  code += '        combined = 0\n';
+  code += '        for f in self.factors:\n';
+  code += '            score = self.compute_factor(data, f["name"])\n';
+  code += '            sign = 1 if f["direction"] == "long" else -1\n';
+  code += '            combined += score * f["weight"] * sign\n';
+  code += '        return combined\n';
+
+  document.getElementById('codeBlock').textContent = code;
+  document.getElementById('codePreview').style.display = '';
+}
+
+function createStrategy() {
+  var stratName = document.getElementById('combineStratName').value;
+  var className = document.getElementById('combineClassName').value;
+  if (!stratName || !className) {
+    showToast('Please fill in Strategy Name and Class Name', 'warning');
+    return;
+  }
+  showToast('Multi-factor strategy "' + stratName + '" created', 'success');
+  combineFactors = [];
+  document.getElementById('combineStratName').value = '';
+  document.getElementById('combineClassName').value = '';
+  document.getElementById('codePreview').style.display = 'none';
+  renderCombineList();
+}
+
+/* ── Create Factor Modal ── */
+function submitCreateFactor() {
+  var name = document.getElementById('modalFactorName').value;
+  if (!name) { showToast('Please enter a factor name', 'warning'); return; }
+  var cat = document.getElementById('modalCategory');
+  var formula = document.getElementById('modalFormula').value;
+  FACTORS.push({
+    id: FACTORS.length + 1,
+    name: name,
+    category: cat.options[cat.selectedIndex].text,
+    expression: formula || '-',
+    status: 'testing'
+  });
+  closeModal('createFactor');
+  showToast('Factor "' + name + '" created successfully', 'success');
+  renderFactorTable(document.getElementById('libSearch').value);
+  populateFactorDropdown();
+}
+
+/* ── Init ── */
+document.addEventListener('DOMContentLoaded', function() {
+  // inject tab icons
+  var icoLib = document.getElementById('ico-library');
+  var icoLC = document.getElementById('ico-linechart');
+  var icoPick = document.getElementById('ico-pickaxe');
+  var icoGC = document.getElementById('ico-gitcompare');
+  var icoTU = document.getElementById('ico-trendingup');
+  if (icoLib) icoLib.innerHTML = icon('library');
+  if (icoLC) icoLC.innerHTML = icon('line-chart');
+  if (icoPick) icoPick.innerHTML = icon('pickaxe');
+  if (icoGC) icoGC.innerHTML = icon('git-compare');
+  if (icoTU) icoTU.innerHTML = icon('trending-up');
+
+  renderFactorTable('');
+  populateFactorDropdown();
+  initLibrarySearch();
+
+  // ICIR factor dropdown change
+  document.getElementById('icirFactor').addEventListener('change', function() {
+    renderEvaluations(this.value);
+  });
 });
 </script>
 </body>

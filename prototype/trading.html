@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>QuantMate - Trade Execution</title>
+  <title>QuantMate - Trading</title>
   <link rel="stylesheet" href="shared.css">
   <script src="https://cdn.tailwindcss.com?v=3.4"></script>
 </head>
@@ -12,78 +12,78 @@
   <main class="main-content" id="main">
 
     <div class="page-header">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">
         <div>
-          <h1 class="page-title">Trade Execution</h1>
-          <p class="page-subtitle">Order management | Real-time fills | Trade records</p>
+          <h1 class="page-title">Trading</h1>
+          <p class="page-subtitle">Order entry, execution details, and algo trading</p>
         </div>
-        <div style="display:flex;gap:8px">
-          <button class="btn btn-secondary" onclick="showToast('Exporting transaction records...','info')">Export Records</button>
-          <button class="btn btn-primary" onclick="openModal('orderModal')">Manual order</button>
+        <div>
+          <button class="btn btn-primary" onclick="openModal('orderModal')">${icon('plus')} New Order</button>
         </div>
       </div>
     </div>
 
     <div class="tabs" data-group="tr">
-      <button class="tab-btn active" data-tab="pending">Same-day order</button>
-      <button class="tab-btn" data-tab="filled">Transaction Record</button>
-      <button class="tab-btn" data-tab="history">Historical Transactions</button>
-      <button class="tab-btn" data-tab="algo">Algorithmic trading</button>
+      <button class="tab-btn active" data-tab="pending">${icon('list')} Open Orders</button>
+      <button class="tab-btn" data-tab="filled">${icon('arrow-down-up')} Trades</button>
+      <button class="tab-btn" data-tab="history">${icon('history')} Order History</button>
+      <button class="tab-btn" data-tab="algo">${icon('settings')} Algo Trading</button>
     </div>
 
-    <!-- Tab: Pending Orders -->
+    <!-- Tab: Open Orders -->
     <div class="tab-panel active" data-group="tr" data-panel="pending">
       <div class="stat-grid cols-4">
-        <div class="stat-card"><div class="stat-label">Today's Commission</div><div class="stat-value">5</div></div>
-        <div class="stat-card"><div class="stat-label">Sold</div><div class="stat-value text-success">3</div></div>
-        <div class="stat-card"><div class="stat-label">Pending Transaction</div><div class="stat-value text-warning">1</div></div>
-        <div class="stat-card"><div class="stat-label">Order Cancelled</div><div class="stat-value text-muted">1</div></div>
+        <div class="stat-card"><div class="stat-label">Today Orders</div><div class="stat-value">5</div></div>
+        <div class="stat-card"><div class="stat-label">Filled</div><div class="stat-value text-success">3</div></div>
+        <div class="stat-card"><div class="stat-label">Pending</div><div class="stat-value text-warning">1</div></div>
+        <div class="stat-card"><div class="stat-label">Cancelled</div><div class="stat-value text-muted">1</div></div>
       </div>
-
+      <div class="filter-bar" style="margin-bottom:12px">
+        <div class="search-wrap"><span id="pendingSearchIcon"></span><input type="text" class="form-input" placeholder="Search symbol..."></div>
+      </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Commission Number</th><th>Time</th><th>Code</th><th>Direction</th><th>Type</th><th>Entrust Price</th><th>Order quantity</th><th>Trading volume</th><th>State</th><th>Operation</th></tr></thead>
+          <thead><tr><th>Symbol</th><th>Side</th><th>Type</th><th>Order Price</th><th>Order Qty</th><th>Filled Qty</th><th>Status</th><th>Strategy</th><th>Time</th><th>Actions</th></tr></thead>
           <tbody id="pendingTable"></tbody>
         </table>
       </div>
     </div>
 
-    <!-- Tab: Filled -->
+    <!-- Tab: Trades -->
     <div class="tab-panel" data-group="tr" data-panel="filled">
-      <div class="filter-bar">
-        <input type="text" class="form-input" placeholder="?? Search symbol..." style="max-width:200px">
-        <select class="form-select" style="max-width:120px"><option>All directions</option><option>Buy</option><option>Sell</option></select>
+      <div class="filter-bar" style="margin-bottom:12px">
+        <div class="search-wrap"><span id="filledSearchIcon"></span><input type="text" class="form-input" placeholder="Search symbol..."></div>
       </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Transaction Number</th><th>Time</th><th>Code</th><th>Name</th><th>Direction</th><th>Transaction Price</th><th>Trading volume</th><th>Turnover</th><th>Handling fee</th></tr></thead>
+          <thead><tr><th>Symbol</th><th>Side</th><th>Trade Price</th><th>Trade Qty</th><th>Strategy</th><th>Trade Time</th></tr></thead>
           <tbody>
-            <tr><td class="font-mono">T-001</td><td>09:31:02</td><td class="font-mono">600519.SH</td><td>Kweichow Moutai</td><td><span class="badge badge-success">Buy</span></td><td>CNY 1,820.00</td><td>100</td><td>CNY 182,000</td><td>CNY 54.60</td></tr>
-            <tr><td class="font-mono">T-002</td><td>09:35:15</td><td class="font-mono">000858.SZ</td><td>Wuliangye</td><td><span class="badge badge-success">Buy</span></td><td>CNY 148.50</td><td>500</td><td>CNY 74,250</td><td>CNY 22.28</td></tr>
-            <tr><td class="font-mono">T-003</td><td>10:02:30</td><td class="font-mono">601012.SH</td><td>LONGi Green Energy</td><td><span class="badge badge-success">Buy</span></td><td>CNY 24.60</td><td>1000</td><td>CNY 24,600</td><td>CNY 7.38</td></tr>
+            <tr><td class="font-mono">600519.SH</td><td><span class="badge badge-success">Buy</span></td><td>¥1,820.00</td><td>100</td><td>DualMA_Cross</td><td>09:31:02</td></tr>
+            <tr><td class="font-mono">000858.SZ</td><td><span class="badge badge-success">Buy</span></td><td>¥148.50</td><td>500</td><td>RSI_Reversal</td><td>09:35:15</td></tr>
+            <tr><td class="font-mono">601012.SH</td><td><span class="badge badge-success">Buy</span></td><td>¥24.60</td><td>1000</td><td>MyAlpha01</td><td>10:02:30</td></tr>
           </tbody>
         </table>
       </div>
     </div>
 
-    <!-- Tab: History -->
+    <!-- Tab: Order History -->
     <div class="tab-panel" data-group="tr" data-panel="history">
-      <div class="filter-bar">
-        <input type="date" class="form-input" value="2026-03-01" style="max-width:160px">
-        <span class="text-muted" style="line-height:38px">to</span>
-        <input type="date" class="form-input" value="2026-03-14" style="max-width:160px">
-        <select class="form-select" style="max-width:160px"><option>All strategies</option><option>DualMA_Cross</option><option>RSI_Reversal</option><option>MyAlpha01</option></select>
-        <button class="btn btn-primary btn-sm" onclick="showToast('Query completed, historical data has been displayed','success')">Query</button>
+      <div class="filter-bar" style="margin-bottom:12px">
+        <div class="search-wrap"><span id="histSearchIcon"></span><input type="text" class="form-input" placeholder="Search symbol..."></div>
+        <select class="form-select" style="width:150px;flex:0 0 150px">
+          <option value="all">All Status</option>
+          <option value="filled">Filled</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
       </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Date</th><th>Strategy</th><th>Code</th><th>Name</th><th>Direction</th><th>Price</th><th>Quantity</th><th>Total amount</th><th>Profit and loss</th></tr></thead>
+          <thead><tr><th>Symbol</th><th>Side</th><th>Type</th><th>Order Price</th><th>Order Qty</th><th>Filled Qty</th><th>Status</th><th>Strategy</th><th>Time</th></tr></thead>
           <tbody>
-            <tr><td>2026-03-13</td><td>DualMA_Cross</td><td class="font-mono">600519.SH</td><td>Kweichow Moutai</td><td><span class="badge badge-success">Buy</span></td><td>CNY 1,820.00</td><td>100</td><td>CNY 182,000</td><td>-</td></tr>
-            <tr><td>2026-03-12</td><td>RSI_Reversal</td><td class="font-mono">000858.SZ</td><td>Wuliangye</td><td><span class="badge badge-success">Buy</span></td><td>CNY 148.50</td><td>500</td><td>CNY 74,250</td><td>-</td></tr>
-            <tr><td>2026-03-10</td><td>DualMA_Cross</td><td class="font-mono">002415.SZ</td><td>Hikvision</td><td><span class="badge badge-destructive">Sell</span></td><td>CNY 35.20</td><td>200</td><td>CNY 7,040</td><td class="text-success">+CNY 640</td></tr>
-            <tr><td>2026-03-08</td><td>DualMA_Cross</td><td class="font-mono">002415.SZ</td><td>Hikvision</td><td><span class="badge badge-success">Buy</span></td><td>CNY 32.00</td><td>200</td><td>CNY 6,400</td><td>-</td></tr>
-            <tr><td>2026-03-05</td><td>MyAlpha01</td><td class="font-mono">601012.SH</td><td>LONGi Green Energy</td><td><span class="badge badge-success">Buy</span></td><td>CNY 24.60</td><td>1000</td><td>CNY 24,600</td><td>-</td></tr>
+            <tr><td class="font-mono">600519.SH</td><td><span class="badge badge-success">Buy</span></td><td>Limit</td><td>¥1,820.00</td><td>100</td><td>100</td><td><span class="badge badge-success">filled</span></td><td>DualMA_Cross</td><td>2026-03-13 09:31</td></tr>
+            <tr><td class="font-mono">000858.SZ</td><td><span class="badge badge-success">Buy</span></td><td>Limit</td><td>¥148.50</td><td>500</td><td>500</td><td><span class="badge badge-success">filled</span></td><td>RSI_Reversal</td><td>2026-03-12 09:35</td></tr>
+            <tr><td class="font-mono">002415.SZ</td><td><span class="badge badge-destructive">Sell</span></td><td>Market</td><td>¥35.20</td><td>200</td><td>200</td><td><span class="badge badge-success">filled</span></td><td>DualMA_Cross</td><td>2026-03-10 10:02</td></tr>
+            <tr><td class="font-mono">601012.SH</td><td><span class="badge badge-success">Buy</span></td><td>Limit</td><td>¥24.60</td><td>1000</td><td>0</td><td><span class="badge badge-muted">cancelled</span></td><td>MyAlpha01</td><td>2026-03-05 14:20</td></tr>
           </tbody>
         </table>
       </div>
@@ -91,12 +91,11 @@
 
     <!-- Tab: Algo Trading -->
     <div class="tab-panel" data-group="tr" data-panel="algo">
-      <div class="card">
-        <div class="card-header"><h3 class="card-title">Algorithmic Trading</h3><button class="btn btn-primary btn-sm" onclick="showToast('Please configure the algorithm parameters before submitting','info')">New Algorithm Order</button></div>
-        <p class="text-muted" style="margin-bottom:16px">Use algorithms to execute large orders, reducing market impact</p>
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header"><h3 class="card-title">Algo Orders</h3></div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Algorithm</th><th>Target</th><th>Direction</th><th>Target quantity</th><th>Completed</th><th>Progress</th><th>State</th><th>Operation</th></tr></thead>
+            <thead><tr><th>Algorithm</th><th>Target</th><th>Side</th><th>Target Qty</th><th>Filled</th><th>Progress</th><th>Status</th><th>Actions</th></tr></thead>
             <tbody>
               <tr>
                 <td><span class="badge badge-primary">TWAP</span></td>
@@ -104,8 +103,8 @@
                 <td><span class="badge badge-success">Buy</span></td>
                 <td>500</td><td>320</td>
                 <td><div class="progress-bar" style="width:120px;display:inline-block"><div class="progress-fill" style="width:64%"></div></div> 64%</td>
-                <td><span class="badge badge-primary">In progress</span></td>
-                <td><button class="btn btn-ghost btn-sm" onclick="showConfirm('Confirm to pause this algorithm order?', () => showToast('Algorithm order has been paused', 'warning'))"> Pause</button><button class="btn btn-ghost btn-sm" onclick="showConfirm('Confirm canceling this algorithm order?', () => showToast('Algorithm order has been canceled', 'error'))">Cancel</button></td>
+                <td><span class="badge badge-primary">Running</span></td>
+                <td><button class="btn btn-ghost btn-sm" onclick="showConfirm('Pause this algo order?', function(){showToast('Algo order paused','warning')})">Pause</button><button class="btn btn-ghost btn-sm" onclick="showConfirm('Cancel this algo order?', function(){showToast('Algo order cancelled','error')})">Cancel</button></td>
               </tr>
               <tr>
                 <td><span class="badge badge-primary">VWAP</span></td>
@@ -114,7 +113,7 @@
                 <td>1000</td><td>1000</td>
                 <td><div class="progress-bar" style="width:120px;display:inline-block"><div class="progress-fill" style="width:100%;background:var(--success)"></div></div> 100%</td>
                 <td><span class="badge badge-success">Completed</span></td>
-                <td><button class="btn btn-ghost btn-sm" onclick="showToast('VWAP execution details loaded','info')">Details</button></td>
+                <td><button class="btn btn-ghost btn-sm" onclick="showToast('VWAP details loaded','info')">Details</button></td>
               </tr>
             </tbody>
           </table>
@@ -123,19 +122,17 @@
 
       <div class="grid-2">
         <div class="card">
-          <div class="card-header"><h3 class="card-title">TWAP Configuration</h3></div>
+          <div class="card-header"><h3 class="card-title">TWAP Settings</h3></div>
           <div style="display:flex;flex-direction:column;gap:12px">
-            <div><label class="form-label">Time Window</label><div style="display:flex;gap:8px"><input type="time" class="form-input" value="09:30"><span style="line-height:38px">~</span><input type="time" class="form-input" value="15:00"></div></div>
-            <div><label class="form-label">Chunk Interval (Seconds)</label><input type="number" class="form-input" value="60"></div>
-            <div><label class="form-label">Price Protection (%)</label><input type="number" class="form-input" value="0.5" step="0.1"></div>
+            <div><label class="form-label">Slice Interval (sec)</label><input type="number" class="form-input" value="60"></div>
+            <div><label class="form-label">Child Ratio (%)</label><input type="number" class="form-input" value="5" step="1"></div>
           </div>
         </div>
         <div class="card">
-          <div class="card-header"><h3 class="card-title">VWAP Configuration</h3></div>
+          <div class="card-header"><h3 class="card-title">VWAP Settings</h3></div>
           <div style="display:flex;flex-direction:column;gap:12px">
-            <div><label class="form-label">Participation Rate (%)</label><input type="number" class="form-input" value="10"></div>
-            <div><label class="form-label">Maximum Deviation (%)</label><input type="number" class="form-input" value="1.0" step="0.1"></div>
-            <div><label class="form-label">Minimum Order Quantity</label><input type="number" class="form-input" value="100"></div>
+            <div><label class="form-label">Participation Cap (%)</label><input type="number" class="form-input" value="10"></div>
+            <div><label class="form-label">Max Deviation (bp)</label><input type="number" class="form-input" value="50" step="10"></div>
           </div>
         </div>
       </div>
@@ -144,38 +141,49 @@
   </main>
 </div>
 
-<!-- Manual Order Modal -->
+<!-- New Order Modal -->
 <div class="modal-overlay" id="orderModal">
-  <div class="modal" style="max-width:520px">
-    <div class="modal-header"><h3 class="modal-title">Manual Order</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('orderModal')">✕</button></div>
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header"><h3 class="modal-title">New Order</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('orderModal')">×</button></div>
     <div class="modal-body">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-        <div style="grid-column:span 2"><label class="form-label">Stock Code</label><input type="text" class="form-input" placeholder="For example: 600519.SH"></div>
-        <div><label class="form-label">Direction</label><select class="form-select"><option>Buy</option><option>Sell</option></select></div>
-        <div><label class="form-label">Commission Type</label><select class="form-select"><option>Price limit</option><option>Market price</option><option>Stop loss</option><option>Take profit</option></select></div>
-        <div><label class="form-label">Entrusted Price</label><input type="number" class="form-input" placeholder="0.00" step="0.01"></div>
-        <div><label class="form-label">Quantity</label><input type="number" class="form-input" placeholder="100" step="100"></div>
-        <div style="grid-column:span 2"><label class="form-label">Association Strategy (Optional)</label><select class="form-select"><option>None</option><option>DualMA_Cross</option><option>RSI_Reversal</option></select></div>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div><label class="form-label">Ticker</label><input type="text" class="form-input" placeholder="e.g. 600519.SH"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div><label class="form-label">Side</label><select class="form-select"><option>Buy</option><option>Sell</option></select></div>
+          <div><label class="form-label">Order Type</label><select class="form-select"><option>Limit</option><option>Market</option></select></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div><label class="form-label">Price</label><input type="number" class="form-input" placeholder="0.00" step="0.01"></div>
+          <div><label class="form-label">Quantity</label><input type="number" class="form-input" placeholder="100" step="100"></div>
+        </div>
+        <div><label class="form-label">Strategy (optional)</label><input type="text" class="form-input" placeholder="e.g. DualMA_Cross"></div>
       </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('orderModal')">Cancel</button>
-      <button class="btn btn-primary" onclick="submitModal('orderModal', 'Order submitted and waiting to be filled', 'success')">Submit Order</button>
+      <button class="btn btn-primary" onclick="submitModal('orderModal','Order submitted','success')">Submit Order</button>
     </div>
   </div>
 </div>
 
 <script src="shared.js"></script>
 <script>
-const tbody = document.getElementById('pendingTable');
-MOCK.orders.forEach(o => {
-  tbody.innerHTML += `<tr>
-    <td class="font-mono">${o.id}</td><td>${o.time}</td><td class="font-mono">${o.symbol}</td>
-    <td><span class="badge ${o.dir==='Buy'?'badge-success':'badge-destructive'}">${o.dir}</span></td>
-    <td>${o.type}</td><td>CNY ${o.price.toFixed(2)}</td><td>${o.qty}</td><td>${o.filled}</td>
-    <td>${statusBadge(o.status)}</td>
-    <td>${o.status==="pending" ? "<button class=\"btn btn-ghost btn-sm\" onclick=\"showConfirm('Confirm cancel order " + o.id + "?', () => showToast('" + o.id + " has been canceled', 'warning'))\">Cancel Order</button>" : "<button class=\"btn btn-ghost btn-sm\" onclick=\"showToast('Order details for " + o.id + " loaded', 'info')\">Details</button>"}</td>
-  </tr>`;
+document.addEventListener('DOMContentLoaded', function() {
+  ['pendingSearchIcon','filledSearchIcon','histSearchIcon'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.innerHTML = icon('search');
+  });
+});
+var tbody = document.getElementById('pendingTable');
+MOCK.orders.forEach(function(o) {
+  var cancelBtn = o.status==='pending' ? '<button class="btn btn-ghost btn-sm text-destructive" onclick="showConfirm(\'Cancel order '+o.id+'?\', function(){showToast(\''+o.id+' cancelled\',\'warning\')})">Cancel</button>' : '';
+  tbody.innerHTML += '<tr>'
+    +'<td class="font-mono">'+o.symbol+'</td>'
+    +'<td><span class="badge '+(o.dir==='Buy'?'badge-success':'badge-destructive')+'">'+o.dir+'</span></td>'
+    +'<td>'+o.type+'</td><td>¥'+o.price.toFixed(2)+'</td><td>'+o.qty+'</td><td>'+o.filled+'</td>'
+    +'<td>'+statusBadge(o.status)+'</td><td>'+o.strategy+'</td><td>'+o.time+'</td>'
+    +'<td>'+cancelBtn+'</td>'
+  +'</tr>';
 });
 </script>
 </body>

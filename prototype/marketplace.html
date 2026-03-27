@@ -2,9 +2,46 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>QuantMate - Template Market</title>
+  <title>QuantMate - Strategy Marketplace</title>
   <link rel="stylesheet" href="shared.css">
   <script src="https://cdn.tailwindcss.com?v=3.4"></script>
+  <style>
+    .cat-btn {
+      padding: 6px 16px; border-radius: 9999px; font-size: 0.8rem; font-weight: 500;
+      border: 1px solid hsl(var(--border)); background: transparent;
+      color: hsl(var(--muted-foreground)); cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .cat-btn:hover { background: hsl(var(--accent)); color: hsl(var(--foreground)); }
+    .cat-btn.active {
+      background: hsl(var(--primary)); color: hsl(var(--primary-foreground));
+      border-color: hsl(var(--primary));
+    }
+    .tmpl-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .tmpl-card { display: flex; flex-direction: column; }
+    .tmpl-card .tmpl-desc {
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+      overflow: hidden; font-size: 0.8rem; color: hsl(var(--muted-foreground)); margin: 8px 0;
+    }
+    .tmpl-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+    .tmpl-tag {
+      padding: 2px 8px; border-radius: 4px; font-size: 0.7rem;
+      background: hsl(var(--muted)); color: hsl(var(--muted-foreground));
+    }
+    .pagination { display: flex; justify-content: center; gap: 4px; margin-top: 24px; }
+    .page-btn {
+      min-width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center;
+      border-radius: calc(var(--radius) - 2px); font-size: 0.8rem; font-weight: 500;
+      border: 1px solid hsl(var(--border)); background: transparent;
+      color: hsl(var(--foreground)); cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+    .page-btn:hover { background: hsl(var(--accent)); }
+    .page-btn.active { background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); border-color: hsl(var(--primary)); }
+    .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    @media (max-width: 1024px) { .tmpl-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 640px) { .tmpl-grid { grid-template-columns: 1fr; } }
+  </style>
 </head>
 <body>
 <div class="app-layout">
@@ -12,188 +49,264 @@
   <main class="main-content" id="main">
 
     <div class="page-header">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
-        <div>
-          <h1 class="page-title">Template Market</h1>
-          <p class="page-subtitle">Strategy Template · Factor Library · Toolkit · Community Contributions</p>
-        </div>
-        <div style="display:flex;gap:8px">
-          <button class="btn btn-secondary" onclick="showToast('Please fill in the template information before publishing', 'info')">Release template</button>
-          <button class="btn btn-primary" onclick="showToast('Favorites list displayed', 'success')">My Favorites</button>
-        </div>
-      </div>
+      <h1 class="page-title">Strategy Marketplace</h1>
+      <p class="page-subtitle">Discover high-quality strategy templates and deploy in one click</p>
     </div>
 
-    <div class="filter-bar">
-      <input type="text" class="form-input" placeholder="🔍 Searching templates..." style="max-width:280px">
-      <select class="form-select" style="max-width:140px"><option>All categories</option><option>CTA Strategy</option><option>Alpha factor</option><option>Toolset</option><option>Risk Control Template</option></select>
-      <select class="form-select" style="max-width:120px"><option>Hot Ranking</option><option>Latest release</option><option>Highest rated</option><option>Most downloaded</option></select>
+    <!-- Search + Category Filters -->
+    <div class="filter-bar" style="flex-direction:column;align-items:stretch;gap:12px">
+      <input type="text" class="form-input" id="searchInput" placeholder="Search strategy templates..." style="max-width:400px">
+      <div id="catBar" style="display:flex;flex-wrap:wrap;gap:8px"></div>
     </div>
 
-    <!-- Featured -->
-    <div class="card" style="background:linear-gradient(135deg,hsl(221 83% 53% / 0.1),hsl(262 83% 58% / 0.1));border:1px solid hsl(221 83% 53% / 0.3)">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px">
-        <div>
-          <span class="badge badge-primary" style="margin-bottom:8px">⭐ This Week's Recommendation</span>
-          <h3 style="font-weight:700;font-size:18px;margin:4px 0">Multi-Factor Alpha Stock Selection Framework v2</h3>
-          <p class="text-muted" style="font-size:13px">Integrates the four major factors of momentum, value, quality, and size, supporting custom factor weights and IC testing. The 12-month backtested annualized return is 28.5%.</p>
-          <div style="display:flex;gap:12px;margin-top:8px;font-size:13px">
-            <span>⭐ 4.8/5</span><span>📥 1,250 Downloads</span><span>👤 quant_master</span>
-          </div>
-        </div>
-        <button class="btn btn-primary" style="white-space:nowrap" onclick="showToast('Multi-Factor Alpha Framework v2 has been downloaded','success')">Free Download</button>
-      </div>
-    </div>
+    <!-- Featured Banner -->
+    <div id="featuredBanner"></div>
 
     <!-- Template Grid -->
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;margin-top:16px">
-      
-      <div class="card">
-        <div class="card-header">
-          <h3 class="card-title">Double Moving Average Crossover Strategy</h3>
-          <span class="badge badge-primary">CTA</span>
-        </div>
-        <p class="text-muted" style="font-size:13px;margin:8px 0">Classic double moving average golden cross/death cross strategy, suitable for trending markets. Supports parameter optimization.</p>
-        <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted-foreground)">
-          <div style="display:flex;gap:12px"><span>⭐ 4.5</span><span>📥 856</span></div>
-          <span>by system</span>
-        </div>
-        <div style="display:flex;gap:8px;margin-top:12px">
-          <button class="btn btn-primary btn-sm">Use</button>
-          <button class="btn btn-ghost btn-sm">Preview</button>
-          <button class="btn btn-ghost btn-sm">⭐ Favorite</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <h3 class="card-title">RSI Reversal Strategy</h3>
-          <span class="badge badge-primary">CTA</span>
-        </div>
-        <p class="text-muted" style="font-size:13px;margin:8px 0">RSI overbought and oversold reversals, verified with trading volume. Suitable for ranging markets.</p>
-        <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted-foreground)">
-          <div style="display:flex;gap:12px"><span>⭐ 4.3</span><span>📥 642</span></div>
-          <span>by system</span>
-        </div>
-        <div style="display:flex;gap:8px;margin-top:12px">
-          <button class="btn btn-primary btn-sm">Use</button>
-          <button class="btn btn-ghost btn-sm">Preview</button>
-          <button class="btn btn-ghost btn-sm">⭐ Favorite</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <h3 class="card-title">Bollinger Band Breakout</h3>
-          <span class="badge badge-primary">CTA</span>
-        </div>
-        <p class="text-muted" style="font-size:13px;margin:8px 0">Bollinger Bands upper and lower band breakout trading, with stop-loss and take-profit logic.</p>
-        <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted-foreground)">
-          <div style="display:flex;gap:12px"><span>⭐ 4.1</span><span>📥 523</span></div>
-          <span>by system</span>
-        </div>
-        <div style="display:flex;gap:8px;margin-top:12px">
-          <button class="btn btn-primary btn-sm">Use</button>
-          <button class="btn btn-ghost btn-sm">Preview</button>
-          <button class="btn btn-ghost btn-sm">⭐ Favorite</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <h3 class="card-title">IC Weighted Multi-Factor</h3>
-          <span class="badge badge-warning">Alpha</span>
-        </div>
-        <p class="text-muted" style="font-size:13px;margin:8px 0">A multi-factor stock selection framework that dynamically adjusts weights based on factor IC values.</p>
-        <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted-foreground)">
-          <div style="display:flex;gap:12px"><span>⭐ 4.7</span><span>📥 428</span></div>
-          <span>by alpha_seeker</span>
-        </div>
-        <div style="display:flex;gap:8px;margin-top:12px">
-          <button class="btn btn-primary btn-sm">Use</button>
-          <button class="btn btn-ghost btn-sm">Preview</button>
-          <button class="btn btn-ghost btn-sm">⭐ Favorite</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <h3 class="card-title">Risk parity portfolio</h3>
-          <span class="badge badge-success">Combination</span>
-        </div>
-        <p class="text-muted" style="font-size:13px;margin:8px 0">Asset allocation framework based on risk contribution equalization, automatically rebalanced.</p>
-        <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted-foreground)">
-          <div style="display:flex;gap:12px"><span>⭐ 4.6</span><span>📥 315</span></div>
-          <span>by risk_labs</span>
-        </div>
-        <div style="display:flex;gap:8px;margin-top:12px">
-          <button class="btn btn-primary btn-sm">Use</button>
-          <button class="btn btn-ghost btn-sm">Preview</button>
-          <button class="btn btn-ghost btn-sm">⭐ Favorite</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <h3 class="card-title">Event-driven strategy</h3>
-          <span class="badge badge-destructive">Experiment</span>
-        </div>
-        <p class="text-muted" style="font-size:13px;margin:8px 0">Event-driven trading framework based on financial events (financial reports, announcements), including NLP analysis.</p>
-        <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted-foreground)">
-          <div style="display:flex;gap:12px"><span>⭐ 4.2</span><span>📥 189</span></div>
-          <span>by nlp_trader</span>
-        </div>
-        <div style="display:flex;gap:8px;margin-top:12px">
-          <button class="btn btn-primary btn-sm">Use</button>
-          <button class="btn btn-ghost btn-sm">Preview</button>
-          <button class="btn btn-ghost btn-sm">⭐ Favorite</button>
-        </div>
-      </div>
-    </div>
+    <div class="tmpl-grid" id="tmplGrid"></div>
 
     <!-- Pagination -->
-    <div style="display:flex;justify-content:center;gap:4px;margin-top:24px">
-      <button class="btn btn-ghost btn-sm" disabled>← Previous Page</button>
-      <button class="btn btn-primary btn-sm">1</button>
-      <button class="btn btn-ghost btn-sm" onclick="showToast('Loading page 2...','info')">2</button>
-      <button class="btn btn-ghost btn-sm" onclick="showToast('Loading page 3...','info')">3</button>
-      <button class="btn btn-ghost btn-sm" onclick="showToast('Loading page 2...','info')">Next page →</button>
-    </div>
+    <div class="pagination" id="pagination"></div>
 
   </main>
 </div>
 
 <script src="shared.js"></script>
 <script>
-// Card action buttons
-document.querySelectorAll('.card').forEach(card=>{
-  const title = (card.querySelector('.card-title')||{}).textContent||'';
-  card.querySelectorAll('.btn-sm').forEach(btn=>{
-    const t = btn.textContent.trim();
-    if(t==='Use') btn.onclick=()=>showToast('Template " has been imported'+title+'"] to the Strategy Editor','success');
-    else if(t==='Preview') btn.onclick=()=>showToast('Preview "'+title+'」','info');
-    else if(t.includes('Favorite')) btn.onclick=function(){this.textContent='✓ Added to Favorites';showToast('Added to favorites "'+title+'」','success')};
-  });
-});
-// Filters
-(function(){
-  const search=document.querySelector('.filter-bar .form-input');
-  const selects=document.querySelectorAll('.filter-bar .form-select');
-  const cards=[...document.querySelectorAll('main > div[style*="grid-template"]> .card')];
-  function filter(){
-    const q=search.value.toLowerCase();
-    const cat=selects[0].value;
-    cards.forEach(c=>{
-      const txt=c.textContent.toLowerCase();
-      const badge=(c.querySelector('.card-header .badge')||{}).textContent||'';
-      const matchQ=!q||txt.includes(q);
-      const matchC=cat==='All categories'||badge.includes(cat.replace(/s*strategy|factor|Toolset|Risk Control Template/g,'').trim())||txt.includes(cat);
-      c.style.display=matchQ&&matchC?'':'none';
+var CATEGORIES = ['All', 'Trend Following', 'Mean Reversion', 'Multi-Factor', 'Arbitrage', 'High Frequency', 'Machine Learning'];
+
+var TEMPLATES = [
+  {
+    name: 'Dual MA Crossover',
+    category: 'Trend Following',
+    rating: 4.8,
+    downloads: 2340,
+    author: 'quant_master',
+    desc: 'Classic dual moving average crossover strategy with optimized entry/exit signals. Supports multiple timeframes and adaptive period tuning.',
+    tags: ['Moving Average', 'Trend', 'Beginner Friendly'],
+    featured: true
+  },
+  {
+    name: 'RSI Mean Reversion',
+    category: 'Mean Reversion',
+    rating: 4.5,
+    downloads: 1856,
+    author: 'alpha_seeker',
+    desc: 'RSI-based mean reversion strategy with dynamic overbought/oversold thresholds. Includes volume confirmation filter.',
+    tags: ['RSI', 'Mean Reversion', 'Volume']
+  },
+  {
+    name: 'Multi-Factor Alpha',
+    category: 'Multi-Factor',
+    rating: 4.7,
+    downloads: 1425,
+    author: 'factor_lab',
+    desc: 'Combines momentum, value, quality and size factors with IC-weighted dynamic allocation. Backtested annualized return of 28.5%.',
+    tags: ['Multi-Factor', 'Alpha', 'Stock Selection']
+  },
+  {
+    name: 'Statistical Arbitrage',
+    category: 'Arbitrage',
+    rating: 4.3,
+    downloads: 980,
+    author: 'pair_trader',
+    desc: 'Cointegration-based statistical arbitrage for correlated pairs. Automatic pair detection and spread z-score trading.',
+    tags: ['Pairs Trading', 'Cointegration', 'Market Neutral']
+  },
+  {
+    name: 'LSTM Price Predictor',
+    category: 'Machine Learning',
+    rating: 4.6,
+    downloads: 1120,
+    author: 'ml_quant',
+    desc: 'LSTM neural network for short-term price prediction. Integrates technical indicators and sentiment features as input.',
+    tags: ['LSTM', 'Deep Learning', 'Prediction']
+  },
+  {
+    name: 'Grid Trading Bot',
+    category: 'High Frequency',
+    rating: 4.2,
+    downloads: 760,
+    author: 'grid_master',
+    desc: 'Dynamic grid trading strategy for range-bound markets. Auto-adjusts grid spacing based on realized volatility.',
+    tags: ['Grid', 'Market Making', 'Volatility']
+  },
+  {
+    name: 'Bollinger Breakout',
+    category: 'Trend Following',
+    rating: 4.1,
+    downloads: 1530,
+    author: 'breakout_pro',
+    desc: 'Bollinger Band breakout strategy with ATR-based stop loss and trailing take profit. Optimized for intraday trading.',
+    tags: ['Bollinger', 'Breakout', 'ATR']
+  },
+  {
+    name: 'XGBoost Ranker',
+    category: 'Machine Learning',
+    rating: 4.4,
+    downloads: 890,
+    author: 'ml_quant',
+    desc: 'XGBoost-based cross-sectional stock ranking model. Features engineered from 60+ technical and fundamental factors.',
+    tags: ['XGBoost', 'Ranking', 'Feature Engineering']
+  }
+];
+
+var ITEMS_PER_PAGE = 6;
+var currentCategory = 'All';
+var currentSearch = '';
+var currentPage = 1;
+
+function getFilteredTemplates() {
+  var results = [];
+  for (var i = 0; i < TEMPLATES.length; i++) {
+    var t = TEMPLATES[i];
+    var matchCat = currentCategory === 'All' || t.category === currentCategory;
+    var matchSearch = !currentSearch || t.name.toLowerCase().indexOf(currentSearch) !== -1 || t.desc.toLowerCase().indexOf(currentSearch) !== -1 || t.category.toLowerCase().indexOf(currentSearch) !== -1;
+    if (matchCat && matchSearch) results.push(t);
+  }
+  return results;
+}
+
+function renderStars(rating) {
+  return icon('star', '') + ' ' + rating.toFixed(1);
+}
+
+function renderCategoryBar() {
+  var html = '';
+  for (var i = 0; i < CATEGORIES.length; i++) {
+    var cat = CATEGORIES[i];
+    var cls = cat === currentCategory ? 'cat-btn active' : 'cat-btn';
+    html += '<button class="' + cls + '" data-cat="' + cat + '">' + cat + '</button>';
+  }
+  document.getElementById('catBar').innerHTML = html;
+
+  var btns = document.getElementById('catBar').querySelectorAll('.cat-btn');
+  for (var j = 0; j < btns.length; j++) {
+    btns[j].addEventListener('click', function() {
+      currentCategory = this.getAttribute('data-cat');
+      currentPage = 1;
+      render();
     });
   }
-  search.addEventListener('input',filter);
-  selects.forEach(s=>s.addEventListener('change',filter));
-})();
+}
+
+function renderFeatured() {
+  var el = document.getElementById('featuredBanner');
+  if (currentCategory !== 'All' || currentSearch) {
+    el.innerHTML = '';
+    return;
+  }
+  var ft = null;
+  for (var i = 0; i < TEMPLATES.length; i++) {
+    if (TEMPLATES[i].featured) { ft = TEMPLATES[i]; break; }
+  }
+  if (!ft) { el.innerHTML = ''; return; }
+
+  el.innerHTML = '<div class="card" style="background:linear-gradient(135deg,hsl(221 83% 53% / 0.08),hsl(262 83% 58% / 0.08));border:1px solid hsl(221 83% 53% / 0.25);margin-bottom:20px">'
+    + '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px">'
+    + '<div style="flex:1;min-width:240px">'
+    + '<span class="badge badge-primary" style="margin-bottom:8px">' + icon('star') + ' Featured</span>'
+    + '<h3 style="font-weight:700;font-size:1.125rem;margin:8px 0 4px">' + ft.name + '</h3>'
+    + '<p class="text-muted" style="font-size:0.8rem;margin:4px 0 8px">' + ft.desc + '</p>'
+    + '<div style="display:flex;gap:16px;font-size:0.8rem;color:hsl(var(--muted-foreground))">'
+    + '<span>' + icon('star') + ' ' + ft.rating.toFixed(1) + '</span>'
+    + '<span>' + icon('download') + ' ' + ft.downloads.toLocaleString() + '</span>'
+    + '<span>' + ft.author + '</span>'
+    + '</div>'
+    + '</div>'
+    + '<button class="btn btn-primary" onclick="showToast(\'' + ft.name + ' template added to your workspace\', \'success\')">Use Template</button>'
+    + '</div>'
+    + '</div>';
+}
+
+function badgeClass(category) {
+  var map = {
+    'Trend Following': 'badge-primary',
+    'Mean Reversion': 'badge-success',
+    'Multi-Factor': 'badge-warning',
+    'Arbitrage': 'badge-destructive',
+    'High Frequency': 'badge-muted',
+    'Machine Learning': 'bg-purple'
+  };
+  return map[category] || 'badge-muted';
+}
+
+function renderGrid() {
+  var filtered = getFilteredTemplates();
+  var totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE) || 1;
+  if (currentPage > totalPages) currentPage = totalPages;
+  var start = (currentPage - 1) * ITEMS_PER_PAGE;
+  var pageItems = filtered.slice(start, start + ITEMS_PER_PAGE);
+
+  var html = '';
+  if (pageItems.length === 0) {
+    html = '<div class="empty-state" style="grid-column:1/-1">' + icon('search') + '<p>No templates found matching your criteria</p></div>';
+  }
+  for (var i = 0; i < pageItems.length; i++) {
+    var t = pageItems[i];
+    var tagsHtml = '';
+    for (var j = 0; j < t.tags.length; j++) {
+      tagsHtml += '<span class="tmpl-tag">' + t.tags[j] + '</span>';
+    }
+    html += '<div class="card card-sm tmpl-card">'
+      + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">'
+      + '<span class="badge ' + badgeClass(t.category) + '">' + t.category + '</span>'
+      + '<span style="font-size:0.75rem;color:hsl(var(--muted-foreground));display:flex;align-items:center;gap:4px">' + icon('star') + ' ' + t.rating.toFixed(1) + '</span>'
+      + '</div>'
+      + '<h4 style="font-weight:600;font-size:0.95rem;margin:4px 0">' + t.name + '</h4>'
+      + '<p class="tmpl-desc">' + t.desc + '</p>'
+      + '<div class="tmpl-tags">' + tagsHtml + '</div>'
+      + '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:8px;border-top:1px solid hsl(var(--border))">'
+      + '<div style="font-size:0.75rem;color:hsl(var(--muted-foreground));display:flex;gap:12px">'
+      + '<span>' + t.author + '</span>'
+      + '<span>' + icon('download') + ' ' + t.downloads.toLocaleString() + '</span>'
+      + '</div>'
+      + '<button class="btn btn-outline btn-sm" onclick="showToast(\'' + t.name + ' template added to your workspace\', \'success\')">Use Template</button>'
+      + '</div>'
+      + '</div>';
+  }
+  document.getElementById('tmplGrid').innerHTML = html;
+}
+
+function renderPagination() {
+  var filtered = getFilteredTemplates();
+  var totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE) || 1;
+  if (totalPages <= 1) { document.getElementById('pagination').innerHTML = ''; return; }
+
+  var html = '<button class="page-btn"' + (currentPage <= 1 ? ' disabled' : '') + ' data-page="prev">' + icon('chevron-right', 'transform:rotate(180deg)') + '</button>';
+  for (var i = 1; i <= totalPages; i++) {
+    html += '<button class="page-btn' + (i === currentPage ? ' active' : '') + '" data-page="' + i + '">' + i + '</button>';
+  }
+  html += '<button class="page-btn"' + (currentPage >= totalPages ? ' disabled' : '') + ' data-page="next">' + icon('chevron-right') + '</button>';
+
+  document.getElementById('pagination').innerHTML = html;
+
+  var btns = document.getElementById('pagination').querySelectorAll('.page-btn');
+  for (var j = 0; j < btns.length; j++) {
+    btns[j].addEventListener('click', function() {
+      var p = this.getAttribute('data-page');
+      if (p === 'prev') currentPage = Math.max(1, currentPage - 1);
+      else if (p === 'next') currentPage = currentPage + 1;
+      else currentPage = parseInt(p, 10);
+      render();
+    });
+  }
+}
+
+function render() {
+  renderCategoryBar();
+  renderFeatured();
+  renderGrid();
+  renderPagination();
+}
+
+document.getElementById('searchInput').addEventListener('input', function() {
+  currentSearch = this.value.toLowerCase().trim();
+  currentPage = 1;
+  render();
+});
+
+render();
 </script>
 </body>
 </html>
