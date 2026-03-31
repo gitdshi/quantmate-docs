@@ -58,6 +58,7 @@
       <button class="tab-btn active" data-tab="list">My Composites</button>
       <button class="tab-btn" data-tab="composer">Composer</button>
       <button class="tab-btn" data-tab="components">Components</button>
+      <button class="tab-btn" data-tab="templateLibrary">Template Library</button>
       <button class="tab-btn" data-tab="detail">Pipeline Detail</button>
     </div>
 
@@ -139,41 +140,74 @@
       </div>
     </div>
 
-    <!-- ═══════════ Tab: Components ═══════════ -->
+    <!-- ═══════════ Tab: Components (full CRUD) ═══════════ -->
     <div class="tab-panel" data-group="cs" data-panel="components">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:16px">
-        <div>
-          <h2 style="font-size:18px;font-weight:600;margin:0">Strategy Components</h2>
-          <p class="text-muted" style="font-size:13px;margin:4px 0 0">Read-only view of your imported components. <a href="strategies.html" style="color:hsl(var(--primary));text-decoration:underline">Edit in Strategy Research →</a></p>
+      <div style="display:grid;grid-template-columns:320px 1fr;gap:16px">
+        <!-- Left: component list -->
+        <div class="card" style="padding:16px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <h2 style="font-size:16px;font-weight:600;margin:0;display:flex;align-items:center;gap:6px">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.84Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></svg>
+              Components
+            </h2>
+            <button class="btn btn-primary btn-sm" onclick="document.getElementById('compCreateModal').classList.add('open')">+ New</button>
+          </div>
+          <div style="margin-bottom:12px">
+            <input type="text" class="form-input" id="compSearch" placeholder="Search components..." oninput="renderCompSidebar()" style="width:100%">
+          </div>
+          <div id="compSidebar"></div>
+        </div>
+        <!-- Right: editor -->
+        <div class="card" style="padding:16px" id="compEditorPanel">
+          <div style="display:flex;align-items:center;justify-content:center;min-height:300px;color:hsl(var(--muted-foreground));font-size:14px">
+            Select a component to edit
+          </div>
         </div>
       </div>
+    </div>
 
-      <!-- Universe -->
-      <div class="card" style="padding:16px;margin-bottom:16px">
-        <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px">
-          <span style="width:8px;height:8px;border-radius:50%;background:hsl(260 60% 50%);display:inline-block"></span>
-          <h3 style="font-size:15px;font-weight:600;margin:0">Universe Components</h3>
-          <span class="badge badge-muted" style="margin-left:auto">5</span>
+    <!-- Component Create Modal -->
+    <div class="modal-overlay" id="compCreateModal">
+      <div class="modal" style="max-width:420px">
+        <div class="modal-header"><h3 class="modal-title">New Component</h3><button class="modal-close" onclick="document.getElementById('compCreateModal').classList.remove('open')">&times;</button></div>
+        <div class="modal-body">
+          <div style="margin-bottom:12px"><label class="form-label">Name</label><input type="text" class="form-input" id="newCompName"></div>
+          <div style="margin-bottom:12px"><label class="form-label">Layer</label><select class="form-select" id="newCompLayer"><option value="universe">Universe</option><option value="trading" selected>Trading</option><option value="risk">Risk</option></select></div>
+          <div><label class="form-label">Sub Type</label><input type="text" class="form-input" id="newCompSubType" placeholder="e.g. dual_ma_signal"></div>
         </div>
-        <div class="table-wrap"><table><thead><tr><th>Name</th><th>Sub-type</th><th>Description</th><th>Version</th><th>Used In</th><th>Actions</th></tr></thead><tbody id="universeTable"></tbody></table></div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="document.getElementById('compCreateModal').classList.remove('open')">Cancel</button>
+          <button class="btn btn-primary" onclick="createComponent()">Create</button>
+        </div>
       </div>
-      <!-- Trading -->
-      <div class="card" style="padding:16px;margin-bottom:16px">
-        <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px">
-          <span style="width:8px;height:8px;border-radius:50%;background:hsl(210 80% 45%);display:inline-block"></span>
-          <h3 style="font-size:15px;font-weight:600;margin:0">Trading Components</h3>
-          <span class="badge badge-muted" style="margin-left:auto">6</span>
-        </div>
-        <div class="table-wrap"><table><thead><tr><th>Name</th><th>Sub-type</th><th>Description</th><th>Version</th><th>Used In</th><th>Actions</th></tr></thead><tbody id="tradingTable"></tbody></table></div>
+    </div>
+
+    <!-- ═══════════ Tab: Template Library ═══════════ -->
+    <div class="tab-panel" data-group="cs" data-panel="templateLibrary">
+      <div style="margin-bottom:16px">
+        <h2 style="font-size:18px;font-weight:600;margin:0">Template Library</h2>
+        <p class="text-muted" style="font-size:13px;margin:4px 0 0">Browse component and composite strategy templates from marketplace and your collection</p>
       </div>
-      <!-- Risk -->
-      <div class="card" style="padding:16px">
-        <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px">
-          <span style="width:8px;height:8px;border-radius:50%;background:hsl(0 70% 50%);display:inline-block"></span>
-          <h3 style="font-size:15px;font-weight:600;margin:0">Risk Components</h3>
-          <span class="badge badge-muted" style="margin-left:auto">4</span>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:16px;align-items:center">
+        <div style="position:relative;flex:1;min-width:200px">
+          <input type="text" class="form-input" id="tplLibSearch" placeholder="Search templates..." oninput="renderTplLibrary()" style="width:100%;padding-left:32px">
+          <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:hsl(var(--muted-foreground))" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         </div>
-        <div class="table-wrap"><table><thead><tr><th>Name</th><th>Sub-type</th><th>Description</th><th>Version</th><th>Used In</th><th>Actions</th></tr></thead><tbody id="riskTable"></tbody></table></div>
+        <div style="display:flex;gap:6px" id="tplSourceFilters"></div>
+        <div style="display:flex;gap:6px" id="tplTypeFilters"></div>
+      </div>
+      <div id="tplLibGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px"></div>
+    </div>
+
+    <!-- Template Preview Drawer (overlay) -->
+    <div class="modal-overlay" id="tplPreviewDrawer">
+      <div class="modal" style="max-width:600px;max-height:80vh;overflow-y:auto">
+        <div class="modal-header"><h3 class="modal-title" id="tplPreviewTitle">Template Preview</h3><button class="modal-close" onclick="closeTplPreview()">&times;</button></div>
+        <div class="modal-body" id="tplPreviewBody"></div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="closeTplPreview()">Close</button>
+          <button class="btn btn-primary" id="tplPreviewAddBtn" onclick="addTplToLibrary()">Add to Library</button>
+        </div>
       </div>
     </div>
 
@@ -358,32 +392,261 @@ function showCompositeDetail(id) {
   activateTab('cs', 'detail');
 }
 
-/* ── Component Tables ── */
-function renderComponentTable(tableId, items) {
-  var tbody = document.getElementById(tableId);
+/* ── Component Tables → CRUD split-panel ── */
+var selectedCompId = null;
+var collapsedLayers = {};
+var compEditorTab = 'code';
+var compBacktestOpen = false;
+
+function getCompsByLayer(layer) {
+  var map = { universe: UNIVERSE, trading: TRADING, risk: RISK };
+  return map[layer] || [];
+}
+
+function renderCompSidebar() {
+  var search = (document.getElementById('compSearch').value || '').trim().toLowerCase();
+  var root = document.getElementById('compSidebar');
+  var layers = ['universe', 'trading', 'risk'];
+  var badgeClass = { universe: 'badge-universe', trading: 'badge-trading', risk: 'badge-risk' };
   var html = '';
-  for (var i = 0; i < items.length; i++) {
-    var item = items[i];
-    html += '<tr>';
-    html += '<td><b>' + item.name + '</b></td>';
-    html += '<td><span class="badge badge-muted">' + item.sub + '</span></td>';
-    html += '<td>' + item.desc + '</td>';
-    html += '<td>v' + item.ver + '</td>';
-    html += '<td>' + item.used + ' composites</td>';
-    html += '<td><button class="btn btn-ghost btn-sm" onclick="showToast(\'Viewing code\', \'info\')">' + icon('eye') + '</button>';
-    html += '<a href="strategies.html" class="btn btn-ghost btn-sm" title="Edit in Strategy Research">' + icon('external-link') + '</a></td>';
-    html += '</tr>';
+  layers.forEach(function(layer) {
+    var items = getCompsByLayer(layer).filter(function(c) {
+      return !search || c.name.toLowerCase().indexOf(search) !== -1;
+    });
+    var collapsed = !!collapsedLayers[layer];
+    html += '<div style="margin-bottom:8px">';
+    html += '<button onclick="toggleCompLayer(\'' + layer + '\')" style="display:flex;align-items:center;gap:4px;width:100%;background:none;border:none;padding:4px 0;cursor:pointer;font-size:12px;text-transform:uppercase;color:hsl(var(--muted-foreground));font-weight:500">';
+    html += collapsed ? '&#9654;' : '&#9660;';
+    html += ' <span class="badge ' + badgeClass[layer] + '" style="font-size:10px">' + layer + '</span>';
+    html += '<span style="margin-left:auto;font-size:10px">' + items.length + '</span></button>';
+    if (!collapsed) {
+      html += '<div style="margin-left:12px">';
+      items.forEach(function(c) {
+        var sel = selectedCompId === c.id ? 'background:hsl(var(--primary)/.1);color:hsl(var(--primary))' : '';
+        html += '<button onclick="selectCompItem(\'' + layer + '\',\'' + c.id + '\')" style="display:block;width:100%;text-align:left;padding:6px 8px;border:none;border-radius:6px;cursor:pointer;font-size:13px;margin-bottom:2px;background:none;' + sel + '">';
+        html += '<div style="font-weight:500">' + c.name + '</div>';
+        html += '<div style="font-size:10px;color:hsl(var(--muted-foreground))">' + c.sub + '</div></button>';
+      });
+      if (!items.length) html += '<p style="font-size:12px;color:hsl(var(--muted-foreground));padding:4px 8px">No components</p>';
+      html += '</div>';
+    }
+    html += '</div>';
+  });
+  root.innerHTML = html;
+}
+
+function toggleCompLayer(layer) {
+  collapsedLayers[layer] = !collapsedLayers[layer];
+  renderCompSidebar();
+}
+
+function selectCompItem(layer, id) {
+  selectedCompId = id;
+  compEditorTab = 'code';
+  compBacktestOpen = false;
+  renderCompSidebar();
+  renderCompEditor(layer, id);
+}
+
+function renderCompEditor(layer, id) {
+  var comp = findComp(layer, id);
+  if (!comp) return;
+  var badgeClass = { universe: 'badge-universe', trading: 'badge-trading', risk: 'badge-risk' };
+  var panel = document.getElementById('compEditorPanel');
+  var tabs = ['code', 'config', 'parameters'];
+  var tabHtml = tabs.map(function(t) {
+    var cls = compEditorTab === t ? 'tab-btn active' : 'tab-btn';
+    return '<button class="' + cls + '" onclick="switchCompEditorTab(\'' + layer + '\',\'' + id + '\',\'' + t + '\')" style="font-size:13px;padding:6px 14px">' + t.charAt(0).toUpperCase() + t.slice(1) + '</button>';
+  }).join('');
+  var codeMap = {
+    code: '# ' + comp.name + ' component\n# Layer: ' + layer + '\n# Sub-type: ' + comp.sub + '\n\nclass ' + comp.name.replace(/[^a-zA-Z0-9]/g, '') + ':\n    def __init__(self, config):\n        self.config = config\n\n    def execute(self, context):\n        """' + comp.desc + '"""\n        pass',
+    config: JSON.stringify({ layer: layer, sub_type: comp.sub, version: comp.ver, enabled: true }, null, 2),
+    parameters: JSON.stringify({ threshold: 0.05, lookback_period: 20, max_positions: 10 }, null, 2)
+  };
+  var html = '';
+  html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">';
+  html += '<div><h3 style="font-size:18px;font-weight:600;margin:0">' + comp.name + '</h3>';
+  html += '<div style="display:flex;align-items:center;gap:8px;margin-top:4px"><span class="badge ' + badgeClass[layer] + '">' + layer + '</span><span style="font-size:12px;color:hsl(var(--muted-foreground))">' + comp.sub + '</span></div></div>';
+  html += '<button class="btn btn-ghost btn-sm" onclick="deleteComponent(\'' + id + '\')" style="color:hsl(var(--destructive))" title="Delete">' + icon('trash-2') + '</button></div>';
+  html += '<div class="tabs" style="margin-bottom:0;border-bottom:1px solid hsl(var(--border))">' + tabHtml + '</div>';
+  html += '<pre style="font-size:12px;font-family:monospace;background:hsl(var(--muted)/.5);padding:12px;border-radius:8px;overflow:auto;max-height:400px;white-space:pre-wrap;margin:12px 0">' + escapeHtml(codeMap[compEditorTab]) + '</pre>';
+  // Backtest drawer
+  html += '<div style="border-top:1px solid hsl(var(--border));padding-top:12px">';
+  html += '<button onclick="toggleCompBacktest(\'' + layer + '\',\'' + id + '\')" style="display:flex;align-items:center;gap:6px;background:none;border:none;cursor:pointer;font-size:13px;font-weight:500;color:hsl(var(--muted-foreground))">';
+  html += (compBacktestOpen ? '&#9660;' : '&#9654;') + ' ' + icon('flask-conical') + ' Component Backtest</button>';
+  if (compBacktestOpen) {
+    html += '<div style="margin-top:12px"><button class="btn btn-primary btn-sm" onclick="showToast(\'Backtest started for ' + comp.name + '\',\'success\')">' + icon('flask-conical') + ' Run Backtest</button></div>';
   }
-  tbody.innerHTML = html;
+  html += '</div>';
+  panel.innerHTML = html;
+}
+
+function switchCompEditorTab(layer, id, tab) {
+  compEditorTab = tab;
+  renderCompEditor(layer, id);
+}
+
+function toggleCompBacktest(layer, id) {
+  compBacktestOpen = !compBacktestOpen;
+  renderCompEditor(layer, id);
+}
+
+function deleteComponent(id) {
+  showToast('Component deleted', 'success');
+  selectedCompId = null;
+  renderCompSidebar();
+  document.getElementById('compEditorPanel').innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:300px;color:hsl(var(--muted-foreground));font-size:14px">Select a component to edit</div>';
+}
+
+function createComponent() {
+  var name = document.getElementById('newCompName').value.trim();
+  var subType = document.getElementById('newCompSubType').value.trim();
+  if (!name || !subType) { showToast('Please fill in all fields', 'warning'); return; }
+  showToast('Component "' + escapeHtml(name) + '" created', 'success');
+  document.getElementById('compCreateModal').classList.remove('open');
+  document.getElementById('newCompName').value = '';
+  document.getElementById('newCompSubType').value = '';
+}
+
+function escapeHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* ── Template Library ── */
+var TPL_DATA = [
+  { id: 101, name: 'Factor Top-K Template', desc: 'Multi-factor universe selection template with configurable ranking', type: 'component', category: 'universe', source: 'marketplace', downloads: 245, code: '# Factor Top-K component template\nclass FactorTopK:\n    def __init__(self, config):\n        self.k = config.get("k", 50)\n\n    def execute(self, context):\n        factors = context.get_factor_scores()\n        return factors.nlargest(self.k, "composite_score")' },
+  { id: 102, name: 'DualMA Signal', desc: 'Dual moving average crossover trading signal template', type: 'component', category: 'trading', source: 'marketplace', downloads: 182, code: '# DualMA Signal component template\nclass DualMASignal:\n    def __init__(self, config):\n        self.fast = config.get("fast_period", 5)\n        self.slow = config.get("slow_period", 20)\n\n    def execute(self, context):\n        fast_ma = context.ma(self.fast)\n        slow_ma = context.ma(self.slow)\n        return 1 if fast_ma > slow_ma else -1' },
+  { id: 103, name: 'ATR Stop Loss', desc: 'ATR-based trailing stop loss risk component', type: 'component', category: 'risk', source: 'marketplace', downloads: 156, code: '# ATR Stop Loss component\nclass ATRStopLoss:\n    def __init__(self, config):\n        self.multiplier = config.get("multiplier", 2.0)' },
+  { id: 104, name: 'Trend Following Pipeline', desc: 'Complete trend-following composite strategy with universe screening, MA signals, and ATR stops', type: 'composite', category: 'pipeline', source: 'marketplace', downloads: 312, code: '# Trend Following Composite\n# Universe: Factor Top-K\n# Trading: DualMA Cross\n# Risk: ATR Stop Loss\nPIPELINE = [\n    ("universe", "factor_top_k"),\n    ("trading", "dual_ma_signal"),\n    ("risk", "atr_stop_loss")\n]' },
+  { id: 105, name: 'Mean Reversion Pipeline', desc: 'Statistical mean reversion composite with RSI and Bollinger bands', type: 'composite', category: 'pipeline', source: 'marketplace', downloads: 198, code: '# Mean Reversion Composite\nPIPELINE = [\n    ("universe", "sector_screen"),\n    ("trading", "rsi_reversal"),\n    ("risk", "position_sizing")\n]' },
+  { id: 106, name: 'My Custom Universe', desc: 'Custom universe filter based on sector rotation', type: 'component', category: 'universe', source: 'mine', downloads: 0, code: '# My custom universe component' },
+  { id: 107, name: 'My Alpha Pipeline', desc: 'Personal composite strategy combining AI ranking with grid trading', type: 'composite', category: 'pipeline', source: 'mine', downloads: 0, code: '# My Alpha Pipeline\nPIPELINE = [...]' }
+];
+var tplSourceFilter = 'all';
+var tplTypeFilter = 'all';
+var tplLibrarySet = {};
+var previewTplId = null;
+
+function getFilteredTpl() {
+  var search = (document.getElementById('tplLibSearch').value || '').trim().toLowerCase();
+  return TPL_DATA.filter(function(t) {
+    if (tplSourceFilter !== 'all' && t.source !== tplSourceFilter) return false;
+    if (tplTypeFilter !== 'all' && t.type !== tplTypeFilter) return false;
+    if (search && t.name.toLowerCase().indexOf(search) === -1 && t.desc.toLowerCase().indexOf(search) === -1) return false;
+    return true;
+  });
+}
+
+function renderTplSourceFilters() {
+  var root = document.getElementById('tplSourceFilters');
+  var options = [['all','All'],['marketplace','Marketplace'],['mine','My Templates']];
+  root.innerHTML = options.map(function(o) {
+    var cls = tplSourceFilter === o[0] ? 'btn btn-primary btn-sm' : 'btn btn-secondary btn-sm';
+    return '<button class="' + cls + '" onclick="setTplSource(\'' + o[0] + '\')">' + o[1] + '</button>';
+  }).join('');
+}
+
+function renderTplTypeFilters() {
+  var root = document.getElementById('tplTypeFilters');
+  var options = [['all','All Types'],['component','Component'],['composite','Composite']];
+  root.innerHTML = options.map(function(o) {
+    var cls = tplTypeFilter === o[0] ? 'btn btn-primary btn-sm' : 'btn btn-secondary btn-sm';
+    return '<button class="' + cls + '" onclick="setTplType(\'' + o[0] + '\')">' + o[1] + '</button>';
+  }).join('');
+}
+
+function setTplSource(s) { tplSourceFilter = s; renderTplSourceFilters(); renderTplLibrary(); }
+function setTplType(t) { tplTypeFilter = t; renderTplTypeFilters(); renderTplLibrary(); }
+
+function renderTplLibrary() {
+  var items = getFilteredTpl();
+  var grid = document.getElementById('tplLibGrid');
+  if (!items.length) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:hsl(var(--muted-foreground));border:1px dashed hsl(var(--border));border-radius:12px">No templates found</div>';
+    return;
+  }
+  var html = '';
+  items.forEach(function(t) {
+    var typeBadge = t.type === 'composite' ? 'badge-risk' : 'badge-universe';
+    var typeLabel = t.type === 'composite' ? 'Composite' : 'Component';
+    var srcBadge = t.source === 'marketplace' ? 'badge-trading' : 'badge-muted';
+    var srcLabel = t.source === 'marketplace' ? 'Marketplace' : 'Mine';
+    var inLib = !!tplLibrarySet[t.id];
+    html += '<div class="card" style="padding:16px;cursor:pointer" onclick="openTplPreview(' + t.id + ')">';
+    html += '<div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:6px">';
+    html += '<span style="font-weight:600;font-size:14px">' + escapeHtml(t.name) + '</span>';
+    html += '<span class="badge ' + typeBadge + '">' + typeLabel + '</span></div>';
+    html += '<p style="font-size:12px;color:hsl(var(--muted-foreground));margin:0 0 8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">' + escapeHtml(t.desc) + '</p>';
+    html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span class="badge ' + srcBadge + '">' + srcLabel + '</span><span style="font-size:11px;color:hsl(var(--muted-foreground))">' + t.downloads + ' downloads</span></div>';
+    html += '<div style="display:flex;gap:8px" onclick="event.stopPropagation()">';
+    html += '<button class="btn btn-secondary btn-sm" onclick="openTplPreview(' + t.id + ')">Preview</button>';
+    if (t.source === 'marketplace') {
+      if (inLib) {
+        html += '<button class="btn btn-secondary btn-sm" disabled style="opacity:0.5">In Library</button>';
+      } else {
+        html += '<button class="btn btn-primary btn-sm" onclick="addTplToLibraryById(' + t.id + ')">Add to Library</button>';
+      }
+    }
+    html += '</div></div>';
+  });
+  grid.innerHTML = html;
+}
+
+function openTplPreview(id) {
+  var tpl = null;
+  for (var i = 0; i < TPL_DATA.length; i++) { if (TPL_DATA[i].id === id) { tpl = TPL_DATA[i]; break; } }
+  if (!tpl) return;
+  previewTplId = id;
+  document.getElementById('tplPreviewTitle').textContent = tpl.name;
+  var typeBadge = tpl.type === 'composite' ? 'badge-risk' : 'badge-universe';
+  var typeLabel = tpl.type === 'composite' ? 'Composite' : 'Component';
+  var html = '<p style="color:hsl(var(--muted-foreground));font-size:13px;margin:0 0 12px">' + escapeHtml(tpl.desc) + '</p>';
+  html += '<div style="display:flex;gap:6px;margin-bottom:16px"><span class="badge ' + typeBadge + '">' + typeLabel + '</span><span class="badge badge-muted">' + tpl.category + '</span></div>';
+  html += '<h4 style="font-size:14px;font-weight:600;margin:0 0 8px">Code</h4>';
+  html += '<pre style="font-size:12px;font-family:monospace;background:hsl(var(--muted)/.5);padding:12px;border-radius:8px;overflow:auto;max-height:300px;white-space:pre-wrap">' + escapeHtml(tpl.code) + '</pre>';
+  document.getElementById('tplPreviewBody').innerHTML = html;
+  var addBtn = document.getElementById('tplPreviewAddBtn');
+  if (tpl.source === 'marketplace' && !tplLibrarySet[id]) {
+    addBtn.style.display = '';
+    addBtn.disabled = false;
+    addBtn.textContent = 'Add to Library';
+  } else if (tplLibrarySet[id]) {
+    addBtn.style.display = '';
+    addBtn.disabled = true;
+    addBtn.textContent = 'In Library';
+  } else {
+    addBtn.style.display = 'none';
+  }
+  document.getElementById('tplPreviewDrawer').classList.add('open');
+}
+
+function closeTplPreview() {
+  document.getElementById('tplPreviewDrawer').classList.remove('open');
+  previewTplId = null;
+}
+
+function addTplToLibrary() {
+  if (!previewTplId) return;
+  addTplToLibraryById(previewTplId);
+  var addBtn = document.getElementById('tplPreviewAddBtn');
+  addBtn.disabled = true;
+  addBtn.textContent = 'In Library';
+}
+
+function addTplToLibraryById(id) {
+  tplLibrarySet[id] = true;
+  showToast('Template added to library', 'success');
+  renderTplLibrary();
 }
 
 /* ── Init ── */
 renderAllLanes();
 updatePipelinePreview();
 renderCompositeList();
-renderComponentTable('universeTable', UNIVERSE);
-renderComponentTable('tradingTable', TRADING);
-renderComponentTable('riskTable', RISK);
+renderCompSidebar();
+renderTplSourceFilters();
+renderTplTypeFilters();
+renderTplLibrary();
 </script>
 </body>
 </html>

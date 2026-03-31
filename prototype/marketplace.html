@@ -24,7 +24,8 @@
     }
     /* ── Grid ── */
     .tmpl-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-    .tmpl-card { display: flex; flex-direction: column; }
+    .tmpl-card { display: flex; flex-direction: column; cursor: pointer; }
+    .tmpl-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,.08); }
     .tmpl-card .tmpl-desc {
       display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
       overflow: hidden; font-size: 0.8rem; color: hsl(var(--muted-foreground)); margin: 8px 0;
@@ -65,6 +66,15 @@
     .stats-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px; }
     @media (max-width: 1024px) { .tmpl-grid { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 640px) { .tmpl-grid { grid-template-columns: 1fr; } }
+    /* ── Preview tabs ── */
+    .preview-tab {
+      padding: 10px 16px; font-size: 0.8rem; font-weight: 500; border: none; background: none;
+      color: hsl(var(--muted-foreground)); cursor: pointer; border-bottom: 2px solid transparent;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .preview-tab:hover { color: hsl(var(--foreground)); }
+    .preview-tab.active { color: hsl(var(--primary)); border-bottom-color: hsl(var(--primary)); }
+    .btn-added { background: hsl(var(--muted)) !important; color: hsl(var(--muted-foreground)) !important; cursor: not-allowed; pointer-events: none; }
   </style>
 </head>
 <body>
@@ -352,7 +362,7 @@ function renderFeatured() {
     + '<span>' + ft.author + '</span>'
     + '</div>'
     + '</div>'
-    + '<button class="btn btn-primary" onclick="importTemplate(\'' + ft.name.replace(/'/g, "\\'") + '\')">Import to Workspace</button>'
+    + '<button class="btn btn-primary" onclick="openPreview(\'' + ft.name.replace(/'/g, "\\'") + '\')">Preview</button>'
     + '</div>'
     + '</div>';
 }
@@ -392,7 +402,7 @@ function renderGrid() {
       layerHtml = '<span class="tmpl-tag" style="font-size:10px;text-transform:uppercase">' + t.subType + '</span>';
     }
 
-    html += '<div class="card card-sm tmpl-card">'
+    html += '<div class="card card-sm tmpl-card" onclick="openPreview(\'' + t.name.replace(/'/g, "\\'") + '\')">'
       + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">'
       + '<div style="display:flex;gap:6px;align-items:center">' + typeBadge(t) + '<span class="badge ' + catBadgeClass(t.category) + '">' + t.category + '</span></div>'
       + '<span style="font-size:0.75rem;color:hsl(var(--muted-foreground));display:flex;align-items:center;gap:4px">' + icon('star') + ' ' + t.rating.toFixed(1) + '</span>'
@@ -406,7 +416,9 @@ function renderGrid() {
       + '<span>' + t.author + '</span>'
       + '<span>' + icon('download') + ' ' + t.downloads.toLocaleString() + '</span>'
       + '</div>'
-      + '<button class="btn btn-outline btn-sm" onclick="importTemplate(\'' + t.name.replace(/'/g, "\\'") + '\')">Import</button>'
+      + (isInLibrary(t.name)
+        ? '<button class="btn btn-outline btn-sm btn-added" disabled onclick="event.stopPropagation()">In Library</button>'
+        : '<button class="btn btn-outline btn-sm" onclick="event.stopPropagation();importTemplate(\'' + t.name.replace(/'/g, "\\'") + '\')">Add to Library</button>')
       + '</div>'
       + '</div>';
   }
@@ -438,33 +450,82 @@ function renderPagination() {
   }
 }
 
-/* ── Import Flow ── */
+/* ── Library tracking ── */
+var librarySet = {};
+
+function isInLibrary(name) { return !!librarySet[name]; }
+
+/* ── Import Flow → now "Add to Template Library" ── */
 function importTemplate(name) {
   var t = null;
   for (var i = 0; i < TEMPLATES.length; i++) { if (TEMPLATES[i].name === name) { t = TEMPLATES[i]; break; } }
   if (!t) return;
-  pendingImport = t;
-  document.getElementById('importTmplName').textContent = t.name;
-  var dest = 'Strategy Research → Workspace';
-  if (t.templateType === 'component') dest = 'Strategy Research → Components';
-  else if (t.templateType === 'composite') dest = 'Composite Strategies → My Composites';
-  document.getElementById('importTmplInfo').innerHTML =
-    '<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">'
-    + typeBadge(t) + '<span class="badge ' + catBadgeClass(t.category) + '">' + t.category + '</span>'
-    + '</div>'
-    + '<div><strong>Destination:</strong> ' + dest + '</div>';
-  openModal('importConfirmModal');
+  if (isInLibrary(name)) return;
+  librarySet[name] = true;
+  showToast(t.name + ' added to Template Library!', 'success');
+  render();
 }
 
 function confirmImport() {
   closeModal('importConfirmModal');
   if (!pendingImport) return;
-  var t = pendingImport;
-  var dest = 'Strategy Research → Workspace';
-  if (t.templateType === 'component') dest = 'Strategy Research → Components';
-  else if (t.templateType === 'composite') dest = 'Composite Strategies → My Composites';
-  showToast(t.name + ' imported! Go to ' + dest + ' to edit.', 'success');
+  importTemplate(pendingImport.name);
   pendingImport = null;
+}
+
+/* ── Preview Drawer ── */
+var currentPreview = null;
+
+function openPreview(name) {
+  var t = null;
+  for (var i = 0; i < TEMPLATES.length; i++) { if (TEMPLATES[i].name === name) { t = TEMPLATES[i]; break; } }
+  if (!t) return;
+  currentPreview = t;
+  document.getElementById('previewName').textContent = t.name;
+  document.getElementById('previewBadges').innerHTML = typeBadge(t) + '<span class="badge ' + catBadgeClass(t.category) + '">' + t.category + '</span>';
+  document.getElementById('previewMeta').innerHTML =
+    '<span>' + icon('star') + ' ' + t.rating.toFixed(1) + '</span>'
+    + '<span>' + icon('download') + ' ' + t.downloads.toLocaleString() + '</span>'
+    + '<span>' + t.author + '</span>';
+  document.getElementById('previewDesc').textContent = t.desc;
+  var tagsHtml = '';
+  for (var j = 0; j < t.tags.length; j++) { tagsHtml += '<span class="tmpl-tag">' + t.tags[j] + '</span>'; }
+  document.getElementById('previewTags').innerHTML = tagsHtml;
+  // Params
+  var paramsBody = document.getElementById('previewParamsBody');
+  paramsBody.innerHTML = '<tr><td style="padding:8px 12px;border-bottom:1px solid hsl(var(--border))">short_window</td><td style="padding:8px 12px;border-bottom:1px solid hsl(var(--border))">number</td><td style="padding:8px 12px;border-bottom:1px solid hsl(var(--border))">5</td></tr>'
+    + '<tr><td style="padding:8px 12px;border-bottom:1px solid hsl(var(--border))">long_window</td><td style="padding:8px 12px;border-bottom:1px solid hsl(var(--border))">number</td><td style="padding:8px 12px;border-bottom:1px solid hsl(var(--border))">20</td></tr>';
+  // Button state
+  var addBtn = document.getElementById('previewAddBtn');
+  if (isInLibrary(t.name)) {
+    addBtn.textContent = 'Already in Template Library';
+    addBtn.classList.add('btn-added');
+  } else {
+    addBtn.textContent = 'Add to Template Library';
+    addBtn.classList.remove('btn-added');
+  }
+  switchPreviewTab('desc');
+  openModal('previewDrawer');
+}
+
+function closePreview() { closeModal('previewDrawer'); currentPreview = null; }
+
+function switchPreviewTab(tab) {
+  var tabs = document.querySelectorAll('.preview-tab');
+  for (var i = 0; i < tabs.length; i++) {
+    tabs[i].classList.toggle('active', tabs[i].getAttribute('data-ptab') === tab);
+  }
+  document.getElementById('previewDescPanel').style.display = tab === 'desc' ? '' : 'none';
+  document.getElementById('previewCodePanel').style.display = tab === 'code' ? '' : 'none';
+  document.getElementById('previewParamsPanel').style.display = tab === 'params' ? '' : 'none';
+}
+
+function addToLibraryFromPreview() {
+  if (!currentPreview || isInLibrary(currentPreview.name)) return;
+  importTemplate(currentPreview.name);
+  var addBtn = document.getElementById('previewAddBtn');
+  addBtn.textContent = 'Already in Template Library';
+  addBtn.classList.add('btn-added');
 }
 
 /* ── Main Render ── */

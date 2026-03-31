@@ -33,33 +33,7 @@
     .param-card .param-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: hsl(var(--muted-foreground)); }
     .scope-toggle { display: flex; gap: 8px; }
     .rating-stars { color: #eab308; }
-    /* ── Components Tab ── */
-    .comp-shell { display: grid; grid-template-columns: 320px minmax(0,1fr); gap: 16px; align-items: start; }
-    .comp-layer-group { margin-bottom: 16px; }
-    .comp-layer-header { display: flex; align-items: center; gap: 8px; padding: 10px 0; cursor: pointer; }
-    .comp-layer-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
-    .comp-layer-dot.universe { background: hsl(260 60% 50%); }
-    .comp-layer-dot.trading { background: hsl(210 80% 45%); }
-    .comp-layer-dot.risk { background: hsl(0 70% 50%); }
-    .comp-item { border: 1px solid hsl(var(--border)); border-radius: 10px; padding: 12px; margin-bottom: 8px; background: hsl(var(--background)); cursor: pointer; transition: border-color .15s, background .15s; }
-    .comp-item:hover { background: hsl(var(--accent)/.4); border-color: hsl(var(--ring)/.4); }
-    .comp-item.active { background: hsl(var(--primary)/.05); border-color: hsl(var(--primary)); box-shadow: 0 0 0 1px hsl(var(--primary)/.15); }
-    .badge-universe { background: hsl(260 60% 92%); color: hsl(260 60% 40%); }
-    .badge-trading { background: hsl(210 80% 92%); color: hsl(210 80% 35%); }
-    .badge-risk { background: hsl(0 70% 92%); color: hsl(0 70% 40%); }
-    .dark .badge-universe { background: hsl(260 40% 22%); color: hsl(260 60% 75%); }
-    .dark .badge-trading { background: hsl(210 40% 22%); color: hsl(210 80% 75%); }
-    .dark .badge-risk { background: hsl(0 40% 22%); color: hsl(0 70% 75%); }
-    .backtest-drawer { border: 1px solid hsl(var(--border)); border-radius: 12px; background: hsl(var(--card)); overflow: hidden; margin-top: 16px; }
-    .backtest-drawer-header { padding: 12px 16px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: hsl(var(--muted)/.3); }
-    .backtest-drawer-body { padding: 16px; display: none; }
-    .backtest-drawer.open .backtest-drawer-body { display: block; }
-    .backtest-result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
-    .type-filter-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
-    .type-pill { padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 500; border: 1px solid hsl(var(--border)); background: transparent; color: hsl(var(--muted-foreground)); cursor: pointer; transition: all .15s; }
-    .type-pill:hover { background: hsl(var(--accent)); }
-    .type-pill.active { background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); border-color: hsl(var(--primary)); }
-    @media (max-width:1024px) { .strategies-shell { grid-template-columns: 1fr; } .comp-shell { grid-template-columns: 1fr; } .filter-bar { flex-wrap: wrap; } .filter-bar select { width: 100%; flex: 1 1 100%; } }
+    @media (max-width:1024px) { .strategies-shell { grid-template-columns: 1fr; } .filter-bar { flex-wrap: wrap; } .filter-bar select { width: 100%; flex: 1 1 100%; } }
   </style>
 </head>
 <body>
@@ -81,11 +55,10 @@
       </div>
     </div>
 
-    <!-- Main Tabs: Workspace | Components | Templates -->
+    <!-- Main Tabs: Workspace | Template Library -->
     <div class="tabs" data-group="strat-main">
       <button class="tab-btn active" data-tab="workspace">Workspace</button>
-      <button class="tab-btn" data-tab="components">Components</button>
-      <button class="tab-btn" data-tab="templates">Templates</button>
+      <button class="tab-btn" data-tab="templates">Template Library</button>
     </div>
 
     <!-- ═══════════ Workspace Tab ═══════════ -->
@@ -210,110 +183,6 @@
       </div>
     </div>
 
-    <!-- ═══════════ Components Tab (NEW) ═══════════ -->
-    <div class="tab-panel" data-group="strat-main" data-panel="components">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px">
-        <div>
-          <h2 style="font-size:18px;font-weight:600;margin:0">Strategy Components</h2>
-          <p class="text-muted" style="font-size:13px;margin:4px 0 0">Edit individual building blocks (Universe / Trading / Risk) and test them in isolation</p>
-        </div>
-        <button class="btn btn-primary" onclick="openModal('newCompModal')">${icon('plus')} New Component</button>
-      </div>
-
-      <div class="comp-shell">
-        <!-- Left: Component List grouped by layer -->
-        <section class="card" style="padding:16px">
-          <input id="compSearch" type="text" class="form-input" placeholder="Search components..." style="margin-bottom:12px;font-size:13px">
-          <div id="compList"></div>
-        </section>
-
-        <!-- Right: Component Editor -->
-        <section class="card" style="padding:20px">
-          <div id="compEmpty" class="empty-spot" style="min-height:480px;display:flex;flex-direction:column;align-items:center;justify-content:center">
-            <div style="margin-bottom:16px">${icon('file-code')}</div>
-            <div style="font-size:18px;font-weight:600;color:hsl(var(--foreground))">No component selected</div>
-            <p style="font-size:14px;max-width:400px;margin:8px 0 0">Select a component from the list to edit its code, config, and parameters.</p>
-          </div>
-          <div id="compEditor" style="display:none">
-            <!-- Component Header -->
-            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:16px">
-              <div>
-                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-                  <h2 id="ceNames" style="font-size:20px;font-weight:600;margin:0"></h2>
-                  <span id="ceLayer"></span>
-                  <span id="ceSub" class="badge badge-muted"></span>
-                </div>
-                <p id="ceDesc" class="text-muted" style="font-size:13px;margin:4px 0 0"></p>
-              </div>
-              <div class="detail-toolbar">
-                <button class="btn btn-primary btn-sm" onclick="showToast('Component saved','success')">${icon('check')} Save</button>
-                <button class="btn btn-ghost btn-sm" onclick="showToast('Duplicated','success')">${icon('copy')} Duplicate</button>
-                <button class="btn btn-ghost btn-sm" onclick="showConfirm('Delete this component?',function(){showToast('Deleted','success')})">${icon('trash')} Delete</button>
-              </div>
-            </div>
-
-            <!-- Component Sub-Tabs -->
-            <div class="tabs" data-group="comp-detail" style="margin-bottom:16px">
-              <button class="tab-btn active" data-tab="comp-code">Code</button>
-              <button class="tab-btn" data-tab="comp-config">Config</button>
-              <button class="tab-btn" data-tab="comp-params">Parameters</button>
-            </div>
-
-            <!-- Code Sub-Tab -->
-            <div class="detail-panel active" data-group="comp-detail" data-panel="comp-code">
-              <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px">
-                <span class="badge badge-success">Syntax OK</span>
-                <div class="detail-toolbar">
-                  <button class="btn btn-ghost btn-sm" onclick="showToast('Code formatted','success')">Format</button>
-                  <button class="btn btn-ghost btn-sm" onclick="showToast('Syntax OK','success')">Validate</button>
-                </div>
-              </div>
-              <pre id="ceCode" class="code-block" style="min-height:300px;font-size:13px;line-height:1.6"></pre>
-            </div>
-
-            <!-- Config Sub-Tab -->
-            <div class="detail-panel" data-group="comp-detail" data-panel="comp-config">
-              <label class="form-label">Component Configuration (JSON)</label>
-              <textarea id="ceConfig" class="form-textarea" rows="12" style="font-family:monospace;font-size:12px;line-height:1.6"></textarea>
-            </div>
-
-            <!-- Params Sub-Tab -->
-            <div class="detail-panel" data-group="comp-detail" data-panel="comp-params">
-              <label class="form-label">Parameters (JSON)</label>
-              <textarea id="ceParams" class="form-textarea" rows="12" style="font-family:monospace;font-size:12px;line-height:1.6"></textarea>
-            </div>
-
-            <!-- Backtest Drawer -->
-            <div class="backtest-drawer" id="backtestDrawer">
-              <div class="backtest-drawer-header" onclick="toggleBacktestDrawer()">
-                <div style="display:flex;align-items:center;gap:8px">
-                  ${icon('trending-up')}
-                  <span style="font-weight:600;font-size:14px">Component Backtest</span>
-                </div>
-                <span id="drawerArrow" style="transition:transform .2s">${icon('chevron-down')}</span>
-              </div>
-              <div class="backtest-drawer-body">
-                <!-- Backtest Parameters -->
-                <div id="btParams"></div>
-                <!-- Run Button -->
-                <div style="display:flex;gap:8px;margin:12px 0">
-                  <button class="btn btn-primary btn-sm" onclick="runComponentBacktest()">${icon('play')} Run Backtest</button>
-                  <button class="btn btn-secondary btn-sm" onclick="showToast('Results exported','success')">${icon('download')} Export</button>
-                </div>
-                <!-- Backtest Results -->
-                <div id="btResults" style="display:none">
-                  <div style="border-top:1px solid hsl(var(--border));padding-top:12px">
-                    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-bottom:12px" id="btStats"></div>
-                    <div class="backtest-result-grid" id="btCharts"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      </div>
-    </div>
-
     <!-- ═══════════ Templates Tab ═══════════ -->
     <div class="tab-panel" data-group="strat-main" data-panel="templates">
       <div class="strategies-shell">
@@ -321,16 +190,19 @@
         <section class="card" style="padding:20px;grid-column:1/2">
           <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:16px;flex-wrap:wrap">
             <div>
-              <h2 style="font-size:18px;font-weight:600;margin:0">Strategy Templates</h2>
-              <p class="text-muted" style="font-size:13px;margin:4px 0 0">Browse and use strategy templates</p>
-            </div>
-            <div class="scope-toggle">
-              <button class="btn btn-primary btn-sm" id="scopeMarketplace" onclick="setTemplateScope('marketplace')">Marketplace</button>
-              <button class="btn btn-secondary btn-sm" id="scopeMine" onclick="setTemplateScope('mine')">My Templates</button>
+              <h2 style="font-size:18px;font-weight:600;margin:0">Template Library</h2>
+              <p class="text-muted" style="font-size:13px;margin:4px 0 0">Browse standalone strategy templates from marketplace and your collection</p>
             </div>
           </div>
-          <!-- Template Type Filter -->
-          <div class="type-filter-row" id="tplTypeFilter"></div>
+          <!-- Search & Source Filter -->
+          <div class="filter-bar" style="margin-bottom:12px">
+            <div class="search-wrap"><span id="tplSearchIcon"></span><input id="tplSearch" type="text" class="form-input" placeholder="Search templates..."></div>
+            <div class="scope-toggle">
+              <button class="btn btn-primary btn-sm" id="scopeAll" onclick="setTemplateSource('all')">All</button>
+              <button class="btn btn-secondary btn-sm" id="scopeMarketplace" onclick="setTemplateSource('marketplace')">Marketplace</button>
+              <button class="btn btn-secondary btn-sm" id="scopeMine" onclick="setTemplateSource('mine')">My Templates</button>
+            </div>
+          </div>
           <div id="templateGrid" class="template-grid"></div>
         </section>
 
@@ -385,24 +257,6 @@
   </main>
 </div>
 <div id="codeFullscreenBackdrop" class="fullscreen-backdrop" onclick="exitCodeFullscreen()"></div>
-
-<!-- New Component Modal -->
-<div class="modal-overlay" id="newCompModal">
-  <div class="modal" style="max-width:560px">
-    <div class="modal-header"><h3 class="modal-title">New Strategy Component</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('newCompModal')">&#10005;</button></div>
-    <div class="modal-body">
-      <div style="display:flex;flex-direction:column;gap:16px">
-        <div><label class="form-label">Name</label><input type="text" class="form-input" placeholder="e.g. MomentumTopK"></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-          <div><label class="form-label">Layer</label><select class="form-select"><option>Universe</option><option>Trading</option><option>Risk</option></select></div>
-          <div><label class="form-label">Sub-type</label><select class="form-select"><option>Filter</option><option>Factor</option><option>Trend</option><option>Mean Reversion</option><option>Stop Loss</option><option>Allocation</option></select></div>
-        </div>
-        <div><label class="form-label">Description</label><textarea class="form-textarea" rows="2" placeholder="Component description..."></textarea></div>
-      </div>
-    </div>
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('newCompModal')">Cancel</button><button class="btn btn-primary" onclick="submitModal('newCompModal','Component created','success')">Create</button></div>
-  </div>
-</div>
 
 <!-- Create Strategy Modal -->
 <div class="modal-overlay" id="createModal">
@@ -570,62 +424,9 @@ var TEMPLATE_DATA = {
 };
 
 var currentId = null;
-var currentScope = 'marketplace';
+var currentSource = 'all';
 var codeFullscreen = false;
-var currentTplType = 'all';
-
-/* ── Component Data ── */
-var COMPONENT_DATA = [
-  /* Universe */
-  { id:'C1', name:'Market Cap Filter', layer:'universe', subType:'filter', desc:'Filter stocks by market cap range.', ver:2,
-    code:'# Market Cap Filter\nimport pandas as pd\n\ndef select(date, market_data, config):\n    """Select stocks within market cap range."""\n    min_cap = config.get("min_market_cap", 5e9)\n    max_cap = config.get("max_market_cap", 1e12)\n    df = market_data.get_daily(date)\n    mask = (df["market_cap"] >= min_cap) & (df["market_cap"] <= max_cap)\n    return df[mask].index.tolist()\n',
-    config:'{\n  "min_market_cap": 5000000000,\n  "max_market_cap": 1000000000000\n}',
-    params:'{\n  "min_market_cap": 5000000000,\n  "max_market_cap": 1000000000000\n}' },
-  { id:'C2', name:'Liquidity Filter', layer:'universe', subType:'filter', desc:'Filter by average daily volume and turnover.', ver:1,
-    code:'# Liquidity Filter\ndef select(date, market_data, config):\n    min_vol = config.get("min_avg_volume", 1000000)\n    min_turnover = config.get("min_turnover_rate", 0.005)\n    df = market_data.get_daily(date)\n    mask = (df["avg_volume_20d"] >= min_vol) & (df["turnover_rate"] >= min_turnover)\n    return df[mask].index.tolist()\n',
-    config:'{\n  "min_avg_volume": 1000000,\n  "min_turnover_rate": 0.005\n}',
-    params:'{\n  "min_avg_volume": 1000000,\n  "min_turnover_rate": 0.005\n}' },
-  { id:'C3', name:'Sector Rotation', layer:'universe', subType:'rotation', desc:'Sector momentum rotation by relative strength.', ver:2,
-    code:'# Sector Rotation\ndef select(date, market_data, config):\n    top_n = config.get("top_sectors", 3)\n    lookback = config.get("lookback_days", 20)\n    sector_returns = market_data.get_sector_returns(date, lookback)\n    top = sector_returns.nlargest(top_n).index.tolist()\n    return market_data.get_stocks_by_sectors(top)\n',
-    config:'{\n  "top_sectors": 3,\n  "lookback_days": 20\n}',
-    params:'{\n  "top_sectors": 3,\n  "lookback_days": 20\n}' },
-  { id:'C4', name:'ST/Halt Filter', layer:'universe', subType:'compliance', desc:'Exclude ST, suspended, and newly-listed stocks.', ver:1,
-    code:'# ST/Halt Filter\ndef select(date, market_data, config):\n    min_list_days = config.get("min_list_days", 60)\n    df = market_data.get_daily(date)\n    mask = (~df["is_st"]) & (~df["is_suspended"]) & (df["list_days"] >= min_list_days)\n    return df[mask].index.tolist()\n',
-    config:'{\n  "min_list_days": 60,\n  "exclude_st": true,\n  "exclude_suspended": true\n}',
-    params:'{\n  "min_list_days": 60\n}' },
-  /* Trading */
-  { id:'C5', name:'Dual MA Signal', layer:'trading', subType:'trend', desc:'Dual MA crossover signal generation.', ver:3,
-    code:'# Dual MA Signal\nimport numpy as np\n\ndef generate_signals(date, universe, market_data, config):\n    short_w = config.get("short_window", 5)\n    long_w = config.get("long_window", 20)\n    signals = []\n    for symbol in universe:\n        bars = market_data.get_bars(symbol, long_w + 1)\n        ma_short = np.mean(bars[-short_w:])\n        ma_long = np.mean(bars[-long_w:])\n        if ma_short > ma_long:\n            signals.append({"symbol": symbol, "direction": "buy", "strength": (ma_short - ma_long) / ma_long})\n    return signals\n',
-    config:'{\n  "short_window": 5,\n  "long_window": 20\n}',
-    params:'{\n  "short_window": 5,\n  "long_window": 20\n}' },
-  { id:'C6', name:'MACD Signal', layer:'trading', subType:'trend', desc:'MACD histogram zero-cross and divergence.', ver:1,
-    code:'# MACD Signal\ndef generate_signals(date, universe, market_data, config):\n    fast = config.get("fast_period", 12)\n    slow = config.get("slow_period", 26)\n    signal_p = config.get("signal_period", 9)\n    signals = []\n    for symbol in universe:\n        macd_hist = market_data.get_macd(symbol, fast, slow, signal_p)\n        if macd_hist[-1] > 0 and macd_hist[-2] <= 0:\n            signals.append({"symbol": symbol, "direction": "buy", "strength": macd_hist[-1]})\n    return signals\n',
-    config:'{\n  "fast_period": 12,\n  "slow_period": 26,\n  "signal_period": 9\n}',
-    params:'{\n  "fast_period": 12,\n  "slow_period": 26,\n  "signal_period": 9\n}' },
-  { id:'C7', name:'Multi-Factor Alpha', layer:'trading', subType:'factor', desc:'IC-weighted multi-factor composite scoring.', ver:2,
-    code:'# Multi-Factor Alpha\ndef generate_signals(date, universe, market_data, config):\n    factors = config.get("factors", ["momentum_20d", "quality_roe", "value_pe"])\n    top_k = config.get("top_k", 30)\n    scores = market_data.get_factor_scores(date, universe, factors)\n    ranked = scores.nlargest(top_k)\n    return [{"symbol": s, "direction": "buy", "strength": v} for s, v in ranked.items()]\n',
-    config:'{\n  "factors": ["momentum_20d", "quality_roe", "value_pe"],\n  "top_k": 30,\n  "weighting": "ic_weighted"\n}',
-    params:'{\n  "factors": ["momentum_20d", "quality_roe", "value_pe"],\n  "top_k": 30\n}' },
-  { id:'C8', name:'Bollinger Mean Reversion', layer:'trading', subType:'mean_reversion', desc:'Bollinger band mean reversion signals.', ver:1,
-    code:'# Bollinger Mean Reversion\ndef generate_signals(date, universe, market_data, config):\n    window = config.get("bb_window", 20)\n    num_std = config.get("bb_std", 2.0)\n    signals = []\n    for symbol in universe:\n        bars = market_data.get_bars(symbol, window)\n        mean = sum(bars) / len(bars)\n        std = (sum((x - mean)**2 for x in bars) / len(bars)) ** 0.5\n        price = bars[-1]\n        if price < mean - num_std * std:\n            signals.append({"symbol": symbol, "direction": "buy", "strength": (mean - price) / std})\n    return signals\n',
-    config:'{\n  "bb_window": 20,\n  "bb_std": 2.0\n}',
-    params:'{\n  "bb_window": 20,\n  "bb_std": 2.0\n}' },
-  /* Risk */
-  { id:'C9', name:'Trailing Stop', layer:'risk', subType:'stop_loss', desc:'ATR-based trailing stop loss.', ver:2,
-    code:'# Trailing Stop\ndef filter_and_size(signals, portfolio, config):\n    atr_multiplier = config.get("atr_multiplier", 2.0)\n    result = []\n    for sig in signals:\n        atr = portfolio.get_atr(sig["symbol"])\n        stop_price = sig.get("price", 0) - atr * atr_multiplier\n        sig["stop_loss"] = stop_price\n        sig["position_size"] = portfolio.risk_per_trade / (atr * atr_multiplier)\n        result.append(sig)\n    return result\n',
-    config:'{\n  "atr_multiplier": 2.0,\n  "atr_period": 14\n}',
-    params:'{\n  "atr_multiplier": 2.0,\n  "atr_period": 14\n}' },
-  { id:'C10', name:'Drawdown Control', layer:'risk', subType:'drawdown', desc:'Reduce exposure when drawdown exceeds threshold.', ver:1,
-    code:'# Drawdown Control\ndef filter_and_size(signals, portfolio, config):\n    max_dd = config.get("max_drawdown", 0.15)\n    reduce_factor = config.get("reduce_factor", 0.5)\n    current_dd = portfolio.current_drawdown()\n    if current_dd > max_dd:\n        for sig in signals:\n            sig["position_size"] *= reduce_factor\n    return signals\n',
-    config:'{\n  "max_drawdown": 0.15,\n  "reduce_factor": 0.5\n}',
-    params:'{\n  "max_drawdown": 0.15,\n  "reduce_factor": 0.5\n}' },
-  { id:'C11', name:'Position Limits', layer:'risk', subType:'compliance', desc:'Position size limits per stock, sector, total.', ver:1,
-    code:'# Position Limits\ndef filter_and_size(signals, portfolio, config):\n    max_single = config.get("max_single_pct", 0.05)\n    max_sector = config.get("max_sector_pct", 0.20)\n    max_total = config.get("max_positions", 30)\n    filtered = []\n    for sig in signals[:max_total]:\n        sig["position_size"] = min(sig.get("position_size", 1), portfolio.total_value * max_single)\n        filtered.append(sig)\n    return filtered\n',
-    config:'{\n  "max_single_pct": 0.05,\n  "max_sector_pct": 0.20,\n  "max_positions": 30\n}',
-    params:'{\n  "max_single_pct": 0.05,\n  "max_sector_pct": 0.20,\n  "max_positions": 30\n}' }
-];
-
-var currentCompId = null;
+var tplSearchQuery = '';
 
 var CATEGORY_BADGES = {
   CTA: 'badge-primary', Alpha: 'badge-success', StatArb: 'badge-warning',
@@ -714,18 +515,49 @@ function previewHistory(sId, vIdx) {
 }
 
 /* ── Templates ── */
-function setTemplateScope(scope) {
-  currentScope = scope;
-  document.getElementById('scopeMarketplace').className = 'btn btn-sm ' + (scope==='marketplace' ? 'btn-primary' : 'btn-secondary');
-  document.getElementById('scopeMine').className = 'btn btn-sm ' + (scope==='mine' ? 'btn-primary' : 'btn-secondary');
+function setTemplateSource(src) {
+  currentSource = src;
+  document.getElementById('scopeAll').className = 'btn btn-sm ' + (src==='all' ? 'btn-primary' : 'btn-secondary');
+  document.getElementById('scopeMarketplace').className = 'btn btn-sm ' + (src==='marketplace' ? 'btn-primary' : 'btn-secondary');
+  document.getElementById('scopeMine').className = 'btn btn-sm ' + (src==='mine' ? 'btn-primary' : 'btn-secondary');
   renderTemplates();
 }
 
+function getFilteredTemplateList() {
+  var all = [];
+  if (currentSource === 'all' || currentSource === 'marketplace') {
+    for (var i = 0; i < TEMPLATE_DATA.marketplace.length; i++) {
+      var t = TEMPLATE_DATA.marketplace[i];
+      t._scope = 'marketplace';
+      all.push(t);
+    }
+  }
+  if (currentSource === 'all' || currentSource === 'mine') {
+    for (var j = 0; j < TEMPLATE_DATA.mine.length; j++) {
+      var m = TEMPLATE_DATA.mine[j];
+      m._scope = 'mine';
+      all.push(m);
+    }
+  }
+  // Filter to standalone only
+  all = all.filter(function(t) { return t.templateType === 'standalone'; });
+  // Apply search
+  var q = tplSearchQuery.toLowerCase().trim();
+  if (q) {
+    all = all.filter(function(t) {
+      return t.name.toLowerCase().indexOf(q) >= 0 || t.desc.toLowerCase().indexOf(q) >= 0;
+    });
+  }
+  return all;
+}
+
 function renderTemplates() {
-  var list = TEMPLATE_DATA[currentScope] || [];
+  var list = getFilteredTemplateList();
   var grid = document.getElementById('templateGrid');
   if (!list.length) { grid.innerHTML='<div class="empty-spot" style="padding:28px">No templates available.</div>'; return; }
   grid.innerHTML = list.map(function(t,i) {
+    var scopeLabel = t._scope === 'marketplace' ? 'Marketplace' : 'Mine';
+    var scopeBadge = t._scope === 'marketplace' ? 'badge-success' : 'badge-muted';
     return '<article class="card" style="padding:16px;min-width:0">'
       +'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">'
         +'<div style="min-width:0;flex:1">'
@@ -735,12 +567,12 @@ function renderTemplates() {
         +categoryBadge(t.type)
       +'</div>'
       +'<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">'
-        +'<span class="badge '+(currentScope==='marketplace'?'badge-success':'badge-muted')+'">'+(currentScope==='marketplace'?'Marketplace':'Mine')+'</span>'
+        +'<span class="badge '+scopeBadge+'">'+scopeLabel+'</span>'
         +'<span class="badge badge-muted">'+t.visibility+'</span>'
       +'</div>'
       +'<div class="text-muted" style="font-size:12px;margin-top:8px">'+t.downloads+' downloads | '+t.updated+'</div>'
       +'<div style="display:flex;gap:8px;margin-top:12px">'
-        +'<button class="btn btn-ghost btn-sm" onclick="previewTemplate(\''+currentScope+'\','+i+')">'+icon('eye')+' Preview</button>'
+        +'<button class="btn btn-ghost btn-sm" onclick="previewTemplate(\''+t._scope+'\','+TEMPLATE_DATA[t._scope].indexOf(t)+')">'+icon('eye')+' Preview</button>'
         +'<button class="btn btn-primary btn-sm" onclick="showToast(\'Strategy created from template\',\'success\')">Use Template</button>'
       +'</div>'
     +'</article>';
@@ -786,209 +618,20 @@ function exitCodeFullscreen() {
 document.addEventListener('DOMContentLoaded', function() {
   var si = document.getElementById('searchIcon');
   if (si) si.innerHTML = icon('search');
+  var tsi = document.getElementById('tplSearchIcon');
+  if (tsi) tsi.innerHTML = icon('search');
   document.getElementById('stratSearch').addEventListener('input', renderStrategyList);
   document.getElementById('typeFilter').addEventListener('change', renderStrategyList);
   document.getElementById('statusFilter').addEventListener('change', renderStrategyList);
-  document.getElementById('compSearch').addEventListener('input', renderCompList);
+  document.getElementById('tplSearch').addEventListener('input', function() {
+    tplSearchQuery = this.value;
+    renderTemplates();
+  });
   currentId = 1;
   renderStrategyList();
   renderTemplates();
-  renderTplTypeFilter();
-  renderCompList();
 });
 document.addEventListener('keydown', function(e) { if(e.key==='Escape'&&codeFullscreen) exitCodeFullscreen(); });
-
-/* ═══════════ Components Tab Logic ═══════════ */
-function layerBadge(layer) {
-  var cls = 'badge-' + layer;
-  var label = layer.charAt(0).toUpperCase() + layer.slice(1);
-  return '<span class="badge ' + cls + '">' + label + '</span>';
-}
-
-function renderCompList() {
-  var root = document.getElementById('compList');
-  var q = (document.getElementById('compSearch').value || '').toLowerCase().trim();
-  var layers = ['universe', 'trading', 'risk'];
-  var html = '';
-  for (var li = 0; li < layers.length; li++) {
-    var layer = layers[li];
-    var items = COMPONENT_DATA.filter(function(c) {
-      return c.layer === layer && (!q || c.name.toLowerCase().indexOf(q) >= 0 || c.desc.toLowerCase().indexOf(q) >= 0);
-    });
-    if (items.length === 0 && q) continue;
-    var dotCls = 'comp-layer-dot ' + layer;
-    html += '<div class="comp-layer-group">';
-    html += '<div class="comp-layer-header">';
-    html += '<span class="' + dotCls + '"></span>';
-    html += '<strong style="font-size:14px">' + layer.charAt(0).toUpperCase() + layer.slice(1) + '</strong>';
-    html += '<span class="badge badge-muted" style="margin-left:auto">' + items.length + '</span>';
-    html += '</div>';
-    for (var i = 0; i < items.length; i++) {
-      var c = items[i];
-      var sel = currentCompId === c.id ? ' active' : '';
-      html += '<div class="comp-item' + sel + '" onclick="selectComp(\'' + c.id + '\')">';
-      html += '<div style="display:flex;justify-content:space-between;align-items:center">';
-      html += '<strong style="font-size:13px">' + c.name + '</strong>';
-      html += '<span class="badge badge-muted" style="font-size:10px">v' + c.ver + '</span>';
-      html += '</div>';
-      html += '<div class="text-muted" style="font-size:12px;margin-top:4px">' + c.desc + '</div>';
-      html += '</div>';
-    }
-    html += '</div>';
-  }
-  root.innerHTML = html;
-}
-
-function selectComp(id) {
-  currentCompId = id;
-  renderCompList();
-  renderCompEditor();
-}
-
-function renderCompEditor() {
-  var empty = document.getElementById('compEmpty');
-  var editor = document.getElementById('compEditor');
-  var c = null;
-  for (var i = 0; i < COMPONENT_DATA.length; i++) { if (COMPONENT_DATA[i].id === currentCompId) { c = COMPONENT_DATA[i]; break; } }
-  if (!c) { empty.style.display = 'flex'; editor.style.display = 'none'; return; }
-  empty.style.display = 'none';
-  editor.style.display = 'block';
-  document.getElementById('ceNames').textContent = c.name;
-  document.getElementById('ceLayer').innerHTML = layerBadge(c.layer);
-  document.getElementById('ceSub').textContent = c.subType;
-  document.getElementById('ceDesc').textContent = c.desc;
-  document.getElementById('ceCode').textContent = c.code;
-  document.getElementById('ceConfig').value = c.config;
-  document.getElementById('ceParams').value = c.params;
-  renderBacktestParams(c);
-  document.getElementById('btResults').style.display = 'none';
-}
-
-/* ── Backtest Drawer ── */
-function toggleBacktestDrawer() {
-  var drawer = document.getElementById('backtestDrawer');
-  drawer.classList.toggle('open');
-  var arrow = document.getElementById('drawerArrow');
-  arrow.style.transform = drawer.classList.contains('open') ? 'rotate(180deg)' : '';
-}
-
-function renderBacktestParams(c) {
-  var html = '';
-  if (c.layer === 'universe') {
-    html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">'
-      + '<div><label class="form-label">Start Date</label><input type="date" class="form-input" value="2025-01-01"></div>'
-      + '<div><label class="form-label">End Date</label><input type="date" class="form-input" value="2025-12-31"></div>'
-      + '</div>';
-  } else if (c.layer === 'trading') {
-    html = '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">'
-      + '<div><label class="form-label">Start Date</label><input type="date" class="form-input" value="2025-01-01"></div>'
-      + '<div><label class="form-label">End Date</label><input type="date" class="form-input" value="2025-12-31"></div>'
-      + '<div><label class="form-label">Universe Source</label><select class="form-select"><option>Market Cap Filter</option><option>Liquidity Filter</option><option>ST/Halt Filter</option></select></div>'
-      + '</div>';
-  } else if (c.layer === 'risk') {
-    html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">'
-      + '<div><label class="form-label">Simulated Signals</label><select class="form-select"><option>Random 50 buy signals</option><option>From Dual MA Signal</option><option>From Multi-Factor Alpha</option></select></div>'
-      + '<div><label class="form-label">Portfolio Value</label><input type="number" class="form-input" value="1000000"></div>'
-      + '</div>';
-  }
-  document.getElementById('btParams').innerHTML = html;
-}
-
-function runComponentBacktest() {
-  var c = null;
-  for (var i = 0; i < COMPONENT_DATA.length; i++) { if (COMPONENT_DATA[i].id === currentCompId) { c = COMPONENT_DATA[i]; break; } }
-  if (!c) return;
-  showToast('Running ' + c.layer + ' backtest...', 'info');
-  setTimeout(function() {
-    document.getElementById('btResults').style.display = 'block';
-    if (c.layer === 'universe') {
-      document.getElementById('btStats').innerHTML =
-        '<div class="stat-card"><div class="stat-label">Avg Selected</div><div class="stat-value">42</div></div>'
-        + '<div class="stat-card"><div class="stat-label">Min Selected</div><div class="stat-value">28</div></div>'
-        + '<div class="stat-card"><div class="stat-label">Max Selected</div><div class="stat-value">56</div></div>'
-        + '<div class="stat-card"><div class="stat-label">Trading Days</div><div class="stat-value">244</div></div>';
-      document.getElementById('btCharts').innerHTML =
-        '<div class="card" style="padding:16px"><h4 style="font-size:13px;font-weight:600;margin:0 0 8px">Daily Selected Count</h4><div style="height:120px;background:linear-gradient(180deg,hsl(260 60% 92%),hsl(260 60% 96%));border-radius:8px;display:flex;align-items:flex-end;justify-content:center;font-size:12px;color:hsl(var(--muted-foreground))">📈 Line chart: stock count over time</div></div>'
-        + '<div class="card" style="padding:16px"><h4 style="font-size:13px;font-weight:600;margin:0 0 8px">Selected Stocks Sample</h4><div class="table-wrap"><table><thead><tr><th>Date</th><th>Count</th><th>Top Stocks</th></tr></thead><tbody><tr><td>2025-01-02</td><td>45</td><td>AAPL, MSFT, NVDA...</td></tr><tr><td>2025-06-15</td><td>38</td><td>AMZN, META, JPM...</td></tr><tr><td>2025-12-30</td><td>42</td><td>TSLA, XOM, NVDA...</td></tr></tbody></table></div></div>';
-    } else if (c.layer === 'trading') {
-      document.getElementById('btStats').innerHTML =
-        '<div class="stat-card"><div class="stat-label">Total Signals</div><div class="stat-value">186</div></div>'
-        + '<div class="stat-card"><div class="stat-label">Buy Signals</div><div class="stat-value text-success">124</div></div>'
-        + '<div class="stat-card"><div class="stat-label">Sell Signals</div><div class="stat-value text-destructive">62</div></div>'
-        + '<div class="stat-card"><div class="stat-label">Hit Rate</div><div class="stat-value">62.3%</div></div>';
-      document.getElementById('btCharts').innerHTML =
-        '<div class="card" style="padding:16px"><h4 style="font-size:13px;font-weight:600;margin:0 0 8px">Signal Timeline</h4><div style="height:120px;background:linear-gradient(180deg,hsl(210 80% 92%),hsl(210 80% 96%));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;color:hsl(var(--muted-foreground))">📊 K-line chart with buy/sell markers</div></div>'
-        + '<div class="card" style="padding:16px"><h4 style="font-size:13px;font-weight:600;margin:0 0 8px">Signal List</h4><div class="table-wrap"><table><thead><tr><th>Date</th><th>Symbol</th><th>Direction</th><th>Strength</th></tr></thead><tbody><tr><td>2025-03-12</td><td>AAPL</td><td class="text-success">Buy</td><td>0.85</td></tr><tr><td>2025-05-20</td><td>MSFT</td><td class="text-destructive">Sell</td><td>-0.62</td></tr><tr><td>2025-08-15</td><td>NVDA</td><td class="text-success">Buy</td><td>0.91</td></tr></tbody></table></div></div>';
-    } else if (c.layer === 'risk') {
-      document.getElementById('btStats').innerHTML =
-        '<div class="stat-card"><div class="stat-label">Signals In</div><div class="stat-value">50</div></div>'
-        + '<div class="stat-card"><div class="stat-label">Signals Out</div><div class="stat-value">38</div></div>'
-        + '<div class="stat-card"><div class="stat-label">Filtered</div><div class="stat-value text-destructive">12</div></div>'
-        + '<div class="stat-card"><div class="stat-label">Avg Position %</div><div class="stat-value">3.2%</div></div>';
-      document.getElementById('btCharts').innerHTML =
-        '<div class="card" style="padding:16px"><h4 style="font-size:13px;font-weight:600;margin:0 0 8px">Before vs After</h4><div class="table-wrap"><table><thead><tr><th>Metric</th><th>Before</th><th>After</th></tr></thead><tbody><tr><td>Total Signals</td><td>50</td><td>38</td></tr><tr><td>Max Single Position</td><td>8.5%</td><td>5.0%</td></tr><tr><td>Sector Concentration</td><td>42%</td><td>20%</td></tr></tbody></table></div></div>'
-        + '<div class="card" style="padding:16px"><h4 style="font-size:13px;font-weight:600;margin:0 0 8px">Position Allocation</h4><div style="height:120px;background:linear-gradient(180deg,hsl(0 70% 92%),hsl(0 70% 96%));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;color:hsl(var(--muted-foreground))">🥧 Pie chart: position allocation by sector</div></div>';
-    }
-    showToast('Backtest completed', 'success');
-  }, 800);
-}
-
-/* ═══════════ Template Type Filter ═══════════ */
-function renderTplTypeFilter() {
-  var types = ['all', 'standalone', 'component', 'composite'];
-  var labels = { all: 'All', standalone: 'Standalone', component: 'Component', composite: 'Composite' };
-  var html = '';
-  for (var i = 0; i < types.length; i++) {
-    var t = types[i];
-    var cls = t === currentTplType ? 'type-pill active' : 'type-pill';
-    html += '<button class="' + cls + '" onclick="setTplType(\'' + t + '\')">' + labels[t] + '</button>';
-  }
-  document.getElementById('tplTypeFilter').innerHTML = html;
-}
-
-function setTplType(type) {
-  currentTplType = type;
-  renderTplTypeFilter();
-  renderTemplates();
-}
-
-/* ── Override renderTemplates to add type filter ── */
-var _origRenderTemplates = renderTemplates;
-renderTemplates = function() {
-  var list = TEMPLATE_DATA[currentScope] || [];
-  if (currentTplType !== 'all') {
-    list = list.filter(function(t) { return t.templateType === currentTplType; });
-  }
-  var grid = document.getElementById('templateGrid');
-  if (!list.length) { grid.innerHTML='<div class="empty-spot" style="padding:28px">No templates available.</div>'; return; }
-  grid.innerHTML = list.map(function(t,i) {
-    var typeBdg = '';
-    if (t.templateType === 'standalone') typeBdg = '<span class="badge" style="background:hsl(221 83% 92%);color:hsl(221 83% 40%);font-size:11px">Standalone</span>';
-    else if (t.templateType === 'component') {
-      var lbl = (t.layer || 'component').charAt(0).toUpperCase() + (t.layer || 'component').slice(1);
-      typeBdg = '<span class="badge badge-' + (t.layer || 'muted') + '" style="font-size:11px">' + lbl + '</span>';
-    } else if (t.templateType === 'composite') typeBdg = '<span class="badge" style="background:linear-gradient(135deg,hsl(221 83% 92%),hsl(262 83% 92%));color:hsl(262 60% 40%);font-size:11px">Composite</span>';
-
-    return '<article class="card" style="padding:16px;min-width:0">'
-      +'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">'
-        +'<div style="min-width:0;flex:1">'
-          +'<div style="font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+t.name+'</div>'
-          +'<div class="text-muted" style="font-size:13px;margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">'+t.desc+'</div>'
-        +'</div>'
-        +categoryBadge(t.type)
-      +'</div>'
-      +'<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">'
-        +typeBdg
-        +'<span class="badge '+(currentScope==='marketplace'?'badge-success':'badge-muted')+'">'+(currentScope==='marketplace'?'Marketplace':'Mine')+'</span>'
-      +'</div>'
-      +'<div class="text-muted" style="font-size:12px;margin-top:8px">'+t.downloads+' downloads | '+t.updated+'</div>'
-      +'<div style="display:flex;gap:8px;margin-top:12px">'
-        +'<button class="btn btn-ghost btn-sm" onclick="previewTemplate(\''+currentScope+'\','+i+')">'+icon('eye')+' Preview</button>'
-        +'<button class="btn btn-primary btn-sm" onclick="showToast(\'Imported to workspace\',\'success\')">Import</button>'
-      +'</div>'
-    +'</article>';
-  }).join('');
-};
 </script>
 </body>
 </html>
