@@ -20,14 +20,14 @@
 ### 1. Critical - DataSync E2E still cannot execute in staging because required runtime files are missing
 - Observation: The new staging image still lacks the CLI script and schema file required by the approved SOP.
 - Evidence:
-  - `docker compose -f docker-compose.staging.yml exec -T api sh -lc "ls -la scripts/init_market_data.py /app/mysql/init/tradermate.sql 2>&1 || true"`
+  - `docker compose -f docker-compose.staging.yml exec -T api sh -lc "ls -la scripts/init_market_data.py /app/mysql/init/quantmate.sql 2>&1 || true"`
   - Raw output:
     ```text
     ls: cannot access 'scripts/init_market_data.py': No such file or directory
-    ls: cannot access '/app/mysql/init/tradermate.sql': No such file or directory
+    ls: cannot access '/app/mysql/init/quantmate.sql': No such file or directory
     ```
 - Impact: Approved SOP A cannot run, schema step remains broken, and DataSync resume/rate-limit regression cannot be closed on staging.
-- Recommendation: Rebuild or remount the API image so both `scripts/init_market_data.py` and `/app/mysql/init/tradermate.sql` exist, then rerun DataSync E2E.
+- Recommendation: Rebuild or remount the API image so both `scripts/init_market_data.py` and `/app/mysql/init/quantmate.sql` exist, then rerun DataSync E2E.
 - Severity: Critical
 
 ### 2. High - `GET /api/v1/reports` returns 500 for a normal authenticated user
@@ -167,7 +167,7 @@ printf "===== TIMESTAMP =====\n"; date -u
 printf "===== DOCKER PS =====\n"; docker compose -f docker-compose.staging.yml ps
 printf "===== HEALTH =====\n"; curl -sS -i http://127.0.0.1:8000/health || true
 printf "\n===== METRICS HEAD =====\n"; curl -sS http://127.0.0.1:8000/metrics | sed -n "1,120p"
-printf "\n===== SCRIPT PATH =====\n"; docker compose -f docker-compose.staging.yml exec -T api sh -lc "ls -la scripts/init_market_data.py /app/mysql/init/tradermate.sql 2>&1 || true"
+printf "\n===== SCRIPT PATH =====\n"; docker compose -f docker-compose.staging.yml exec -T api sh -lc "ls -la scripts/init_market_data.py /app/mysql/init/quantmate.sql 2>&1 || true"
 printf "===== API LOGS =====\n"; docker compose -f docker-compose.staging.yml logs --tail=120 api
 '
 ```
@@ -184,7 +184,7 @@ HTTP/1.1 200 OK
 datasync_backfill_lock_status 0.0
 ...
 ls: cannot access 'scripts/init_market_data.py': No such file or directory
-ls: cannot access '/app/mysql/init/tradermate.sql': No such file or directory
+ls: cannot access '/app/mysql/init/quantmate.sql': No such file or directory
 ```
 
 ### Command 2 - Auth contract validation

@@ -21,18 +21,18 @@
 - Observation: Approved staging SOP cannot start because required files are absent from the `api` container.
 - Evidence:
   - `scripts/init_market_data.py` missing
-  - `/app/mysql/init/tradermate.sql` missing
+  - `/app/mysql/init/quantmate.sql` missing
 - Impact: DataSync regression, resume flow, schema step, and metrics validation cannot be completed in staging.
 - Repro:
   ```text
   ssh -i /home/ubuntu/backup/keys/testserver/ssh-key-2026-03-09.key ubuntu@10.0.0.240
   cd /opt/quantmate
-  docker compose -f docker-compose.staging.yml exec -T api sh -lc "ls -la scripts/init_market_data.py /app/mysql/init/tradermate.sql 2>&1 || true"
+  docker compose -f docker-compose.staging.yml exec -T api sh -lc "ls -la scripts/init_market_data.py /app/mysql/init/quantmate.sql 2>&1 || true"
   ```
 - Actual:
   ```text
   ls: cannot access 'scripts/init_market_data.py': No such file or directory
-  ls: cannot access '/app/mysql/init/tradermate.sql': No such file or directory
+  ls: cannot access '/app/mysql/init/quantmate.sql': No such file or directory
   ```
 - Expected: Both runtime files exist and approved SOP can execute inside `api` container.
 - Recommendation: Fix image/build context or volume mount so staging artifact layout matches the approved execution path.
