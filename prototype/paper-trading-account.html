@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>QuantMate — Paper Trading Account</title>
+  <link rel="stylesheet" href="shared.css">
+  <script src="https://cdn.tailwindcss.com?v=3.4"></script>
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <main class="main-content" id="main">
+
+    <div class="page-header">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
+        <div>
+          <a href="paper-trading.html" class="btn btn-ghost btn-sm" style="margin-bottom:8px">Back to Paper Trading</a>
+          <h1 class="page-title">Paper Account — A-share Test</h1>
+          <p class="page-subtitle">Inspect deployments, positions, orders, signals, and account analytics for one paper account</p>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-secondary" onclick="openModal('orderModal')">${icon('shopping-cart')} New Order</button>
+          <button class="btn btn-primary" onclick="openModal('deployModal')">${icon('play')} New Deployment</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="stat-grid cols-4" style="margin-bottom:16px">
+      <div class="stat-card"><div class="stat-label">Current Equity</div><div class="stat-value">¥1,045,800</div></div>
+      <div class="stat-card"><div class="stat-label">Total P&amp;L</div><div class="stat-value text-success">+¥45,800</div></div>
+      <div class="stat-card"><div class="stat-label">Total Return</div><div class="stat-value text-success">+4.58%</div></div>
+      <div class="stat-card"><div class="stat-label">Pending Signals</div><div class="stat-value">2</div></div>
+    </div>
+
+    <div class="tabs" data-group="pta">
+      <button class="tab-btn active" data-tab="detail">Detail</button>
+      <button class="tab-btn" data-tab="deployments">Deployments</button>
+      <button class="tab-btn" data-tab="positions">Positions</button>
+      <button class="tab-btn" data-tab="orders">Orders</button>
+      <button class="tab-btn" data-tab="signals">Signals</button>
+    </div>
+
+    <div class="tab-panel active" data-group="pta" data-panel="detail">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><h3 class="card-title">Account Overview</h3></div>
+          <div class="table-wrap">
+            <table>
+              <tbody>
+                <tr><td>Account Name</td><td>A-share Test</td></tr>
+                <tr><td>Market</td><td>CN</td></tr>
+                <tr><td>Status</td><td><span class="badge badge-success">active</span></td></tr>
+                <tr><td>Initial Capital</td><td>¥1,000,000.00</td></tr>
+                <tr><td>Total Equity</td><td>¥1,045,800.00</td></tr>
+                <tr><td>Total Trades</td><td>128</td></tr>
+                <tr><td>Win Rate</td><td>61.7%</td></tr>
+                <tr><td>Sharpe Ratio</td><td>1.34</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3 class="card-title">Equity Curve</h3></div>
+          <div style="height:260px;border:1px dashed hsl(var(--border));border-radius:12px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;background:hsl(var(--muted)/.35)">
+            <div style="font-size:28px;color:hsl(var(--primary))">${icon('trending-up')}</div>
+            <div style="font-weight:600">Equity curve preview</div>
+            <div class="text-muted" style="font-size:13px;text-align:center;max-width:280px">The real portal renders the account equity chart here and updates it from account analytics.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-panel" data-group="pta" data-panel="deployments">
+      <div class="filter-bar">
+        <div class="search-wrap"><span>${icon('search')}</span><input class="form-input" placeholder="Search deployments"></div>
+        <select class="form-select" style="width:180px;flex:0 0 180px"><option>All Statuses</option><option>running</option><option>stopped</option></select>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Strategy</th><th>Source</th><th>Status</th><th>Symbol</th><th>Execution Mode</th><th>Created</th></tr></thead>
+          <tbody>
+            <tr><td>DualMA_Cross</td><td>strategy</td><td><span class="badge badge-success">running</span></td><td>600519.SH</td><td>auto</td><td>2026-05-19 09:30</td></tr>
+            <tr><td>CompositeAlpha01</td><td>composite</td><td><span class="badge badge-muted">stopped</span></td><td>300750.SZ</td><td>semi-auto</td><td>2026-05-16 13:40</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="tab-panel" data-group="pta" data-panel="positions">
+      <div class="filter-bar"><div class="search-wrap"><span>${icon('search')}</span><input class="form-input" placeholder="Search positions"></div></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Symbol</th><th>Direction</th><th>Quantity</th><th>Avg Cost</th><th>Current Price</th><th>P&amp;L</th><th>P&amp;L %</th></tr></thead>
+          <tbody>
+            <tr><td>600519.SH</td><td><span class="badge badge-success">buy</span></td><td>300</td><td>¥1,685.20</td><td>¥1,732.80</td><td class="text-success">+¥14,280</td><td class="text-success">+2.82%</td></tr>
+            <tr><td>300750.SZ</td><td><span class="badge badge-success">buy</span></td><td>1,200</td><td>¥224.60</td><td>¥238.15</td><td class="text-success">+¥16,260</td><td class="text-success">+6.03%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="tab-panel" data-group="pta" data-panel="orders">
+      <div class="filter-bar">
+        <div class="search-wrap"><span>${icon('search')}</span><input class="form-input" placeholder="Search orders"></div>
+        <select class="form-select" style="width:180px;flex:0 0 180px"><option>All Statuses</option><option>filled</option><option>pending</option><option>cancelled</option></select>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Symbol</th><th>Direction</th><th>Order Type</th><th>Quantity</th><th>Price</th><th>Status</th><th>Created</th></tr></thead>
+          <tbody>
+            <tr><td>600519.SH</td><td>buy</td><td>market</td><td>100</td><td>-</td><td><span class="badge badge-success">filled</span></td><td>2026-05-21 09:35</td></tr>
+            <tr><td>300750.SZ</td><td>sell</td><td>limit</td><td>200</td><td>¥239.50</td><td><span class="badge badge-warning">pending</span></td><td>2026-05-21 10:02</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="tab-panel" data-group="pta" data-panel="signals">
+      <div class="filter-bar">
+        <div class="search-wrap"><span>${icon('search')}</span><input class="form-input" placeholder="Search signals"></div>
+        <select class="form-select" style="width:180px;flex:0 0 180px"><option>All Statuses</option><option>pending</option><option>confirmed</option><option>rejected</option></select>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Strategy</th><th>Symbol</th><th>Direction</th><th>Status</th><th>Generated</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr><td>DualMA_Cross</td><td>600519.SH</td><td>buy</td><td><span class="badge badge-warning">pending</span></td><td>2026-05-21 10:11</td><td><button class="btn btn-ghost btn-sm" onclick="showToast('Signal confirmed','success')">Confirm</button> <button class="btn btn-ghost btn-sm text-destructive" onclick="showToast('Signal rejected','warning')">Reject</button></td></tr>
+            <tr><td>CompositeAlpha01</td><td>300750.SZ</td><td>sell</td><td><span class="badge badge-success">confirmed</span></td><td>2026-05-21 09:58</td><td></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div class="modal-overlay" id="orderModal">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-header"><h3 class="modal-title">Create Paper Order</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('orderModal')">×</button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Symbol</label><input class="form-input" placeholder="600519.SH"></div>
+        <div class="form-group"><label class="form-label">Direction</label><select class="form-select"><option>buy</option><option>sell</option></select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Order Type</label><select class="form-select"><option>market</option><option>limit</option></select></div>
+        <div class="form-group"><label class="form-label">Quantity</label><input class="form-input" value="100"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Price</label><input class="form-input" placeholder="Optional for market orders"></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('orderModal')">Cancel</button><button class="btn btn-primary" onclick="submitModal('orderModal', 'Order submitted', 'success')">Submit</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="deployModal">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-header"><h3 class="modal-title">Create Paper Deployment</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('deployModal')">×</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Source Type</label><select class="form-select"><option>strategy</option><option>composite</option></select></div>
+      <div class="form-group"><label class="form-label">Strategy</label><select class="form-select"><option>DualMA_Cross</option><option>CompositeAlpha01</option></select></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Symbol</label><input class="form-input" placeholder="600519.SH"></div>
+        <div class="form-group"><label class="form-label">Execution Mode</label><select class="form-select"><option>auto</option><option>semi-auto</option></select></div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('deployModal')">Cancel</button><button class="btn btn-primary" onclick="submitModal('deployModal', 'Deployment created', 'success')">Create</button></div>
+  </div>
+</div>
+
+<script src="shared.js"></script>
+</body>
+</html>

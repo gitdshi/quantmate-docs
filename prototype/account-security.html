@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>QuantMate — Account Security</title>
+  <link rel="stylesheet" href="shared.css">
+  <script src="https://cdn.tailwindcss.com?v=3.4"></script>
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <main class="main-content" id="main">
+
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Account Security</h1>
+        <p class="page-subtitle">Manage profile, password, API keys, active sessions, and billing information</p>
+      </div>
+    </div>
+
+    <div class="tabs" data-group="acc">
+      <button class="tab-btn active" data-tab="profile">${icon('user')} Profile</button>
+      <button class="tab-btn" data-tab="security">${icon('lock')} Security</button>
+      <button class="tab-btn" data-tab="apikeys">${icon('key')} API Keys</button>
+      <button class="tab-btn" data-tab="sessions">${icon('monitor')} Sessions</button>
+      <button class="tab-btn" data-tab="billing">${icon('credit-card')} Billing</button>
+    </div>
+
+    <div class="tab-panel active" data-group="acc" data-panel="profile">
+      <div class="card" style="max-width:860px">
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px">
+          <div style="width:64px;height:64px;border-radius:9999px;background:hsl(var(--primary)/.12);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:hsl(var(--primary))">Z</div>
+          <div>
+            <div style="font-size:18px;font-weight:600">Zhang Wei</div>
+            <div class="text-muted" style="font-size:13px">zhang@example.com</div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Display Name</label><input class="form-input" value="Zhang Wei"></div>
+          <div class="form-group"><label class="form-label">Email</label><input class="form-input" value="zhang@example.com"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Phone</label><input class="form-input" value="13800008888"></div>
+          <div class="form-group"><label class="form-label">Company</label><input class="form-input" value="QuantMate宽盟"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Bio</label><textarea class="form-textarea">Quant research, factor development, and portfolio workflow validation.</textarea></div>
+        <button class="btn btn-primary" onclick="showToast('Profile updated','success')">Save Profile</button>
+      </div>
+    </div>
+
+    <div class="tab-panel" data-group="acc" data-panel="security">
+      <div class="card" style="max-width:720px">
+        <h3 class="card-title">Update Password</h3>
+        <div class="form-group"><label class="form-label">Current Password</label><input type="password" class="form-input"></div>
+        <div class="form-group"><label class="form-label">New Password</label><input type="password" class="form-input"></div>
+        <div class="form-group"><label class="form-label">Confirm Password</label><input type="password" class="form-input"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:20px">
+          <div>
+            <div style="font-size:14px;font-weight:600">Two-factor authentication</div>
+            <div class="text-muted" style="font-size:13px">Email verification is enabled by default for this prototype.</div>
+          </div>
+          <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div style="margin-top:20px"><button class="btn btn-primary" onclick="showToast('Password updated','success')">Update Password</button></div>
+      </div>
+    </div>
+
+    <div class="tab-panel" data-group="acc" data-panel="apikeys">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px">
+        <div>
+          <h3 style="font-size:18px;font-weight:600;margin:0">API Keys</h3>
+          <p class="text-muted" style="font-size:13px;margin:4px 0 0">Manage integration credentials for automation and reporting.</p>
+        </div>
+        <button class="btn btn-primary" onclick="openModal('newKeyModal')">${icon('plus')} New Key</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Name</th><th>Key Prefix</th><th>Permissions</th><th>Created</th><th>Last Used</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr><td>Research Notebook</td><td><code>qm_live_12ab</code></td><td>read, backtest</td><td>2026-05-11</td><td>2026-05-20 18:42</td><td><span class="badge badge-success">active</span></td><td><button class="btn btn-ghost btn-sm text-destructive" onclick="showToast('Key revoked','success')">Revoke</button></td></tr>
+            <tr><td>BI Dashboard</td><td><code>qm_view_91df</code></td><td>read</td><td>2026-04-26</td><td>-</td><td><span class="badge badge-muted">revoked</span></td><td></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="tab-panel" data-group="acc" data-panel="sessions">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Device</th><th>IP</th><th>Location</th><th>Last Active</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>MacBook Pro / Chrome</td><td>10.0.0.18</td><td>Shanghai</td><td>2026-05-21 10:12</td><td><span class="badge badge-success">current</span></td></tr>
+            <tr><td>Windows / Edge</td><td>10.0.0.25</td><td>Shenzhen</td><td>2026-05-20 19:30</td><td><button class="btn btn-ghost btn-sm text-destructive" onclick="showToast('Session revoked','success')">Revoke</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="tab-panel" data-group="acc" data-panel="billing">
+      <div class="card" style="max-width:760px">
+        <h3 class="card-title">Billing</h3>
+        <div class="stat-grid cols-3" style="margin-bottom:16px">
+          <div class="stat-card"><div class="stat-label">Current Plan</div><div class="stat-value">Pro</div></div>
+          <div class="stat-card"><div class="stat-label">Renewal Date</div><div class="stat-value">2026-06-21</div></div>
+          <div class="stat-card"><div class="stat-label">Monthly Cost</div><div class="stat-value">$29</div></div>
+        </div>
+        <p class="text-muted" style="font-size:13px;margin:0">Billing records and invoice export stay in the real portal workflow. This prototype keeps the current plan summary visible in the same slot.</p>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div class="modal-overlay" id="newKeyModal">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header"><h3 class="modal-title">Create API Key</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('newKeyModal')">×</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Key Name</label><input class="form-input" placeholder="Research Notebook"></div>
+      <div class="form-group"><label class="form-label">Permissions</label><select class="form-select"><option>read, backtest</option><option>read</option><option>read, backtest, deploy</option></select></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('newKeyModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitModal('newKeyModal', 'API key created', 'success')">Create</button>
+    </div>
+  </div>
+</div>
+
+<script src="shared.js"></script>
+</body>
+</html>

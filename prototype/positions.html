@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>QuantMate — Positions</title>
+  <link rel="stylesheet" href="shared.css">
+  <script src="https://cdn.tailwindcss.com?v=3.4"></script>
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <main class="main-content" id="main">
+
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Positions</h1>
+        <p class="page-subtitle">Review current holdings, floating P&amp;L, and close positions directly from the portfolio book</p>
+      </div>
+    </div>
+
+    <div class="stat-grid cols-3" style="margin-bottom:16px">
+      <div class="stat-card"><div class="stat-label">Position Count</div><div class="stat-value">6</div></div>
+      <div class="stat-card"><div class="stat-label">Position Value</div><div class="stat-value">¥3,245,800</div></div>
+      <div class="stat-card"><div class="stat-label">Floating P&amp;L</div><div class="stat-value text-success">+¥128,600</div></div>
+    </div>
+
+    <div class="filter-bar">
+      <div class="search-wrap"><span>${icon('search')}</span><input class="form-input" placeholder="Search positions by symbol or name"></div>
+      <select class="form-select" style="width:200px;flex:0 0 200px">
+        <option>All Strategies</option>
+        <option>DualMA_Cross</option>
+        <option>MomentumAlpha</option>
+        <option>QlibTopK</option>
+      </select>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Symbol</th><th>Name</th><th>Strategy</th><th>Direction</th><th>Quantity</th><th>Avg Cost</th><th>Market Price</th><th>Market Value</th><th>P&amp;L</th><th>P&amp;L %</th><th>Actions</th></tr></thead>
+        <tbody>
+          <tr><td><code>600519.SH</code></td><td>Kweichow Moutai</td><td>MomentumAlpha</td><td><span class="badge badge-success">Long</span></td><td>300</td><td>¥1,685.20</td><td>¥1,732.80</td><td>¥519,840</td><td class="text-success">+¥14,280</td><td class="text-success">+2.82%</td><td><button class="btn btn-outline btn-sm" onclick="showConfirm('Close this position?',function(){showToast('Position close submitted','success')})">Close Position</button></td></tr>
+          <tr><td><code>300750.SZ</code></td><td>CATL</td><td>DualMA_Cross</td><td><span class="badge badge-success">Long</span></td><td>1,200</td><td>¥224.60</td><td>¥238.15</td><td>¥285,780</td><td class="text-success">+¥16,260</td><td class="text-success">+6.03%</td><td><button class="btn btn-outline btn-sm" onclick="showConfirm('Close this position?',function(){showToast('Position close submitted','success')})">Close Position</button></td></tr>
+          <tr><td><code>000333.SZ</code></td><td>Midea Group</td><td>QlibTopK</td><td><span class="badge badge-success">Long</span></td><td>2,500</td><td>¥63.40</td><td>¥61.20</td><td>¥153,000</td><td class="text-destructive">-¥5,500</td><td class="text-destructive">-3.47%</td><td><button class="btn btn-outline btn-sm" onclick="showConfirm('Close this position?',function(){showToast('Position close submitted','success')})">Close Position</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+</div>
+
+<script src="shared.js"></script>
+</body>
+</html>

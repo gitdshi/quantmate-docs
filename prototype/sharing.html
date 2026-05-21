@@ -12,179 +12,148 @@
   <main class="main-content" id="main">
 
     <div class="page-header">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
-        <div>
-          <h1 class="page-title">Team Space</h1>
-          <p class="page-subtitle">Collaborative workspaces, member management, and strategy sharing</p>
-        </div>
-        <button class="btn btn-primary" id="btnCreateWs" onclick="openModal('createWs')">+ Create Workspace</button>
+      <div>
+        <h1 class="page-title">Team Space</h1>
+        <p class="page-subtitle">Collaborative workspaces, member management, and strategy sharing</p>
       </div>
     </div>
 
-    <!-- Workspace List View -->
-    <div id="workspaceList"></div>
+    <div class="tabs" data-group="ts">
+      <button class="tab-btn active" data-tab="workspaces">${icon('users')} Workspaces</button>
+      <button class="tab-btn" data-tab="sharing">${icon('share-2')} Sharing</button>
+    </div>
 
-    <!-- Member Detail View -->
-    <div id="memberDetail" style="display:none"></div>
+    <div class="tab-panel active" data-group="ts" data-panel="workspaces">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px">
+        <div class="stat-grid cols-3" style="flex:1;min-width:280px;margin:0">
+          <div class="stat-card"><div class="stat-label">Workspaces</div><div class="stat-value">4</div></div>
+          <div class="stat-card"><div class="stat-label">Members</div><div class="stat-value">28</div></div>
+          <div class="stat-card"><div class="stat-label">Shared Strategies</div><div class="stat-value">19</div></div>
+        </div>
+        <button class="btn btn-primary" onclick="openModal('createWsModal')">${icon('plus')} Create Workspace</button>
+      </div>
+
+      <div class="grid-2" style="align-items:start">
+        <div class="card">
+          <div class="card-header"><h3 class="card-title">Workspace List</h3></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Name</th><th>Role</th><th>Members</th><th>Strategies</th><th>Created</th></tr></thead>
+              <tbody>
+                <tr onclick="selectWorkspace('Alpha Research Lab')" style="cursor:pointer"><td>Alpha Research Lab</td><td><span class="badge badge-destructive">owner</span></td><td>5</td><td>12</td><td>2026-01-15</td></tr>
+                <tr onclick="selectWorkspace('Quant Trading Team')" style="cursor:pointer"><td>Quant Trading Team</td><td><span class="badge badge-warning">admin</span></td><td>8</td><td>24</td><td>2025-11-20</td></tr>
+                <tr onclick="selectWorkspace('Risk Analytics Group')" style="cursor:pointer"><td>Risk Analytics Group</td><td><span class="badge badge-primary">member</span></td><td>3</td><td>6</td><td>2026-02-28</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card" id="workspaceDetailCard">
+          <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+            <div>
+              <h3 class="card-title" style="margin-bottom:4px">Alpha Research Lab</h3>
+              <p class="text-muted" style="font-size:13px;margin:0">Core quantitative strategy research and development</p>
+            </div>
+            <button class="btn btn-secondary btn-sm" onclick="openModal('inviteModal')">Invite Member</button>
+          </div>
+          <div class="table-wrap" style="margin-bottom:16px">
+            <table>
+              <thead><tr><th>Member</th><th>Role</th><th>Joined</th><th>Last Active</th><th>Actions</th></tr></thead>
+              <tbody id="memberTableBody">
+                <tr><td>Daniel Shi</td><td><span class="badge badge-destructive">owner</span></td><td>2026-01-15</td><td>2026-05-21</td><td></td></tr>
+                <tr><td>Alice Chen</td><td><span class="badge badge-warning">admin</span></td><td>2026-01-20</td><td>2026-05-20</td><td><button class="btn btn-ghost btn-sm text-destructive" onclick="showToast('Member removed','success')">Remove</button></td></tr>
+                <tr><td>Bob Wang</td><td><span class="badge badge-primary">member</span></td><td>2026-02-01</td><td>2026-05-19</td><td><button class="btn btn-ghost btn-sm text-destructive" onclick="showToast('Member removed','success')">Remove</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div>
+            <h4 style="font-size:14px;font-weight:600;margin:0 0 10px">Recent Workspace Activity</h4>
+            <div class="list-item"><span>${icon('share-2')}</span><div><div style="font-weight:600;font-size:14px">MomentumAlpha shared to workspace</div><div class="text-muted" style="font-size:12px">Today 10:20</div></div></div>
+            <div class="list-item" style="margin-top:10px"><span>${icon('users')}</span><div><div style="font-weight:600;font-size:14px">New reviewer invited</div><div class="text-muted" style="font-size:12px">Yesterday 16:44</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-panel" data-group="ts" data-panel="sharing">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px">
+        <div>
+          <h3 style="font-size:18px;font-weight:600;margin:0">Strategy Sharing</h3>
+          <p class="text-muted" style="font-size:13px;margin:4px 0 0">Track received shares and outbound strategy sharing in one place.</p>
+        </div>
+        <button class="btn btn-primary" onclick="openModal('shareModal')">${icon('share-2')} Share Strategy</button>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><h3 class="card-title">Received Shares</h3></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Strategy</th><th>Shared By</th><th>Permission</th><th>Created</th></tr></thead>
+              <tbody>
+                <tr><td>MomentumAlpha</td><td>Alice Chen</td><td><span class="badge badge-primary">view</span></td><td>2026-05-18</td></tr>
+                <tr><td>QlibTopK</td><td>Quant Trading Team</td><td><span class="badge badge-warning">edit</span></td><td>2026-05-16</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3 class="card-title">Sent Shares</h3></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Strategy</th><th>Shared With</th><th>Permission</th><th>Created</th></tr></thead>
+              <tbody>
+                <tr><td>DualMA_Cross</td><td>Alpha Research Lab</td><td><span class="badge badge-primary">view</span></td><td>2026-05-20</td></tr>
+                <tr><td>RSI_Reversal</td><td>Bob Wang</td><td><span class="badge badge-warning">edit</span></td><td>2026-05-17</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
 
   </main>
 </div>
 
-<!-- Create Workspace Modal -->
-<div class="modal-overlay" id="createWs">
+<div class="modal-overlay" id="createWsModal">
   <div class="modal" style="max-width:480px">
-    <div class="modal-header">
-      <h3 class="modal-title">Create Workspace</h3>
-      <button class="btn btn-ghost btn-icon" onclick="closeModal('createWs')">&#10005;</button>
-    </div>
+    <div class="modal-header"><h3 class="modal-title">Create Workspace</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('createWsModal')">×</button></div>
     <div class="modal-body">
-      <div style="display:flex;flex-direction:column;gap:16px">
-        <div>
-          <label class="form-label">Workspace Name</label>
-          <input type="text" class="form-input" placeholder="Enter workspace name">
-        </div>
-        <div>
-          <label class="form-label">Description</label>
-          <textarea class="form-textarea" rows="4" placeholder="Describe the purpose of this workspace..."></textarea>
-        </div>
-      </div>
+      <div class="form-group"><label class="form-label">Workspace Name</label><input class="form-input"></div>
+      <div class="form-group"><label class="form-label">Description</label><textarea class="form-textarea"></textarea></div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal('createWs')">Cancel</button>
-      <button class="btn btn-primary" onclick="submitModal('createWs', 'Workspace created successfully', 'success')">Create</button>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('createWsModal')">Cancel</button><button class="btn btn-primary" onclick="submitModal('createWsModal', 'Workspace created', 'success')">Create</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="inviteModal">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header"><h3 class="modal-title">Invite Member</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('inviteModal')">×</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">User ID</label><input class="form-input" placeholder="10012"></div>
+      <div class="form-group"><label class="form-label">Role</label><select class="form-select"><option>member</option><option>admin</option><option>viewer</option></select></div>
     </div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('inviteModal')">Cancel</button><button class="btn btn-primary" onclick="submitModal('inviteModal', 'Member invited', 'success')">Invite</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="shareModal">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-header"><h3 class="modal-title">Share Strategy</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('shareModal')">×</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Strategy</label><select class="form-select"><option>DualMA_Cross</option><option>MomentumAlpha</option><option>QlibTopK</option></select></div>
+      <div class="form-group"><label class="form-label">Target</label><select class="form-select"><option>Workspace</option><option>User</option></select></div>
+      <div class="form-group"><label class="form-label">Permission</label><select class="form-select"><option>view</option><option>edit</option></select></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('shareModal')">Cancel</button><button class="btn btn-primary" onclick="submitModal('shareModal', 'Strategy shared', 'success')">Share</button></div>
   </div>
 </div>
 
 <script src="shared.js"></script>
 <script>
-var workspaces = [
-  { id: 'ws1', name: 'Alpha Research Lab', role: 'owner', description: 'Core quantitative strategy research and development', members: 5, strategies: 12, created_at: '2026-01-15' },
-  { id: 'ws2', name: 'Quant Trading Team', role: 'admin', description: 'High-frequency and algorithmic trading strategies', members: 8, strategies: 24, created_at: '2025-11-20' },
-  { id: 'ws3', name: 'Risk Analytics Group', role: 'member', description: 'Portfolio risk measurement and hedging research', members: 3, strategies: 6, created_at: '2026-02-28' },
-  { id: 'ws4', name: 'ML Factor Research', role: 'viewer', description: 'Machine learning based factor discovery and validation', members: 12, strategies: 31, created_at: '2025-09-05' }
-];
-
-var membersByWs = {
-  ws1: [
-    { username: 'Daniel Shi', email: 'daniel@quantmate.io', role: 'owner', joined_at: '2026-01-15', last_active: '2026-03-26' },
-    { username: 'Alice Chen', email: 'alice@quantmate.io', role: 'admin', joined_at: '2026-01-20', last_active: '2026-03-25' },
-    { username: 'Bob Wang', email: 'bob@quantmate.io', role: 'member', joined_at: '2026-02-01', last_active: '2026-03-24' },
-    { username: 'Carol Li', email: 'carol@quantmate.io', role: 'member', joined_at: '2026-02-15', last_active: '2026-03-20' },
-    { username: 'David Zhang', email: 'david@quantmate.io', role: 'viewer', joined_at: '2026-03-01', last_active: '2026-03-18' }
-  ],
-  ws2: [
-    { username: 'Sarah Liu', email: 'sarah@quantmate.io', role: 'owner', joined_at: '2025-11-20', last_active: '2026-03-26' },
-    { username: 'Daniel Shi', email: 'daniel@quantmate.io', role: 'admin', joined_at: '2025-12-01', last_active: '2026-03-25' },
-    { username: 'Mike Zhao', email: 'mike@quantmate.io', role: 'member', joined_at: '2025-12-15', last_active: '2026-03-23' },
-    { username: 'Emily Xu', email: 'emily@quantmate.io', role: 'member', joined_at: '2026-01-05', last_active: '2026-03-22' },
-    { username: 'Frank Wu', email: 'frank@quantmate.io', role: 'member', joined_at: '2026-01-10', last_active: '2026-03-21' },
-    { username: 'Grace Huang', email: 'grace@quantmate.io', role: 'member', joined_at: '2026-02-01', last_active: '2026-03-19' },
-    { username: 'Henry Tan', email: 'henry@quantmate.io', role: 'viewer', joined_at: '2026-02-10', last_active: '2026-03-17' },
-    { username: 'Ivy Guo', email: 'ivy@quantmate.io', role: 'viewer', joined_at: '2026-02-20', last_active: '2026-03-15' }
-  ],
-  ws3: [
-    { username: 'Kevin Sun', email: 'kevin@quantmate.io', role: 'owner', joined_at: '2026-02-28', last_active: '2026-03-26' },
-    { username: 'Linda Ma', email: 'linda@quantmate.io', role: 'admin', joined_at: '2026-03-01', last_active: '2026-03-25' },
-    { username: 'Daniel Shi', email: 'daniel@quantmate.io', role: 'member', joined_at: '2026-03-05', last_active: '2026-03-24' }
-  ],
-  ws4: [
-    { username: 'Nathan Zhou', email: 'nathan@quantmate.io', role: 'owner', joined_at: '2025-09-05', last_active: '2026-03-26' },
-    { username: 'Olivia Jiang', email: 'olivia@quantmate.io', role: 'admin', joined_at: '2025-09-10', last_active: '2026-03-25' },
-    { username: 'Peter He', email: 'peter@quantmate.io', role: 'admin', joined_at: '2025-09-15', last_active: '2026-03-24' },
-    { username: 'Queenie Luo', email: 'queenie@quantmate.io', role: 'member', joined_at: '2025-10-01', last_active: '2026-03-23' },
-    { username: 'Rachel Feng', email: 'rachel@quantmate.io', role: 'member', joined_at: '2025-10-15', last_active: '2026-03-22' },
-    { username: 'Sam Deng', email: 'sam@quantmate.io', role: 'member', joined_at: '2025-11-01', last_active: '2026-03-21' },
-    { username: 'Tina Ye', email: 'tina@quantmate.io', role: 'member', joined_at: '2025-11-15', last_active: '2026-03-20' },
-    { username: 'Daniel Shi', email: 'daniel@quantmate.io', role: 'viewer', joined_at: '2025-12-01', last_active: '2026-03-19' },
-    { username: 'Vicky Pan', email: 'vicky@quantmate.io', role: 'viewer', joined_at: '2025-12-15', last_active: '2026-03-18' },
-    { username: 'Will Cao', email: 'will@quantmate.io', role: 'viewer', joined_at: '2026-01-01', last_active: '2026-03-16' },
-    { username: 'Xavier Lu', email: 'xavier@quantmate.io', role: 'viewer', joined_at: '2026-01-15', last_active: '2026-03-14' },
-    { username: 'Yuki Mori', email: 'yuki@quantmate.io', role: 'viewer', joined_at: '2026-02-01', last_active: '2026-03-12' }
-  ]
-};
-
-function roleBadge(role) {
-  var variant = 'primary';
-  if (role === 'owner') variant = 'destructive';
-  else if (role === 'admin') variant = 'warning';
-  var label = role.charAt(0).toUpperCase() + role.slice(1);
-  return '<span class="badge badge-' + variant + '">' + label + '</span>';
+function selectWorkspace(name) {
+  document.querySelector('#workspaceDetailCard .card-title').textContent = name;
 }
-
-function renderWorkspaceList() {
-  var container = document.getElementById('workspaceList');
-  var html = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px">';
-  for (var i = 0; i < workspaces.length; i++) {
-    var ws = workspaces[i];
-    html += '<div class="card" style="cursor:pointer;transition:box-shadow .2s" onmouseover="this.style.boxShadow=\'0 4px 12px rgba(0,0,0,.1)\'" onmouseout="this.style.boxShadow=\'\'" onclick="showMembers(\'' + ws.id + '\')">'
-      + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">'
-      + '<h3 style="font-weight:600;font-size:16px">' + ws.name + '</h3>'
-      + roleBadge(ws.role)
-      + '</div>'
-      + '<p class="text-muted" style="font-size:13px;margin-bottom:16px">' + ws.description + '</p>'
-      + '<div style="display:flex;gap:20px;font-size:13px;color:var(--muted-foreground)">'
-      + '<span>' + icon('users') + ' ' + ws.members + ' members</span>'
-      + '<span>' + ws.strategies + ' strategies</span>'
-      + '<span>Created ' + ws.created_at + '</span>'
-      + '</div>'
-      + '</div>';
-  }
-  html += '</div>';
-  container.innerHTML = html;
-}
-
-function showMembers(wsId) {
-  var ws = null;
-  for (var i = 0; i < workspaces.length; i++) {
-    if (workspaces[i].id === wsId) { ws = workspaces[i]; break; }
-  }
-  if (!ws) return;
-
-  var members = membersByWs[wsId] || [];
-  document.getElementById('workspaceList').style.display = 'none';
-  var detail = document.getElementById('memberDetail');
-  detail.style.display = 'block';
-
-  var html = '<a href="#" style="font-size:14px;color:var(--primary);text-decoration:none" onclick="backToList();return false">'
-    + '← Back to workspace list</a>'
-    + '<div class="card" style="margin-top:16px">'
-    + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'
-    + '<h3 style="font-weight:600;font-size:16px">' + ws.name + ' — Member Management</h3>'
-    + '<button class="btn btn-primary btn-sm" onclick="showToast(\'Invite link copied!\', \'success\')">'
-    + icon('plus') + ' Invite Member</button>'
-    + '</div>'
-    + '<div class="table-wrap"><table><thead><tr>'
-    + '<th>Member</th><th>Email</th><th>Role</th><th>Joined At</th><th>Last Active</th><th>Actions</th>'
-    + '</tr></thead><tbody>';
-
-  for (var j = 0; j < members.length; j++) {
-    var m = members[j];
-    var actionCell = '';
-    if (m.role !== 'owner') {
-      actionCell = '<button class="btn btn-ghost btn-icon btn-sm" onclick="showToast(\'Member settings opened\', \'info\')">'
-        + icon('settings') + '</button>';
-    }
-    html += '<tr>'
-      + '<td style="font-weight:500">' + m.username + '</td>'
-      + '<td>' + m.email + '</td>'
-      + '<td>' + roleBadge(m.role) + '</td>'
-      + '<td>' + m.joined_at + '</td>'
-      + '<td>' + m.last_active + '</td>'
-      + '<td>' + actionCell + '</td>'
-      + '</tr>';
-  }
-
-  html += '</tbody></table></div></div>';
-  detail.innerHTML = html;
-}
-
-function backToList() {
-  document.getElementById('memberDetail').style.display = 'none';
-  document.getElementById('workspaceList').style.display = 'block';
-}
-
-renderWorkspaceList();
 </script>
 </body>
 </html>

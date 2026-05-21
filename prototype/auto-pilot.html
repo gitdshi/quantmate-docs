@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>QuantMate — Auto Pilot</title>
+  <link rel="stylesheet" href="shared.css">
+  <script src="https://cdn.tailwindcss.com?v=3.4"></script>
+  <style>
+    .auto-grid { display:grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr); gap:16px; }
+    .auto-grid > * { min-width:0; }
+    .catalog-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:16px; }
+    @media (max-width: 960px) { .auto-grid { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <main class="main-content" id="main">
+
+    <div class="page-header">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
+        <div>
+          <h1 class="page-title">Auto Pilot</h1>
+          <p class="page-subtitle">Run autonomous factor mining jobs, inspect discovered factors, and browse the data catalog</p>
+        </div>
+        <button class="btn btn-primary" onclick="openModal('newRunModal')">${icon('play')} Start Mining Run</button>
+      </div>
+    </div>
+
+    <div class="tabs" data-group="ap">
+      <button class="tab-btn active" data-tab="runs">${icon('bot')} Runs</button>
+      <button class="tab-btn" data-tab="catalog">${icon('database')} Data Catalog</button>
+    </div>
+
+    <div class="tab-panel active" data-group="ap" data-panel="runs">
+      <div class="auto-grid">
+        <div class="card">
+          <div class="card-header"><h3 class="card-title">Mining Runs</h3></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Run ID</th><th>Scenario</th><th>Status</th><th>Progress</th><th>Created</th><th>Actions</th></tr></thead>
+              <tbody>
+                <tr onclick="selectRun('RUN-240521-01','fin_factor','running','7 / 10','2026-05-21 09:30','Quality + momentum factors are being evaluated on CSI 300 with GPT-4o Mini.','alpha_quality_mom_07, alpha_turnover_reversal_02')" style="cursor:pointer"><td><button class="btn btn-ghost btn-sm">RUN-240521-01</button></td><td>fin_factor</td><td><span class="badge badge-primary">running</span></td><td>7 / 10</td><td>2026-05-21 09:30</td><td><button class="btn btn-ghost btn-sm text-destructive" onclick="event.stopPropagation();showToast('Run cancelled','success')">Cancel</button></td></tr>
+                <tr onclick="selectRun('RUN-240517-03','fin_factor','completed','10 / 10','2026-05-17 13:10','Completed shortlist ready for factor import and review.','alpha_cashflow_quality_03, alpha_lowvol_value_01')" style="cursor:pointer"><td><button class="btn btn-ghost btn-sm">RUN-240517-03</button></td><td>fin_factor</td><td><span class="badge badge-success">completed</span></td><td>10 / 10</td><td>2026-05-17 13:10</td><td><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();showToast('Run exported','success')">${icon('download')} Export</button></td></tr>
+                <tr onclick="selectRun('RUN-240509-08','price_action','failed','2 / 10','2026-05-09 08:45','The run stopped after training data quality dropped below threshold.','-')" style="cursor:pointer"><td><button class="btn btn-ghost btn-sm">RUN-240509-08</button></td><td>price_action</td><td><span class="badge badge-destructive">failed</span></td><td>2 / 10</td><td>2026-05-09 08:45</td><td></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card" id="runDetailCard">
+          <div class="card-header"><h3 class="card-title">Run Detail</h3></div>
+          <div id="runDetailBody">
+            <div style="font-size:18px;font-weight:600;margin-bottom:6px">RUN-240521-01</div>
+            <p class="text-muted" style="font-size:13px;margin:0 0 16px">Quality + momentum factors are being evaluated on CSI 300 with GPT-4o Mini.</p>
+            <div class="stat-grid cols-2" style="margin-bottom:16px">
+              <div class="stat-card"><div class="stat-label">Scenario</div><div class="stat-value" style="font-size:18px">fin_factor</div></div>
+              <div class="stat-card"><div class="stat-label">Progress</div><div class="stat-value" style="font-size:18px">7 / 10</div></div>
+            </div>
+            <div style="margin-bottom:16px">
+              <div class="text-muted" style="font-size:13px;margin-bottom:6px">Discovered Factors</div>
+              <div id="runFactorList" style="display:flex;flex-direction:column;gap:8px">
+                <div class="list-item"><span>${icon('flask-conical')}</span><div><div style="font-weight:600;font-size:14px">alpha_quality_mom_07</div><div class="text-muted" style="font-size:12px">Ready for import</div></div></div>
+                <div class="list-item"><span>${icon('flask-conical')}</span><div><div style="font-weight:600;font-size:14px">alpha_turnover_reversal_02</div><div class="text-muted" style="font-size:12px">Under review</div></div></div>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="btn btn-secondary btn-sm" onclick="showToast('Factor imported','success')">Import Factor</button>
+              <button class="btn btn-secondary btn-sm" onclick="showToast('Download queued','info')">${icon('download')} Download Results</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-panel" data-group="ap" data-panel="catalog">
+      <div class="card" style="margin-bottom:16px">
+        <h3 class="card-title">Catalog Summary</h3>
+        <p class="text-muted" style="font-size:13px;margin:0">182 fields available across Tushare, AkShare, Qlib, and derived research features.</p>
+      </div>
+      <div class="catalog-grid">
+        <div class="card"><h3 class="card-title">Pricing</h3><p class="text-muted" style="font-size:13px;margin:0">open, high, low, close, volume, turnover</p></div>
+        <div class="card"><h3 class="card-title">Fundamentals</h3><p class="text-muted" style="font-size:13px;margin:0">roe, gross_margin, pe_ttm, pb, cashflow ratios</p></div>
+        <div class="card"><h3 class="card-title">Derived Features</h3><p class="text-muted" style="font-size:13px;margin:0">momentum_60d, volatility_20d, liquidity_rank</p></div>
+        <div class="card"><h3 class="card-title">Universes</h3><p class="text-muted" style="font-size:13px;margin:0">csi300, csi500, broad_a_share</p></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div class="modal-overlay" id="newRunModal">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-header"><h3 class="modal-title">Start Mining Run</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('newRunModal')">×</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Scenario</label><select class="form-select"><option>fin_factor</option><option>price_action</option><option>sector_rotation</option></select></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Max Iterations</label><input class="form-input" type="number" value="10"></div>
+        <div class="form-group"><label class="form-label">LLM Model</label><select class="form-select"><option>OpenCode AI / MiniMax M2.5 Free</option><option>GPT-4o Mini</option><option>GPT-4o</option></select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Universe</label><input class="form-input" value="csi300"></div>
+        <div class="form-group"><label class="form-label">Date Range</label><input class="form-input" value="2025-05-21 to 2026-05-21"></div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('newRunModal')">Cancel</button><button class="btn btn-primary" onclick="submitModal('newRunModal', 'Mining run started', 'success')">Start</button></div>
+  </div>
+</div>
+
+<script src="shared.js"></script>
+<script>
+function selectRun(runId, scenario, status, progress, created, summary, factors) {
+  var body = document.getElementById('runDetailBody');
+  var factorList = factors === '-' ? '<div class="text-muted" style="font-size:13px">No factors discovered.</div>' : factors.split(', ').map(function(name) {
+    return '<div class="list-item"><span>' + icon('flask-conical') + '</span><div><div style="font-weight:600;font-size:14px">' + name + '</div><div class="text-muted" style="font-size:12px">Candidate output</div></div></div>';
+  }).join('');
+  body.innerHTML = ''
+    + '<div style="font-size:18px;font-weight:600;margin-bottom:6px">' + runId + '</div>'
+    + '<p class="text-muted" style="font-size:13px;margin:0 0 16px">' + summary + '</p>'
+    + '<div class="stat-grid cols-2" style="margin-bottom:16px">'
+    +   '<div class="stat-card"><div class="stat-label">Scenario</div><div class="stat-value" style="font-size:18px">' + scenario + '</div></div>'
+    +   '<div class="stat-card"><div class="stat-label">Progress</div><div class="stat-value" style="font-size:18px">' + progress + '</div></div>'
+    + '</div>'
+    + '<div style="margin-bottom:8px" class="text-muted">Status: ' + status + '</div>'
+    + '<div style="margin-bottom:16px" class="text-muted">Created: ' + created + '</div>'
+    + '<div style="margin-bottom:16px"><div class="text-muted" style="font-size:13px;margin-bottom:6px">Discovered Factors</div><div style="display:flex;flex-direction:column;gap:8px">' + factorList + '</div></div>'
+    + '<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-secondary btn-sm" onclick="showToast(\'Factor imported\',\'success\')">Import Factor</button><button class="btn btn-secondary btn-sm" onclick="showToast(\'Download queued\',\'info\')">' + icon('download') + ' Download Results</button></div>';
+}
+</script>
+</body>
+</html>
