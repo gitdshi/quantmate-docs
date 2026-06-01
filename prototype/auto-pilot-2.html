@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>QuantMate — AutoPilot 2.0</title>
+  <link rel="stylesheet" href="shared.css">
+  <script src="https://cdn.tailwindcss.com?v=3.4"></script>
+  <style>
+    .ap2-layout { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: 16px; }
+    .ap2-layout > * { min-width: 0; }
+    .ap2-full { grid-column: 1 / -1; }
+
+    /* Agent status bar */
+    .agent-bar { display: flex; gap: 12px; flex-wrap: wrap; }
+    .agent-chip {
+      display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 8px;
+      border: 1px solid hsl(var(--border)); font-size: 13px; background: hsl(var(--card));
+    }
+    .agent-chip .agent-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .agent-dot.active { background: hsl(var(--success)); animation: pulse-dot 2s infinite; }
+    .agent-dot.idle { background: hsl(var(--muted-foreground)); }
+    .agent-dot.thinking { background: hsl(var(--warning)); animation: pulse-dot 1s infinite; }
+    @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+    /* Orchestrator log */
+    .orch-log { max-height: 400px; overflow-y: auto; font-size: 13px; }
+    .orch-entry { padding: 8px 12px; border-left: 3px solid transparent; margin-bottom: 2px; }
+    .orch-entry.orch { border-left-color: hsl(var(--primary)); }
+    .orch-entry.factor { border-left-color: #6366f1; }
+    .orch-entry.strategy { border-left-color: #f59e0b; }
+    .orch-entry.backtest { border-left-color: #10b981; }
+    .orch-entry.risk { border-left-color: #ef4444; }
+    .orch-entry .orch-time { font-size: 10px; color: hsl(var(--muted-foreground)); }
+    .orch-entry .orch-agent { font-size: 10px; font-weight: 600; text-transform: uppercase; margin-left: 8px; }
+
+    /* Discovery table */
+    .disc-table { font-size: 13px; }
+
+    /* New goal form */
+    .goal-form { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    @media (max-width: 960px) {
+      .ap2-layout { grid-template-columns: 1fr; }
+      .goal-form { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <main class="main-content" id="main">
+
+    <div class="page-header" style="margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
+        <div>
+          <h1 class="page-title">AutoPilot 2.0 <span class="badge badge-primary" style="font-size:10px;vertical-align:middle">Multi-Agent</span></h1>
+          <p class="page-subtitle">Autonomous strategy R&D: Factor Mining → Strategy Synthesis → Backtest → Paper Trading</p>
+        </div>
+        <button class="btn btn-primary" onclick="openModal('newGoalModal')"><span id="ico-plus"></span> New Research Goal</button>
+      </div>
+    </div>
+
+    <!-- ═══ Agent Status Bar ═══ -->
+    <div class="agent-bar" style="margin-bottom:16px">
+      <div class="agent-chip"><div class="agent-dot active"></div><strong>Orchestrator</strong><span class="text-muted" style="font-size:11px">Scheduling 4 tasks</span></div>
+      <div class="agent-chip"><div class="agent-dot thinking"></div><strong>Factor Agent</strong><span class="text-muted" style="font-size:11px">Mining iteration 3/10</span></div>
+      <div class="agent-chip"><div class="agent-dot idle"></div><strong>Strategy Agent</strong><span class="text-muted" style="font-size:11px">Waiting for factors</span></div>
+      <div class="agent-chip"><div class="agent-dot idle"></div><strong>Backtest Agent</strong><span class="text-muted" style="font-size:11px">Idle</span></div>
+      <div class="agent-chip"><div class="agent-dot idle"></div><strong>Risk Agent</strong><span class="text-muted" style="font-size:11px">Idle</span></div>
+    </div>
+
+    <div class="tabs" data-group="ap2">
+      <button class="tab-btn active" data-tab="active-run">Active Run</button>
+      <button class="tab-btn" data-tab="history">Run History</button>
+      <button class="tab-btn" data-tab="pipeline">Validation Pipeline</button>
+    </div>
+
+    <!-- ═══ ACTIVE RUN ═══ -->
+    <div class="tab-panel active" data-group="ap2" data-panel="active-run">
+      <!-- Run Header -->
+      <div class="card" style="margin-bottom:16px;background:hsl(var(--primary)/.03);border:1px solid hsl(var(--primary)/.15)">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+          <div>
+            <div style="font-size:18px;font-weight:700;margin-bottom:4px">Research Goal: Low-drawdown strategy for range-bound markets</div>
+            <div style="font-size:13px;color:hsl(var(--muted-foreground))">Goal: Sharpe > 1.5, MaxDD < 15% · Universe: CSI 300 · Depth: Standard (10-15 iterations)</div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span class="badge badge-primary">Running · 3h 24m</span>
+            <button class="btn btn-ghost btn-sm" onclick="showToast('Research paused','info')">⏸ Pause</button>
+            <button class="btn btn-ghost btn-sm text-destructive" onclick="showToast('Research terminated','info')">⏹ Stop</button>
+          </div>
+        </div>
+        <div style="margin-top:12px">
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+            <span>Overall Progress</span><span>Iteration 6 / 12 · ~4h remaining</span>
+          </div>
+          <div style="width:100%;height:6px;background:hsl(var(--muted));border-radius:3px;overflow:hidden">
+            <div style="width:50%;height:100%;background:hsl(var(--primary));border-radius:3px;transition:width 1s"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ap2-layout">
+        <!-- LEFT: Orchestrator Log -->
+        <div class="card">
+          <h3 class="card-title">Orchestrator Log <span style="font-weight:400;font-size:12px;color:hsl(var(--muted-foreground))">— Live agent communication</span></h3>
+          <div class="orch-log" id="orchLog">
+            <div class="orch-entry orch"><span class="orch-time">14:32:05</span><span class="orch-agent">Orchestrator</span><br>Goal decomposed into 4 sub-tasks. Assigned to Factor (2), Strategy (1), Risk (1).</div>
+            <div class="orch-entry orch"><span class="orch-time">14:35:12</span><span class="orch-agent">Orchestrator → Factor</span><br>Task: Find factors suitable for range-bound CSI 300 market. Context: volatility=15%, sideways for 3 months.</div>
+            <div class="orch-entry factor"><span class="orch-time">14:35:18</span><span class="orch-agent">Factor Agent</span><br>Acknowledged. Querying Shared Memory for historically effective range-bound factors. Found 12 candidates.</div>
+            <div class="orch-entry factor"><span class="orch-time">15:10:44</span><span class="orch-agent">Factor Agent → Orchestrator</span><br>Iteration 3 complete. Discovered 5 candidate factors: vol_ratio_20d (IC=0.045), bb_width (IC=0.041), rsi_reversal_14d (IC=0.038), amplitude_ratio (IC=0.031), turnover_ma (IC=0.035).</div>
+            <div class="orch-entry orch"><span class="orch-time">15:12:01</span><span class="orch-agent">Orchestrator → Strategy</span><br>Task: Build strategies using [vol_ratio_20d, bb_width, rsi_reversal_14d]. Requirements: low drawdown, include stop-loss, suitable for CSI 300.</div>
+            <div class="orch-entry strategy"><span class="orch-time">15:45:21</span><span class="orch-agent">Strategy Agent → Orchestrator</span><br>Generated 3 strategy candidates:<br>1. GridMA_Strategy — grid-based with MA filter and BB width trigger<br>2. BB_RSI_Reversal — pure mean-reversion with RSI confirmation<br>3. VolRegime_Strategy — volatility regime-switching with momentum overlay</div>
+            <div class="orch-entry orch"><span class="orch-time">15:46:30</span><span class="orch-agent">Orchestrator → Backtest</span><br>Task: Backtest 3 strategy candidates. Period: 2023-01-01 to 2025-12-31. Universe: CSI 300 Top-50.</div>
+            <div class="orch-entry backtest"><span class="orch-time">16:02:15</span><span class="orch-agent">Backtest Agent → Orchestrator</span><br>Results: GridMA (Sharpe=1.71, MaxDD=11.8%) ✅ | BB_RSI (Sharpe=1.62, MaxDD=12.3%) ✅ | VolRegime (Sharpe=1.35, MaxDD=16.2%) ⚠️</div>
+            <div class="orch-entry orch"><span class="orch-time">16:05:00</span><span class="orch-agent">Orchestrator → Risk</span><br>Task: Assess VolRegime_Strategy. Why did MaxDD exceed 15%? Suggest improvements.</div>
+            <div class="orch-entry risk"><span class="orch-time">16:20:33</span><span class="orch-agent">Risk Agent → Orchestrator</span><br>Analysis: VolRegime failed during 2024-Q1 correction (18% drawdown in 15 days). Root cause: regime detection lagged by 3-5 days. Suggestion: Add faster volatility signal (5-day vs 20-day) and reduce position size during transition periods.</div>
+            <div class="orch-entry orch"><span class="orch-time">16:22:00</span><span class="orch-agent">Orchestrator → Strategy</span><br>Task: Optimize VolRegime_Strategy with Risk Agent suggestions.</div>
+            <div class="orch-entry strategy"><span class="orch-time">17:12:45</span><span class="orch-agent">Strategy Agent → Orchestrator</span><br>VolRegime v2 optimized. Added 5-day vol trigger + graduated position sizing. Re-running backtest...</div>
+            <div class="orch-entry orch"><span class="orch-time">17:15:00</span><span class="orch-agent">Orchestrator</span><br><em>Starting iteration 7 — refining factor selection based on latest market data...</em></div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Discoveries + Agent detail -->
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <!-- Discovered Strategies -->
+          <div class="card">
+            <h3 class="card-title">Discovered Strategies <span class="badge badge-success" style="font-size:10px">3 candidates</span></h3>
+            <div class="table-wrap disc-table">
+              <table>
+                <thead><tr><th>#</th><th>Strategy</th><th>Sharpe</th><th>MaxDD</th><th>Return</th><th>Status</th><th></th></tr></thead>
+                <tbody>
+                  <tr style="background:hsl(var(--success)/.05)">
+                    <td>1</td><td><strong>GridMA_Strategy</strong></td>
+                    <td style="color:hsl(var(--success));font-weight:600">1.71</td>
+                    <td style="color:hsl(var(--success))">11.8%</td>
+                    <td>32.5%</td>
+                    <td><span class="badge badge-success">Pass</span></td>
+                    <td><button class="btn btn-ghost btn-sm" onclick="showToast('Importing GridMA_Strategy...','success')">Import</button></td>
+                  </tr>
+                  <tr style="background:hsl(var(--success)/.03)">
+                    <td>2</td><td><strong>BB_RSI_Reversal</strong></td>
+                    <td style="color:hsl(var(--success));font-weight:600">1.62</td>
+                    <td style="color:hsl(var(--success))">12.3%</td>
+                    <td>28.1%</td>
+                    <td><span class="badge badge-success">Pass</span></td>
+                    <td><button class="btn btn-ghost btn-sm" onclick="showToast('Importing BB_RSI_Reversal...','success')">Import</button></td>
+                  </tr>
+                  <tr>
+                    <td>3</td><td><strong>VolRegime_Strategy</strong></td>
+                    <td>1.35</td>
+                    <td style="color:hsl(var(--destructive));font-weight:600">16.2%</td>
+                    <td>25.8%</td>
+                    <td><span class="badge badge-warning">Optimizing</span></td>
+                    <td><button class="btn btn-ghost btn-sm" disabled>Pending v2</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Factor Agent Detail -->
+          <div class="card">
+            <h3 class="card-title">Factor Agent — Current Iteration</h3>
+            <div style="font-size:13px">
+              <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+                <span>Factors evaluated this iteration:</span><span>8</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+                <span>Passing IC > 0.02:</span><span style="color:hsl(var(--success))">5</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+                <span>Passing ICIR > 0.3:</span><span style="color:hsl(var(--success))">3</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+                <span>Shared Memory hits:</span><span>12 similar market states found</span>
+              </div>
+            </div>
+            <div style="margin-top:8px;display:flex;gap:4px;flex-wrap:wrap">
+              <span class="badge badge-secondary" style="font-size:10px">vol_ratio_20d IC=0.045</span>
+              <span class="badge badge-secondary" style="font-size:10px">bb_width IC=0.041</span>
+              <span class="badge badge-secondary" style="font-size:10px">rsi_reversal_14d IC=0.038</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ RUN HISTORY ═══ -->
+    <div class="tab-panel" data-group="ap2" data-panel="history">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Goal</th><th>Depth</th><th>Iterations</th><th>Strategies Found</th><th>Best Sharpe</th><th>Status</th><th>Completed</th><th></th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>Momentum strategies for bull trend</strong></td>
+              <td>Quick (5 iter)</td><td>5</td><td>2</td><td style="color:hsl(var(--success))">1.89</td>
+              <td><span class="badge badge-success">Completed</span></td>
+              <td>2026-05-18</td>
+              <td><button class="btn btn-ghost btn-sm">View Report</button></td>
+            </tr>
+            <tr>
+              <td><strong>High-dividend defensive portfolio</strong></td>
+              <td>Standard (12 iter)</td><td>12</td><td>4</td><td style="color:hsl(var(--success))">1.55</td>
+              <td><span class="badge badge-success">Completed</span></td>
+              <td>2026-05-12</td>
+              <td><button class="btn btn-ghost btn-sm">View Report</button></td>
+            </tr>
+            <tr>
+              <td><strong>Small-cap breakout strategy</strong></td>
+              <td>Deep (30 iter)</td><td>30</td><td>6</td><td style="color:hsl(var(--success))">2.12</td>
+              <td><span class="badge badge-success">Completed</span></td>
+              <td>2026-04-28</td>
+              <td><button class="btn btn-ghost btn-sm">View Report</button></td>
+            </tr>
+            <tr>
+              <td><strong>Sector rotation with ML</strong></td>
+              <td>Standard</td><td>8</td><td>1</td><td>1.05</td>
+              <td><span class="badge badge-destructive">Failed</span></td>
+              <td>2026-04-15</td>
+              <td><button class="btn btn-ghost btn-sm">View Log</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ═══ VALIDATION PIPELINE ═══ -->
+    <div class="tab-panel" data-group="ap2" data-panel="pipeline">
+      <div class="card" style="margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+          <div>
+            <h3 class="card-title" style="margin:0">Validation Pipeline Status</h3>
+            <p class="text-muted" style="font-size:13px;margin:4px 0 0">Auto-triggered when RD-Agent discovers new factors</p>
+          </div>
+          <span class="badge badge-success">Active — Monitoring</span>
+        </div>
+      </div>
+
+      <div class="stat-grid" style="margin-bottom:16px">
+        <div class="card stat-card" style="padding:16px">
+          <div class="stat-label">Pipeline Runs (30d)</div>
+          <div class="stat-value">12</div>
+          <div class="text-muted" style="font-size:12px">8 completed, 2 failed, 2 in progress</div>
+        </div>
+        <div class="card stat-card" style="padding:16px">
+          <div class="stat-label">Factors Validated</div>
+          <div class="stat-value">47</div>
+          <div class="text-muted" style="font-size:12px">31 passed IC threshold, 16 filtered</div>
+        </div>
+        <div class="card stat-card" style="padding:16px">
+          <div class="stat-label">Strategies Generated</div>
+          <div class="stat-value">23</div>
+          <div class="text-muted" style="font-size:12px">15 passed backtest, 3 auto-deployed</div>
+        </div>
+        <div class="card stat-card" style="padding:16px">
+          <div class="stat-label">Avg Pipeline Duration</div>
+          <div class="stat-value">1h 12m</div>
+          <div class="text-muted" style="font-size:12px">Fastest: 34m, Slowest: 3h 05m</div>
+        </div>
+      </div>
+
+      <!-- Pipeline Config -->
+      <div class="card">
+        <h3 class="card-title">Pipeline Configuration</h3>
+        <div class="goal-form">
+          <div class="form-group"><label class="form-label">Factor IC Threshold</label><input class="form-input" type="number" value="0.02" step="0.005" style="width:120px"></div>
+          <div class="form-group"><label class="form-label">Factor ICIR Threshold</label><input class="form-input" type="number" value="0.3" step="0.05" style="width:120px"></div>
+          <div class="form-group"><label class="form-label">Max Factors per Strategy</label><input class="form-input" type="number" value="3" style="width:120px"></div>
+          <div class="form-group"><label class="form-label">Backtest Lookback (years)</label><input class="form-input" type="number" value="3" style="width:120px"></div>
+          <div class="form-group"><label class="form-label">Backtest Universe</label><select class="form-select" style="width:200px"><option>CSI 300 Top-50</option><option>CSI 500 Top-100</option><option>All A-Shares (liquidity filtered)</option></select></div>
+          <div class="form-group"><label class="form-label">Auto Deploy Top-N</label><select class="form-select" style="width:120px"><option>0 (Disabled)</option><option>1</option><option>3</option><option>5</option></select></div>
+        </div>
+        <button class="btn btn-primary btn-sm" style="margin-top:12px">Save Configuration</button>
+      </div>
+    </div>
+
+    <!-- ═══ NEW RESEARCH GOAL MODAL ═══ -->
+    <div class="modal-overlay" id="newGoalModal" style="display:none">
+      <div class="modal" style="max-width:640px">
+        <div class="modal-header"><h3 class="modal-title">New Research Goal</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('newGoalModal')">×</button></div>
+        <div class="modal-body">
+          <div class="form-group"><label class="form-label">Goal Description *</label>
+            <textarea class="form-input" rows="3" style="width:100%;font-family:inherit" placeholder="Describe what kind of strategy you want the AI to discover. Example: 'Find low-drawdown strategies suitable for range-bound markets, targeting Sharpe > 1.5 and MaxDD < 15%, for CSI 300 stocks.'"></textarea>
+          </div>
+          <div class="form-row" style="margin-bottom:12px">
+            <div class="form-group" style="flex:1"><label class="form-label">Research Depth</label>
+              <select class="form-select">
+                <option value="quick">Quick Explore (~2h, 3-5 iterations)</option>
+                <option value="standard" selected>Standard Research (~8h, 10-15 iterations)</option>
+                <option value="deep">Deep Research (~24h, 30+ iterations)</option>
+              </select>
+            </div>
+            <div class="form-group" style="flex:1"><label class="form-label">Universe</label>
+              <select class="form-select">
+                <option>CSI 300 (000300.SH)</option><option>CSI 500 (000905.SH)</option><option>CSI 1000</option><option>All A-Shares</option>
+              </select>
+            </div>
+          </div>
+          <div style="margin-bottom:12px"><label class="form-label">Constraints</label>
+            <div style="display:flex;flex-direction:column;gap:6px;font-size:13px">
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" checked> Only use price/volume factors (no fundamentals)</label>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" checked> Strategy must include stop-loss logic</label>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox"> Avoid high-turnover strategies (&gt; 200% annual)</label>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox"> Require minimum 50 trades in backtest</label>
+            </div>
+          </div>
+          <div style="margin-bottom:12px"><label class="form-label">Result Delivery</label>
+            <div style="display:flex;flex-direction:column;gap:6px;font-size:13px">
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" checked> Auto-deploy Top-3 strategies to Paper Trading</label>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox"> Generate full research report (PDF)</label>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" checked> Send notification on completion</label>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="closeModal('newGoalModal')">Cancel</button>
+          <button class="btn btn-primary" onclick="submitModal('newGoalModal', 'Research started! AutoPilot 2.0 is now working.', 'success')">Start Research</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="shared.js"></script>
+<script>
+/* ============================================================
+   AutoPilot 2.0 — Multi-Agent Monitoring Simulation
+   ============================================================ */
+
+// ── Simulated live log streaming ──
+const LOG_ENTRIES = [
+  {time:'17:30:15',agent:'orch',text:'Iteration 7 started. Refining factor weights based on latest market regime classification.'},
+  {time:'17:32:40',agent:'orch',text:'Orchestrator → Factor Agent: Re-evaluate factors with stricter IC threshold (0.035) for this iteration.'},
+  {time:'17:45:12',agent:'factor',text:'Factor Agent → Orchestrator: Refined factor set — vol_ratio_20d (IC=0.047), bb_width (IC=0.041), turnover_ma (IC=0.036). Dropped 2 low-IC factors.'},
+  {time:'17:47:30',agent:'orch',text:'Orchestrator → Strategy Agent: Build hybrid strategy combining grid + mean-reversion using refined factors.'},
+  {time:'18:05:00',agent:'strategy',text:'Strategy Agent → Orchestrator: Generated GridReversion_Hybrid strategy. Combines BB-based entry with dynamic grid sizing. Code ready for backtest.'},
+  {time:'18:06:15',agent:'orch',text:'Orchestrator → Backtest Agent: Backtest GridReversion_Hybrid on CSI 300 (2023-2025).'},
+  {time:'18:22:30',agent:'backtest',text:'Backtest Agent → Orchestrator: GridReversion_Hybrid — Sharpe 1.83, MaxDD 10.2%, Return 35.1%. Best result so far! ✅'},
+  {time:'18:25:00',agent:'orch',text:'Orchestrator → Risk Agent: Final validation of GridReversion_Hybrid. Stress-test under 2024-Q1 scenario.'},
+  {time:'18:38:45',agent:'risk',text:'Risk Agent → Orchestrator: GridReversion_Hybrid passed stress test. MaxDD in 2024-Q1 stress: 13.1% (threshold: 15%). VaR(99%) = 3.2%. Approved. ✅'},
+  {time:'18:40:00',agent:'orch',text:'Target achieved! GridReversion_Hybrid meets all criteria (Sharpe 1.83 > 1.5, MaxDD 10.2% < 15%). Compiling final report...'},
+];
+
+let logIndex = 0;
+function streamNextLog() {
+  if (logIndex >= LOG_ENTRIES.length) return;
+  const entry = LOG_ENTRIES[logIndex];
+  const logDiv = document.getElementById('orchLog');
+  const div = document.createElement('div');
+  div.className = 'orch-entry ' + entry.agent;
+  div.innerHTML = `<span class="orch-time">${entry.time}</span><span class="orch-agent">${entry.agent === 'orch' ? 'Orchestrator' : entry.agent === 'factor' ? 'Factor Agent' : entry.agent === 'strategy' ? 'Strategy Agent' : entry.agent === 'backtest' ? 'Backtest Agent' : 'Risk Agent'}</span><br>${entry.text}`;
+  logDiv.appendChild(div);
+  logDiv.scrollTop = logDiv.scrollHeight;
+  logIndex++;
+  if (logIndex < LOG_ENTRIES.length) {
+    setTimeout(streamNextLog, 2500 + Math.random() * 3000);
+  }
+}
+
+// Start streaming after a delay
+setTimeout(streamNextLog, 5000);
+
+// ── Close modal on overlay click ──
+document.addEventListener('click', function(e) {
+  if (e.target.classList.contains('modal-overlay')) {
+    e.target.style.display = 'none';
+  }
+});
+</script>
+</body>
+</html>

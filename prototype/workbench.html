@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>QuantMate — Workbench</title>
+  <link rel="stylesheet" href="shared.css">
+  <script src="https://cdn.tailwindcss.com?v=3.4"></script>
+  <style>
+    /* ── Workbench Layout ── */
+    .wb-layout { display: grid; grid-template-columns: 1fr 380px; gap: 16px; min-height: calc(100vh - 180px); }
+    .wb-left { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+    .wb-right { display: flex; flex-direction: column; gap: 16px; }
+
+    /* ── Pipeline Canvas ── */
+    .pipeline { display: flex; align-items: center; gap: 0; padding: 8px 0; }
+    .pipe-step {
+      display: flex; align-items: center; gap: 8px; padding: 10px 18px;
+      border-radius: 8px; font-size: 14px; font-weight: 500;
+      background: hsl(var(--muted)); color: hsl(var(--muted-foreground));
+      cursor: pointer; transition: all 0.2s; white-space: nowrap;
+      border: 2px solid transparent;
+    }
+    .pipe-step.active { background: hsl(var(--primary)/.1); color: hsl(var(--primary)); border-color: hsl(var(--primary)); font-weight: 600; }
+    .pipe-step.done { background: hsl(var(--success)/.1); color: hsl(var(--success)); }
+    .pipe-step.done:hover { background: hsl(var(--success)/.15); }
+    .pipe-step .step-num {
+      width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700; background: hsl(var(--muted-foreground)/.2); flex-shrink: 0;
+    }
+    .pipe-step.active .step-num { background: hsl(var(--primary)); color: #fff; }
+    .pipe-step.done .step-num { background: hsl(var(--success)); color: #fff; }
+    .pipe-arrow { margin: 0 4px; color: hsl(var(--muted-foreground)); font-size: 18px; flex-shrink: 0; }
+    @media (max-width: 1100px) {
+      .pipeline { flex-wrap: wrap; gap: 4px; }
+      .pipe-arrow { display: none; }
+      .pipe-step { padding: 8px 12px; font-size: 12px; }
+    }
+
+    /* ── Stage Panel ── */
+    .stage-panel { display: none; }
+    .stage-panel.active { display: block; }
+
+    /* ── Copilot Panel ── */
+    .copilot-panel { display: flex; flex-direction: column; border: 1px solid hsl(var(--border)); border-radius: 10px; background: hsl(var(--card)); overflow: hidden; height: calc(100vh - 230px); }
+    .copilot-header { padding: 14px 16px; border-bottom: 1px solid hsl(var(--border)); display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 15px; flex-shrink: 0; }
+    .copilot-header .ai-dot { width: 8px; height: 8px; border-radius: 50%; background: hsl(var(--success)); animation: pulse-dot 2s infinite; }
+    @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.4} }
+    .copilot-msgs { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+    .copilot-msg { padding: 10px 14px; border-radius: 10px; font-size: 13px; line-height: 1.5; }
+    .copilot-msg.system { background: hsl(var(--primary)/.08); border: 1px solid hsl(var(--primary)/.15); }
+    .copilot-msg.user { background: hsl(var(--muted)); align-self: flex-end; max-width: 85%; }
+    .copilot-msg .msg-stage { font-size: 10px; text-transform: uppercase; letter-spacing: .05em; color: hsl(var(--primary)); font-weight: 600; margin-bottom: 4px; }
+    .copilot-actions { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+    .copilot-actions .btn { font-size: 12px; padding: 4px 10px; }
+    .copilot-input { padding: 10px 12px; border-top: 1px solid hsl(var(--border)); display: flex; gap: 8px; flex-shrink: 0; }
+    .copilot-input input { flex: 1; border: 1px solid hsl(var(--border)); border-radius: 8px; padding: 8px 12px; font-size: 13px; background: hsl(var(--background)); color: hsl(var(--foreground)); }
+    .copilot-input input:focus { outline: none; border-color: hsl(var(--primary)); box-shadow: 0 0 0 2px hsl(var(--primary)/.2); }
+
+    /* ── Factor selection ── */
+    .factor-select-list { display: flex; flex-direction: column; gap: 6px; max-height: 400px; overflow-y: auto; }
+    .factor-select-item {
+      display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 8px;
+      border: 1px solid hsl(var(--border)); cursor: pointer; transition: all .15s;
+    }
+    .factor-select-item:hover { border-color: hsl(var(--primary)/.4); background: hsl(var(--primary)/.04); }
+    .factor-select-item.selected { border-color: hsl(var(--primary)); background: hsl(var(--primary)/.06); }
+    .factor-select-item .check {
+      width: 20px; height: 20px; border-radius: 4px; border: 2px solid hsl(var(--border));
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 12px; color: #fff;
+    }
+    .factor-select-item.selected .check { background: hsl(var(--primary)); border-color: hsl(var(--primary)); }
+
+    /* ── Code preview ── */
+    .code-preview { background: #1e1e2e; color: #cdd6f4; border-radius: 8px; padding: 16px; font-family: ui-monospace,SFMono-Regular,Menlo,monospace; font-size: 13px; line-height: 1.6; overflow: auto; max-height: 300px; white-space: pre-wrap; }
+
+    /* ── Backtest result summary ── */
+    .bt-summary { display: grid; grid-template-columns: repeat(auto-fit,minmax(120px,1fr)); gap: 12px; }
+    .bt-metric { padding: 12px; border-radius: 8px; background: hsl(var(--muted)/.5); text-align: center; }
+    .bt-metric .bt-val { font-size: 22px; font-weight: 700; }
+    .bt-metric .bt-label { font-size: 11px; color: hsl(var(--muted-foreground)); margin-top: 2px; }
+    .bt-metric.positive .bt-val { color: hsl(var(--success)); }
+    .bt-metric.negative .bt-val { color: hsl(var(--destructive)); }
+
+    /* ── PT status card ── */
+    .pt-status-card { border: 1px solid hsl(var(--border)); border-radius: 10px; padding: 20px; background: hsl(var(--card)); }
+    .pt-status-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .pt-live-dot { width: 8px; height: 8px; border-radius: 50%; background: hsl(var(--success)); display: inline-block; margin-right: 6px; animation: pulse-dot 2s infinite; }
+
+    /* ── History sessions ── */
+    .session-list-item { padding: 12px; border: 1px solid hsl(var(--border)); border-radius: 8px; cursor: pointer; transition: all .15s; }
+    .session-list-item:hover { border-color: hsl(var(--primary)/.4); background: hsl(var(--primary)/.04); }
+
+    /* ── Responsive ── */
+    @media (max-width: 1024px) {
+      .wb-layout { grid-template-columns: 1fr; }
+      .copilot-panel { height: 400px; }
+    }
+  </style>
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <main class="main-content" id="main">
+
+    <!-- ── Page Header ── -->
+    <div class="page-header" style="margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
+        <div>
+          <h1 class="page-title">Workbench</h1>
+          <p class="page-subtitle">Unified workspace: Factor Research → Strategy → Backtest → Paper Trading</p>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn btn-ghost btn-sm" onclick="showSessionList()"><span id="ico-clock"></span> History</button>
+          <button class="btn btn-secondary btn-sm" onclick="resetPipeline()"><span id="ico-plus"></span> New Workflow</button>
+          <button class="btn btn-ghost btn-icon" onclick="toggleDark()" title="Toggle theme"><span id="ico-moon"></span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Pipeline Canvas ── -->
+    <div class="card" style="padding:12px 20px;margin-bottom:16px">
+      <div class="pipeline" id="pipeline">
+        <div class="pipe-step active" data-stage="factor" onclick="goToStage('factor')">
+          <span class="step-num">1</span> Factor Research
+        </div>
+        <span class="pipe-arrow">→</span>
+        <div class="pipe-step" data-stage="strategy" onclick="goToStage('strategy')">
+          <span class="step-num">2</span> Strategy Builder
+        </div>
+        <span class="pipe-arrow">→</span>
+        <div class="pipe-step" data-stage="backtest" onclick="goToStage('backtest')">
+          <span class="step-num">3</span> Backtest
+        </div>
+        <span class="pipe-arrow">→</span>
+        <div class="pipe-step" data-stage="paper" onclick="goToStage('paper')">
+          <span class="step-num">4</span> Paper Trading
+        </div>
+      </div>
+    </div>
+
+    <div class="wb-layout">
+      <!-- ═══ LEFT: Stage Panels ═══ -->
+      <div class="wb-left">
+
+        <!-- ── STAGE 1: Factor Research ── -->
+        <div class="stage-panel active card" data-stage="factor">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <h3 class="card-title" style="margin:0">Select Factors for Your Strategy</h3>
+            <button class="btn btn-ghost btn-sm" onclick="aiRecommendFactors()"><span id="ico-sparkles"></span> AI Recommend</button>
+          </div>
+          <div class="form-row" style="margin-bottom:12px">
+            <input type="text" class="form-input" style="flex:1" placeholder="Search factors by name, category, or expression..." oninput="filterFactors(this.value)">
+            <select class="form-select" style="width:140px" onchange="filterFactorsByCategory(this.value)">
+              <option value="">All Categories</option>
+              <option>Momentum</option><option>Volatility</option><option>Volume</option><option>Technical</option><option>Fundamental</option>
+            </select>
+          </div>
+          <div class="factor-select-list" id="factorList">
+            <!-- Populated by JS -->
+          </div>
+          <div style="margin-top:16px;display:flex;justify-content:space-between;align-items:center">
+            <span class="text-muted" style="font-size:13px"><span id="selectedCount">0</span> factors selected</span>
+            <button class="btn btn-primary" onclick="confirmFactors()" id="confirmFactorsBtn" disabled>
+              Confirm & Continue <span style="margin-left:4px">→</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- ── STAGE 2: Strategy Builder ── -->
+        <div class="stage-panel card" data-stage="strategy">
+          <div style="display:flex;gap:8px;margin-bottom:16px">
+            <button class="tab-btn active" onclick="switchStrategyMode('code',this)" style="border-bottom:none;margin-bottom:0">Code Mode</button>
+            <button class="tab-btn" onclick="switchStrategyMode('visual',this)" style="border-bottom:none;margin-bottom:0">Visual Builder</button>
+            <button class="tab-btn" onclick="switchStrategyMode('nl',this)" style="border-bottom:none;margin-bottom:0">NL Describe</button>
+            <span class="text-muted" style="margin-left:auto;font-size:13px;align-self:center">Selected factors: <strong id="selectedFactorsLabel">-</strong></span>
+          </div>
+          <div style="border-bottom:1px solid hsl(var(--border));margin-bottom:16px"></div>
+
+          <!-- Code Mode -->
+          <div id="stratModeCode">
+            <div class="form-row" style="margin-bottom:12px">
+              <div class="form-group" style="flex:1"><label class="form-label">Strategy Name</label><input class="form-input" id="strategyName" value="Momentum_Vol_Strategy_20260521"></div>
+              <div class="form-group" style="width:150px"><label class="form-label">Type</label><select class="form-select" id="strategyType"><option>CTA (vnpy)</option><option>Qlib Model</option></select></div>
+            </div>
+            <div class="form-row" style="margin-bottom:12px">
+              <div class="form-group"><label class="form-label">Initial Capital</label><input class="form-input" type="number" value="1000000" style="width:140px"></div>
+              <div class="form-group"><label class="form-label">Commission Rate</label><input class="form-input" type="number" value="0.0003" step="0.0001" style="width:120px"></div>
+              <div class="form-group"><label class="form-label">Slippage</label><input class="form-input" type="number" value="0.01" step="0.01" style="width:100px"></div>
+            </div>
+            <label class="form-label">Strategy Code <span class="text-muted">(editable)</span></label>
+            <div class="code-preview" contenteditable="true" id="strategyCode" style="margin-bottom:12px">from vnpy_ctastrategy import (
+    CtaTemplate, StopOrder, TickData, BarData, TradeData, OrderData
+)
+
+class MomentumVolStrategy(CtaTemplate):
+    """Multi-factor momentum + volatility strategy"""
+    author = "QuantMate Workbench"
+
+    # Parameters
+    momentum_period = 20
+    vol_period = 20
+    vol_threshold = 0.02
+    trailing_stop_pct = 0.05
+
+    def __init__(self, cta_engine, strategy_name, vt_symbol, setting):
+        super().__init__(cta_engine, strategy_name, vt_symbol, setting)
+        self.momentum_value = 0
+        self.volatility = 0
+
+    def on_bar(self, bar: BarData):
+        # Compute momentum signal
+        close_array = self.am.close[-self.momentum_period:]
+        self.momentum_value = (close_array[-1] / close_array[0]) - 1
+
+        # Compute volatility
+        returns = np.diff(close_array) / close_array[:-1]
+        self.volatility = np.std(returns)
+
+        # Entry logic
+        if self.momentum_value > self.vol_threshold and self.pos == 0:
+            self.buy(bar.close_price, self.fixed_size)
+        elif self.momentum_value < -self.vol_threshold and self.pos > 0:
+            self.sell(bar.close_price, abs(self.pos))
+
+        # Trailing stop
+        if self.pos > 0:
+            self.trailing_stop(bar.close_price, self.trailing_stop_pct)</div>
+          </div>
+
+          <!-- Visual Builder (placeholder) -->
+          <div id="stratModeVisual" style="display:none">
+            <div style="padding:40px;text-align:center;border:2px dashed hsl(var(--border));border-radius:12px">
+              <span style="font-size:40px">🧩</span>
+              <h3 style="margin:12px 0 4px">Visual Strategy Builder</h3>
+              <p class="text-muted">Drag &amp; drop components to build your strategy visually.<br>Open the full builder for the complete experience.</p>
+              <a href="strategy-builder.html" class="btn btn-primary" style="margin-top:12px">Open Visual Builder →</a>
+            </div>
+          </div>
+
+          <!-- NL Mode -->
+          <div id="stratModeNL" style="display:none">
+            <label class="form-label">Describe your strategy in natural language</label>
+            <textarea class="form-input" rows="4" style="width:100%;margin-bottom:12px;font-family:inherit" placeholder="Example: &quot;Create a momentum strategy for CSI 500 stocks. Buy top 20% by 20-day returns, hold for 10 trading days, max position 15% per stock, stop loss at 8% drawdown per position.&quot;"></textarea>
+            <button class="btn btn-primary" onclick="nlGenerateStrategy()"><span id="ico-sparkles"></span> Generate Strategy</button>
+            <div id="nlPreview" style="display:none;margin-top:16px">
+              <div class="card" style="background:hsl(var(--muted)/.3)">
+                <h4 style="margin:0 0 12px">AI extracted:</h4>
+                <div class="stat-grid cols-2" style="margin-bottom:12px">
+                  <div><span style="font-size:12px;color:hsl(var(--muted-foreground))">Universe</span><div style="font-weight:600">CSI 500 (000905.SH)</div></div>
+                  <div><span style="font-size:12px;color:hsl(var(--muted-foreground))">Signal</span><div style="font-weight:600">20-day momentum top 20%</div></div>
+                  <div><span style="font-size:12px;color:hsl(var(--muted-foreground))">Holding Period</span><div style="font-weight:600">10 days</div></div>
+                  <div><span style="font-size:12px;color:hsl(var(--muted-foreground))">Position Limit</span><div style="font-weight:600">15% per stock</div></div>
+                </div>
+                <div style="display:flex;gap:8px">
+                  <button class="btn btn-primary btn-sm">Confirm & Save</button>
+                  <button class="btn btn-ghost btn-sm">Refine Description</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:16px;display:flex;justify-content:flex-end;gap:8px">
+            <button class="btn btn-ghost" onclick="goToStage('factor')">← Back to Factors</button>
+            <button class="btn btn-primary" onclick="saveAndBacktest()">Save Strategy & Backtest →</button>
+          </div>
+        </div>
+
+        <!-- ── STAGE 3: Backtest ── -->
+        <div class="stage-panel card" data-stage="backtest">
+          <h3 class="card-title">Backtest Configuration</h3>
+          <div class="form-row" style="margin-bottom:12px">
+            <div class="form-group"><label class="form-label">Start Date</label><input type="date" class="form-input" value="2023-01-01"></div>
+            <div class="form-group"><label class="form-label">End Date</label><input type="date" class="form-input" value="2025-12-31"></div>
+            <div class="form-group"><label class="form-label">Benchmark</label><select class="form-select" style="width:160px"><option>000300.SH (CSI 300)</option><option>000905.SH (CSI 500)</option><option>399001.SZ (SZ Component)</option></select></div>
+          </div>
+          <button class="btn btn-primary" onclick="runBacktest()" id="runBacktestBtn"><span id="ico-play"></span> Run Backtest</button>
+
+          <!-- Backtest Running -->
+          <div id="btRunning" style="display:none;margin-top:20px;text-align:center;padding:40px">
+            <div style="font-size:24px;margin-bottom:12px">⏳</div>
+            <div style="font-weight:600;margin-bottom:8px">Backtest in progress...</div>
+            <div style="width:100%;height:6px;background:hsl(var(--muted));border-radius:3px;overflow:hidden">
+              <div style="width:65%;height:100%;background:hsl(var(--primary));border-radius:3px;transition:width .5s" id="btProgressBar"></div>
+            </div>
+            <div class="text-muted" style="margin-top:8px;font-size:13px">Estimated time remaining: ~45s</div>
+          </div>
+
+          <!-- Backtest Result -->
+          <div id="btResult" style="display:none;margin-top:20px">
+            <div class="bt-summary">
+              <div class="bt-metric positive"><div class="bt-val">32.5%</div><div class="bt-label">Total Return</div></div>
+              <div class="bt-metric positive"><div class="bt-val">1.71</div><div class="bt-label">Sharpe Ratio</div></div>
+              <div class="bt-metric positive"><div class="bt-val">2.15</div><div class="bt-label">Calmar Ratio</div></div>
+              <div class="bt-metric negative"><div class="bt-val">-11.8%</div><div class="bt-label">Max Drawdown</div></div>
+              <div class="bt-metric"><div class="bt-val">58.2%</div><div class="bt-label">Win Rate</div></div>
+              <div class="bt-metric"><div class="bt-val">127</div><div class="bt-label">Total Trades</div></div>
+            </div>
+
+            <!-- AI Analysis -->
+            <div class="card" style="margin-top:16px;background:hsl(var(--primary)/.04);border:1px solid hsl(var(--primary)/.2)">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+                <span id="ico-sparkles" style="color:hsl(var(--primary))"></span>
+                <h4 style="margin:0;font-size:15px">AI Analysis</h4>
+              </div>
+              <div style="font-size:13px;line-height:1.7">
+                <p><strong>Overall:</strong> The strategy performs <span style="color:hsl(var(--success))">well</span> in the backtest period with a Sharpe of 1.71, significantly outperforming the CSI 300 benchmark (+12.3% excess return).</p>
+                <p><strong>Risk:</strong> Max drawdown of 11.8% occurred during the 2024-Q1 correction, lasting 23 days. VaR(95%) = 2.1%. Recovery speed is <span style="color:hsl(var(--warning))">moderate</span>.</p>
+                <p><strong>⚠️ Overfitting Check:</strong> Deflated Sharpe Ratio = 0.08 (p > 0.05 threshold). Parameter sensitivity is <span style="color:hsl(var(--success))">low</span> (±10% param change → Sharpe change &lt; 0.15). The strategy shows <span style="color:hsl(var(--success))">low</span> overfitting risk.</p>
+                <p><strong>Market Adaptability:</strong> Best performance in <span style="color:hsl(var(--success))">trending bull</span> markets (Sharpe 2.1). Performs adequately in <span style="color:hsl(var(--warning))">range-bound</span> (Sharpe 1.3). Weaker in <span style="color:hsl(var(--destructive))">sharp bear</span> markets (Sharpe 0.6).</p>
+                <p><strong>Suggestions:</strong> (1) Add volatility regime filter to reduce exposure during high-VIX periods. (2) Consider ATR-based dynamic position sizing. <a href="#" style="color:hsl(var(--primary))">Apply suggestions →</a></p>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:16px;display:flex;justify-content:flex-end;gap:8px" id="btActions" >
+            <button class="btn btn-ghost" onclick="goToStage('strategy')">← Back to Strategy</button>
+            <button class="btn btn-primary" onclick="deployPaperTrade()" id="deployBtn" disabled>Deploy to Paper Trading →</button>
+          </div>
+        </div>
+
+        <!-- ── STAGE 4: Paper Trading ── -->
+        <div class="stage-panel card" data-stage="paper">
+          <h3 class="card-title">Deploy to Paper Trading</h3>
+          <div class="form-row" style="margin-bottom:16px">
+            <div class="form-group" style="flex:1"><label class="form-label">Paper Account</label><select class="form-select"><option>Default Account (¥1,000,000)</option><option>Test Account A (¥500,000)</option><option>Test Account B (¥2,000,000)</option></select></div>
+            <div class="form-group" style="width:160px"><label class="form-label">Mode</label><select class="form-select" id="ptMode"><option value="auto">Full Auto</option><option value="signal">Signal Mode (Semi-auto)</option></select></div>
+          </div>
+          <div class="form-row" style="margin-bottom:16px">
+            <div class="form-group"><label class="form-label">Max Drawdown Alert</label><input class="form-input" type="number" value="15" style="width:80px"> <span class="text-muted" style="font-size:13px">%</span></div>
+            <div class="form-group"><label class="form-label">Consecutive Loss Alert</label><input class="form-input" type="number" value="5" style="width:80px"> <span class="text-muted" style="font-size:13px">trades</span></div>
+          </div>
+          <button class="btn btn-primary" onclick="confirmDeploy()" id="confirmDeployBtn"><span id="ico-rocket"></span> Start Paper Trading</button>
+
+          <!-- PT Running Status -->
+          <div id="ptRunning" style="display:none;margin-top:20px">
+            <div class="pt-status-card">
+              <div class="pt-status-header">
+                <div><span class="pt-live-dot"></span><strong>Live — Paper Trading Active</strong></div>
+                <span class="badge badge-success">Running</span>
+              </div>
+              <div class="stat-grid cols-2" style="margin-bottom:12px">
+                <div class="stat-card"><div class="stat-label">Strategy</div><div class="stat-value" style="font-size:16px">MomentumVolStrategy</div></div>
+                <div class="stat-card"><div class="stat-label">Account</div><div class="stat-value" style="font-size:16px">Default Account</div></div>
+                <div class="stat-card"><div class="stat-label">Mode</div><div class="stat-value" style="font-size:16px" id="ptModeLabel">Full Auto</div></div>
+                <div class="stat-card"><div class="stat-label">Start Time</div><div class="stat-value" style="font-size:16px" id="ptStartTime">-</div></div>
+              </div>
+              <div class="stat-grid cols-3">
+                <div class="bt-metric positive"><div class="bt-val" style="font-size:18px">+0.8%</div><div class="bt-label">Real-time P&L</div></div>
+                <div class="bt-metric"><div class="bt-val" style="font-size:18px">3</div><div class="bt-label">Open Positions</div></div>
+                <div class="bt-metric"><div class="bt-val" style="font-size:18px">5</div><div class="bt-label">Trades Today</div></div>
+              </div>
+              <div style="margin-top:16px;display:flex;gap:8px">
+                <a href="paper-trading-account.html" class="btn btn-primary btn-sm">View Details →</a>
+                <button class="btn btn-ghost btn-sm text-destructive" onclick="stopPaperTrade()">Stop</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ═══ RIGHT: AI Copilot ═══ -->
+      <div class="wb-right">
+        <div class="copilot-panel" id="copilotPanel">
+          <div class="copilot-header">
+            <div class="ai-dot"></div> AI Copilot
+            <span style="margin-left:auto;font-size:11px;color:hsl(var(--muted-foreground))">Context-aware</span>
+          </div>
+          <div class="copilot-msgs" id="copilotMsgs">
+            <div class="copilot-msg system">
+              <div class="msg-stage">Factor Research</div>
+              Welcome to the Workbench! I'm your AI Copilot. I'll guide you through building a strategy from factors to paper trading.
+              <div class="copilot-actions">
+                <button class="btn btn-ghost btn-sm" onclick="quickAction('recommendFactors')"><span id="ico-sparkles"></span> Recommend factors</button>
+                <button class="btn btn-ghost btn-sm" onclick="quickAction('explainPipeline')"><span id="ico-info"></span> How this works</button>
+              </div>
+            </div>
+          </div>
+          <div class="copilot-input">
+            <input type="text" placeholder="Ask me anything about your strategy..." id="copilotInput" onkeydown="if(event.key==='Enter')sendCopilotMessage()">
+            <button class="btn btn-primary btn-sm" onclick="sendCopilotMessage()">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Session History Modal ── -->
+    <div class="modal-overlay" id="sessionModal" style="display:none">
+      <div class="modal" style="max-width:600px">
+        <div class="modal-header"><h3 class="modal-title">Workflow History</h3><button class="btn btn-ghost btn-icon" onclick="closeModal('sessionModal')">×</button></div>
+        <div class="modal-body">
+          <div style="display:flex;flex-direction:column;gap:8px" id="sessionList">
+            <div class="session-list-item" onclick="loadSession('session-1')">
+              <div style="font-weight:600;font-size:14px">Momentum_Vol_Strategy</div>
+              <div style="font-size:12px;color:hsl(var(--muted-foreground))">Stage: Paper Trading · Last active: 2026-05-21 14:30</div>
+            </div>
+            <div class="session-list-item" onclick="loadSession('session-2')">
+              <div style="font-weight:600;font-size:14px">Grid_Bollinger_Band</div>
+              <div style="font-size:12px;color:hsl(var(--muted-foreground))">Stage: Backtest · Last active: 2026-05-20 09:15</div>
+            </div>
+            <div class="session-list-item" onclick="loadSession('session-3')">
+              <div style="font-weight:600;font-size:14px">Mean_Reversion_Alpha</div>
+              <div style="font-size:12px;color:hsl(var(--muted-foreground))">Stage: Strategy Builder · Last active: 2026-05-19 16:45</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="shared.js"></script>
+<script>
+/* ============================================================
+   Workbench Prototype — Pipeline + Copilot Logic
+   ============================================================ */
+
+// ── Mock Factor Data ──
+const MOCK_FACTORS = [
+  {name:'momentum_20d', category:'Momentum', expr:'ROC(C,20)', ic:0.045, icir:0.72, status:'active'},
+  {name:'volatility_20d', category:'Volatility', expr:'STD(C,20)/MA(C,20)', ic:0.038, icir:0.61, status:'active'},
+  {name:'rsi_reversal_14d', category:'Technical', expr:'100-100/(1+RS(14))', ic:0.042, icir:0.68, status:'active'},
+  {name:'turnover_ma_5d', category:'Volume', expr:'SMA(VOLUME,5)/SMA(VOLUME,20)', ic:0.033, icir:0.55, status:'active'},
+  {name:'bb_width', category:'Volatility', expr:'(BBU(20,2)-BBL(20,2))/MA(C,20)', ic:0.041, icir:0.64, status:'active'},
+  {name:'pe_ttm_rank', category:'Fundamental', expr:'RANK(PE_TTM)', ic:0.029, icir:0.48, status:'active'},
+  {name:'alpha_momentum_60d', category:'Momentum', expr:'ROC(C,60)-BETA*ROC(BENCH,60)', ic:0.051, icir:0.78, status:'active'},
+  {name:'volume_breakout', category:'Volume', expr:'VOLUME/SMA(VOLUME,20)-1', ic:0.027, icir:0.42, status:'active'},
+  {name:'amplitude_ratio', category:'Volatility', expr:'(H-L)/REF(C,1)', ic:0.031, icir:0.49, status:'active'},
+  {name:'cashflow_quality', category:'Fundamental', expr:'OCF/NI', ic:0.035, icir:0.53, status:'active'},
+];
+
+let selectedFactors = [];
+let currentStage = 'factor';
+let pipelineDone = {factor:false, strategy:false, backtest:false, paper:false};
+
+// ── Render factor list ──
+function renderFactorList(filter, category) {
+  const container = document.getElementById('factorList');
+  let factors = MOCK_FACTORS;
+  if (filter) factors = factors.filter(f => f.name.toLowerCase().includes(filter.toLowerCase()) || f.category.toLowerCase().includes(filter.toLowerCase()));
+  if (category) factors = factors.filter(f => f.category === category);
+
+  container.innerHTML = factors.map(f => {
+    const sel = selectedFactors.includes(f.name);
+    return `<div class="factor-select-item${sel?' selected':''}" onclick="toggleFactor('${f.name}')" id="factor-${f.name}">
+      <div class="check">${sel?'✓':''}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:600;font-size:14px">${f.name}</div>
+        <div style="font-size:12px;color:hsl(var(--muted-foreground))">${f.expr}</div>
+      </div>
+      <span class="badge badge-secondary" style="font-size:10px">${f.category}</span>
+      <div style="text-align:right">
+        <div style="font-weight:600;font-size:14px;color:${f.ic>0?'hsl(var(--success))':'hsl(var(--destructive))'}">IC ${f.ic.toFixed(3)}</div>
+        <div style="font-size:11px;color:hsl(var(--muted-foreground))">ICIR ${f.icir.toFixed(2)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleFactor(name) {
+  const idx = selectedFactors.indexOf(name);
+  if (idx >= 0) selectedFactors.splice(idx,1);
+  else selectedFactors.push(name);
+  renderFactorList();
+  updateSelectionCount();
+}
+
+function filterFactors(v) { renderFactorList(v); }
+function filterFactorsByCategory(v) { renderFactorList(null, v); }
+
+function updateSelectionCount() {
+  document.getElementById('selectedCount').textContent = selectedFactors.length;
+  document.getElementById('confirmFactorsBtn').disabled = selectedFactors.length === 0;
+}
+
+// ── AI Recommend ──
+function aiRecommendFactors() {
+  selectedFactors = ['momentum_20d','volatility_20d','bb_width'];
+  renderFactorList();
+  updateSelectionCount();
+  addCopilotMsg('system', 'Factor Research',
+    'Based on the current range-bound market regime (CSI 300 volatility: 15%), I recommend these 3 factors:<br>' +
+    '• <strong>momentum_20d</strong> (IC=0.045) — strong in transitional markets<br>' +
+    '• <strong>volatility_20d</strong> (IC=0.038) — excels in range-bound conditions<br>' +
+    '• <strong>bb_width</strong> (IC=0.041) — captures mean-reversion signals<br><br>' +
+    'These 3 factors have low pairwise correlation (&lt; 0.3), providing good diversification.',
+    [['Run IC Analysis','fa fa-chart-line'],['Auto-select','fa fa-check']]);
+  showToast('AI recommended 3 factors for current market regime', 'info');
+}
+
+// ── Pipeline Navigation ──
+function goToStage(stage) {
+  currentStage = stage;
+  document.querySelectorAll('.stage-panel').forEach(p => p.classList.remove('active'));
+  document.querySelector(`.stage-panel[data-stage="${stage}"]`).classList.add('active');
+  document.querySelectorAll('.pipe-step').forEach(s => s.classList.remove('active'));
+  document.querySelector(`.pipe-step[data-stage="${stage}"]`).classList.add('active');
+  updatePipelineDone();
+}
+
+function confirmFactors() {
+  if (selectedFactors.length === 0) return;
+  document.getElementById('selectedFactorsLabel').textContent = selectedFactors.join(', ');
+  pipelineDone.factor = true;
+  goToStage('strategy');
+  // Copilot contextual message
+  addCopilotMsg('system', 'Strategy Builder',
+    `You've selected ${selectedFactors.length} factors: <strong>${selectedFactors.join(', ')}</strong>.<br><br>` +
+    `<strong>Analysis:</strong> momentum_20d has been trending up (IC 0.045→0.052 in Q1), while volatility_20d maintains stable IC. ` +
+    `Consider adding a stop-loss rule — historical drawdowns for pure momentum strategies average 18%.`,
+    [['Add stop-loss','fa fa-shield'],['Generate strategy code','fa fa-code']]);
+}
+
+function saveAndBacktest() {
+  pipelineDone.strategy = true;
+  goToStage('backtest');
+  document.getElementById('deployBtn').disabled = true;
+  document.getElementById('btResult').style.display = 'none';
+  document.getElementById('btRunning').style.display = 'none';
+}
+
+function runBacktest() {
+  document.getElementById('btRunning').style.display = 'block';
+  document.getElementById('btResult').style.display = 'none';
+  document.getElementById('runBacktestBtn').disabled = true;
+
+  // Simulate backtest progress
+  let progress = 0;
+  const bar = document.getElementById('btProgressBar');
+  const timer = setInterval(() => {
+    progress += Math.random() * 20 + 5;
+    if (progress >= 100) {
+      progress = 100;
+      clearInterval(timer);
+      document.getElementById('btRunning').style.display = 'none';
+      document.getElementById('btResult').style.display = 'block';
+      document.getElementById('deployBtn').disabled = false;
+      document.getElementById('runBacktestBtn').disabled = false;
+      pipelineDone.backtest = true;
+      updatePipelineDone();
+      // Copilot: backtest complete
+      addCopilotMsg('system', 'Backtest',
+        '<strong>Backtest complete.</strong> Sharpe 1.71, MaxDD 11.8%.<br><br>' +
+        '⚠️ <strong>Overfitting check:</strong> DSR=0.08 (passed). Parameter sensitivity is low — the strategy is relatively robust.<br><br>' +
+        'The strategy excels in trending bull markets (Sharpe 2.1) but weakens in sharp bears (Sharpe 0.6). Consider adding a VIX filter.',
+        [['View full AI report','fa fa-file-text'],['Deploy to Paper Trade','fa fa-rocket']]);
+    }
+    bar.style.width = progress + '%';
+  }, 600);
+}
+
+function deployPaperTrade() {
+  goToStage('paper');
+  document.getElementById('ptRunning').style.display = 'none';
+  updatePipelineDone();
+}
+
+function confirmDeploy() {
+  const mode = document.getElementById('ptMode').value;
+  document.getElementById('ptRunning').style.display = 'block';
+  document.getElementById('ptModeLabel').textContent = mode === 'auto' ? 'Full Auto' : 'Signal Mode';
+  document.getElementById('ptStartTime').textContent = new Date().toLocaleString();
+  document.getElementById('confirmDeployBtn').disabled = true;
+  pipelineDone.paper = true;
+  updatePipelineDone();
+  showToast('Strategy deployed to Paper Trading!', 'success');
+  addCopilotMsg('system', 'Paper Trading',
+    '✅ <strong>Strategy deployed!</strong> I\'ll monitor performance and alert you if:<br>' +
+    '• Max drawdown exceeds 15%<br>• 5 consecutive losses occur<br>• Sharpe drops below 1.0<br><br>' +
+    'You can view real-time status in the <a href="paper-trading-account.html" style="color:hsl(var(--primary))">Paper Trading dashboard</a>.',
+    [['View Dashboard','fa fa-chart-line'],['Set more alerts','fa fa-bell']]);
+}
+
+function stopPaperTrade() {
+  document.getElementById('ptRunning').style.display = 'none';
+  document.getElementById('confirmDeployBtn').disabled = false;
+  showToast('Paper trading stopped', 'info');
+}
+
+// ── Pipeline visual update ──
+function updatePipelineDone() {
+  document.querySelectorAll('.pipe-step').forEach(s => {
+    const stage = s.dataset.stage;
+    if (stage === currentStage) s.classList.add('active');
+    else s.classList.remove('active');
+    if (pipelineDone[stage]) s.classList.add('done');
+  });
+}
+
+// ── Reset ──
+function resetPipeline() {
+  selectedFactors = [];
+  currentStage = 'factor';
+  pipelineDone = {factor:false, strategy:false, backtest:false, paper:false};
+  document.querySelectorAll('.stage-panel').forEach(p => p.classList.remove('active'));
+  document.querySelector('.stage-panel[data-stage="factor"]').classList.add('active');
+  document.querySelectorAll('.pipe-step').forEach(s => { s.classList.remove('active','done'); });
+  document.querySelector('.pipe-step[data-stage="factor"]').classList.add('active');
+  document.getElementById('btResult').style.display = 'none';
+  document.getElementById('btRunning').style.display = 'none';
+  document.getElementById('ptRunning').style.display = 'none';
+  document.getElementById('deployBtn').disabled = true;
+  document.getElementById('confirmDeployBtn').disabled = false;
+  document.getElementById('runBacktestBtn').disabled = false;
+  document.getElementById('selectedFactorsLabel').textContent = '-';
+  document.getElementById('copilotMsgs').innerHTML = `<div class="copilot-msg system">
+    <div class="msg-stage">Factor Research</div>
+    Welcome to the Workbench! I'm your AI Copilot. Start by selecting factors for your strategy.
+  </div>`;
+  renderFactorList();
+  updateSelectionCount();
+}
+
+// ── Copilot ──
+function addCopilotMsg(type, stage, text, actions) {
+  const container = document.getElementById('copilotMsgs');
+  const div = document.createElement('div');
+  div.className = 'copilot-msg ' + type;
+  let html = '';
+  if (stage) html += `<div class="msg-stage">${stage}</div>`;
+  html += text;
+  if (actions && actions.length) {
+    html += '<div class="copilot-actions">';
+    actions.forEach(a => { html += `<button class="btn btn-ghost btn-sm">${a[0]}</button>`; });
+    html += '</div>';
+  }
+  div.innerHTML = html;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function sendCopilotMessage() {
+  const input = document.getElementById('copilotInput');
+  const text = input.value.trim();
+  if (!text) return;
+  addCopilotMsg('user', null, text);
+  input.value = '';
+
+  // Simulate AI reply based on context
+  setTimeout(() => {
+    const replies = {
+      'factor': 'Based on your current factor selection, I suggest checking the pairwise correlation. momentum_20d and alpha_momentum_60d have a 0.67 correlation — consider dropping one to reduce redundancy.',
+      'strategy': 'Your strategy code looks good! I noticed the trailing stop is at 5%. For CSI 300 stocks, ATR-based stops often perform better than fixed percentage stops. Would you like me to show you how?',
+      'backtest': 'The backtest shows promising results. Key areas to watch: (1) The strategy underperforms in Q1 seasonality, suggesting potential calendar effects. (2) Turnover ratio of 3.2x/year is reasonable for this style.',
+      'paper': 'Your paper trading deployment is running smoothly. Current P&L is tracking slightly above backtest expectations (+0.3% alpha). This could be due to favorable execution timing in the current market.',
+    };
+    addCopilotMsg('system', currentStage.charAt(0).toUpperCase() + currentStage.slice(1), replies[currentStage] || 'I\'m here to help! What would you like to know about your strategy?');
+  }, 800);
+}
+
+function quickAction(action) {
+  if (action === 'recommendFactors') { aiRecommendFactors(); return; }
+  if (action === 'explainPipeline') {
+    addCopilotMsg('system', null, 'The Workbench guides you through 4 stages:<br>1. <strong>Factor Research</strong> — select predictive factors<br>2. <strong>Strategy Builder</strong> — generate or write strategy code<br>3. <strong>Backtest</strong> — validate performance historically<br>4. <strong>Paper Trading</strong> — test live in simulation<br><br>I\'ll assist at each step with contextual suggestions!');
+  }
+}
+
+// ── NL Strategy Generation ──
+function nlGenerateStrategy() {
+  document.getElementById('nlPreview').style.display = 'block';
+  showToast('AI parsed your strategy description', 'success');
+}
+
+// ── Strategy mode switch ──
+function switchStrategyMode(mode, btn) {
+  document.querySelectorAll('#stratModeCode, #stratModeVisual, #stratModeNL').forEach(e => e.style.display = 'none');
+  document.getElementById('stratMode' + mode.charAt(0).toUpperCase() + mode.slice(1)).style.display = 'block';
+  btn.parentElement.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active'); });
+  btn.classList.add('active');
+}
+
+// ── Session History ──
+function showSessionList() {
+  document.getElementById('sessionModal').style.display = 'flex';
+}
+function loadSession(id) {
+  closeModal('sessionModal');
+  showToast('Session loaded: ' + id, 'info');
+}
+
+// ── Init ──
+renderFactorList();
+updateSelectionCount();
+
+// ── Close modal on overlay click ──
+document.addEventListener('click', function(e) {
+  if (e.target.classList.contains('modal-overlay')) {
+    e.target.style.display = 'none';
+  }
+});
+</script>
+</body>
+</html>

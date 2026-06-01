@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>QuantMate — Visual Strategy Builder</title>
+  <link rel="stylesheet" href="shared.css">
+  <script src="https://cdn.tailwindcss.com?v=3.4"></script>
+  <style>
+    .vb-layout { display: grid; grid-template-columns: 240px 1fr 300px; gap: 16px; min-height: calc(100vh - 180px); }
+    .vb-left, .vb-right { display: flex; flex-direction: column; gap: 8px; }
+    .vb-canvas-area { display: flex; flex-direction: column; }
+    .vb-canvas {
+      flex: 1; min-height: 500px; border: 2px dashed hsl(var(--border)); border-radius: 12px;
+      background: hsl(var(--muted)/.2); padding: 16px; display: flex; flex-direction: column; gap: 12px;
+      position: relative; overflow-y: auto;
+    }
+    .vb-canvas.drag-over { border-color: hsl(var(--primary)); background: hsl(var(--primary)/.04); }
+
+    /* Component palette */
+    .comp-category { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: hsl(var(--muted-foreground)); padding: 8px 4px 4px; }
+    .comp-item {
+      display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 6px; cursor: grab;
+      border: 1px solid hsl(var(--border)); font-size: 13px; transition: all .15s; background: hsl(var(--card));
+    }
+    .comp-item:hover { border-color: hsl(var(--primary)/.4); background: hsl(var(--primary)/.04); }
+    .comp-item:active { cursor: grabbing; }
+    .comp-item .comp-icon { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+
+    /* Canvas blocks */
+    .canvas-block {
+      border: 2px solid hsl(var(--border)); border-radius: 10px; background: hsl(var(--card)); padding: 0;
+      transition: all .15s; cursor: pointer;
+    }
+    .canvas-block.selected { border-color: hsl(var(--primary)); box-shadow: 0 0 0 3px hsl(var(--primary)/.1); }
+    .canvas-block .block-header {
+      padding: 10px 14px; border-bottom: 1px solid hsl(var(--border)); display: flex; align-items: center; gap: 8px;
+      font-weight: 600; font-size: 14px;
+    }
+    .canvas-block .block-body { padding: 8px 14px; font-size: 13px; color: hsl(var(--muted-foreground)); }
+    .canvas-block .block-footer { padding: 6px 14px; border-top: 1px solid hsl(var(--border)); display: flex; gap: 4px; font-size: 12px; }
+    .canvas-block .block-tag { background: hsl(var(--muted)); padding: 2px 8px; border-radius: 4px; font-size: 11px; }
+    .canvas-arrow { text-align: center; font-size: 20px; color: hsl(var(--muted-foreground)); margin: 2px 0; }
+
+    /* Category colors */
+    .cat-universe { border-left: 4px solid #6366f1; }
+    .cat-timing { border-left: 4px solid #f59e0b; }
+    .cat-position { border-left: 4px solid #10b981; }
+    .cat-risk { border-left: 4px solid #ef4444; }
+
+    /* NL Mode */
+    .nl-input-area { padding: 20px; }
+    .nl-examples { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+    .nl-example {
+      padding: 6px 12px; border-radius: 20px; font-size: 12px; cursor: pointer;
+      background: hsl(var(--muted)); border: 1px solid hsl(var(--border)); transition: all .15s;
+    }
+    .nl-example:hover { border-color: hsl(var(--primary)); background: hsl(var(--primary)/.06); }
+
+    /* Code preview modal */
+    .code-modal-body { max-height: 60vh; overflow-y: auto; }
+
+    @media (max-width: 1100px) {
+      .vb-layout { grid-template-columns: 1fr; }
+      .vb-left { flex-direction: row; flex-wrap: wrap; gap: 4px; }
+      .vb-left .comp-category { display: none; }
+      .vb-right { display: none; }
+    }
+  </style>
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <main class="main-content" id="main">
+
+    <div class="page-header" style="margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
+        <div>
+          <h1 class="page-title">Visual Strategy Builder</h1>
+          <p class="page-subtitle">Build strategies by dragging components, or describe in natural language</p>
+        </div>
+        <div style="display:flex;gap:8px">
+          <div class="tabs" style="margin-bottom:0;border-bottom:none">
+            <button class="tab-btn active" onclick="switchMode('visual')" id="tabVisual"><span id="ico-layout"></span> Visual</button>
+            <button class="tab-btn" onclick="switchMode('nl')" id="tabNL"><span id="ico-sparkles"></span> NL Describe</button>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="openCodePreview()"><span id="ico-code"></span> View Code</button>
+          <button class="btn btn-primary btn-sm" onclick="saveStrategy()"><span id="ico-save"></span> Save Strategy</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ VISUAL MODE ═══ -->
+    <div id="visualMode" class="vb-layout">
+      <!-- LEFT: Component Palette -->
+      <div class="vb-left" id="compPalette">
+        <input type="text" class="form-input" placeholder="Search components..." style="margin-bottom:8px" oninput="filterComponents(this.value)">
+
+        <div class="comp-category">📊 Universe (Stock Selection)</div>
+        <div class="comp-item" draggable="true" data-comp="market_cap_filter" data-cat="universe" ondragstart="dragStart(event)" ondragend="dragEnd(event)">
+          <span class="comp-icon" style="background:#6366f1/10">📏</span> Market Cap Filter
+        </div>
+        <div class="comp-item" draggable="true" data-comp="pe_filter" data-cat="universe" ondragstart="dragStart(event)" ondragend="dragEnd(event)">
+          <span class="comp-icon" style="background:#6366f1/10">📋</span> PE Ratio Filter
+        </div>
+        <div class="comp-item" draggable="true" data-comp="volume_filter" data-cat="universe" ondragstart="dragStart(event)" ondragend="dragEnd(event)">
+          <span class="comp-icon" style="background:#6366f1/10">📊</span> Volume Filter
+        </div>
+        <div class="comp-item" draggable="true" data-comp="industry_filter" data-cat="universe" ondragstart="dragStart(event)" ondragend="dragEnd(event)">
+          <span class="comp-icon" style="background:#6366f1/10">🏭</span> Industry Filter
+        </div>
+        <div class="comp-item" draggable="true" data-comp="index_constituent" data-cat="universe" ondragstart="dragStart(event)" ondragend="dragEnd(event)">
+          <span class="comp-icon" style="background:#6366f1/10">📑</span> Index Constituent
+        </div>
+
+        <div class="comp-category">📈 Timing (Signals)</div>
+        <div class="comp-item" draggable="true" data-comp="ma_crossover" data-cat="timing" ondragstart="dragStart(event)" ondragend="dragEnd(event)">
+          <span class="comp-icon" style="background:#f59e0b/10">📈</span> MA Crossover
+        </div>
+        <div class="comp-item" draggable="true" data-comp="bollinger_breakout" data-cat="timing" ondragstart="dragStart(event)" ondragend="dragEnd(event)">
+          <span class="comp-icon" style="background:#f59e0b/10">〰️</span> Bollinger Breakout
+        </div>
+        <div class="comp-item" draggable="true" data-comp="macd_signal" data-cat="timing" ondragstart="dragStart(event)" ondragend="dragEnd(event)">
+          <span class="comp-icon" style="background:#f59e0b/10">📉</span> MACD Signal
+        </div>
+        <div class="comp-item" draggable="true" data-comp="rsi_signal" data-cat="timing" ondragstart="dragStart(event)" ondragend="dragEnd(event)">
+          <span class="comp-icon" style="background:#f59e0b/10">🔄</span> RSI Signal
+        </div>
+        <div class="comp-item" draggable="true" data-comp="factor_scoring" data-cat="timing" ondragstart="dragStart(event)" ondragend="dragEnd(event)">
+          <span class="comp-icon" style="background:#f59e0b/10">🎯</span> Factor Scoring
+        </div>
+        <div class="comp-item" draggable="true" data-comp="volume_breakout" data-cat="timing" ondragstart="dragStart(event)" ondragend="dragEnd(event)">
+          <span class="comp-icon" style="background:#f59e0b/10">🔊</span> Volume Breakout
+        </div>
+
+        <div class="comp-category">⚖️ Position Sizing</div>
+        <div class="comp-item" draggable="true" data-comp="equal_weight" data-cat="position" ondragstart="dragStart(event)" ondragend="dragEnd(event)">
+          <span class="comp-icon" style="background:#10b981/10">⚖️</span> Equal Weight
+        </div>
+        <div class="comp-item" draggable="true" data-comp="kelly_sizing" data-cat="position" ondragstart="dragStart(event)" ondragend="dragEnd(event)">
+          <span class="comp-icon" style="background:#10b981/10">🎲</span> Kelly Criterion
+        </div>
+        <div class="comp-item" draggable="true" data-comp="risk_parity" data-cat="position" ondragstart="dragStart(event)" ondragend="dragEnd(event)">
+          <span class="comp-icon" style="background:#10b981/10">🛡️</span> Risk Parity
+        </div>
+
+        <div class="comp-category">🛡️ Risk Control</div>
+        <div class="comp-item" draggable="true" data-comp="fixed_stop_loss" data-cat="risk" ondragstart="dragStart(event)" ondragend="dragEnd(event)">
+          <span class="comp-icon" style="background:#ef4444/10">🛑</span> Fixed Stop Loss
+        </div>
+        <div class="comp-item" draggable="true" data-comp="atr_stop" data-cat="risk" ondragstart="dragStart(event)" ondragend="dragEnd(event)">
+          <span class="comp-icon" style="background:#ef4444/10">📐</span> ATR Trailing Stop
+        </div>
+        <div class="comp-item" draggable="true" data-comp="drawdown_clear" data-cat="risk" ondragstart="dragStart(event)" ondragend="dragEnd(event)">
+          <span class="comp-icon" style="background:#ef4444/10">🚫</span> Drawdown Clearout
+        </div>
+      </div>
+
+      <!-- CENTER: Canvas -->
+      <div class="vb-canvas-area">
+        <div style="font-size:12px;color:hsl(var(--muted-foreground));margin-bottom:8px">
+          <span id="ico-info"></span> Drag components here to build your strategy pipeline. Click a block to configure.
+        </div>
+        <div class="vb-canvas" id="canvas" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="drop(event)">
+          <div style="color:hsl(var(--muted-foreground));text-align:center;padding:40px" id="canvasEmpty">
+            <div style="font-size:48px;margin-bottom:12px;opacity:.3">🧩</div>
+            <div style="font-weight:600;margin-bottom:4px">Your strategy canvas is empty</div>
+            <div style="font-size:13px">Drag &amp; drop components from the left palette</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Properties -->
+      <div class="vb-right" id="propsPanel">
+        <div class="card" style="padding:16px">
+          <h4 style="margin:0 0 4px;font-size:15px;font-weight:600">Properties</h4>
+          <p class="text-muted" style="font-size:12px;margin:0 0 12px;">Select a block on the canvas to edit</p>
+          <div id="propsContent">
+            <div style="color:hsl(var(--muted-foreground));font-size:13px;text-align:center;padding:20px">
+              No block selected
+            </div>
+          </div>
+        </div>
+
+        <!-- Strategy Summary -->
+        <div class="card" style="padding:16px">
+          <h4 style="margin:0 0 8px;font-size:15px;font-weight:600">Strategy Summary</h4>
+          <div id="strategySummary" style="font-size:13px;color:hsl(var(--muted-foreground))">
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span>Components:</span><strong id="compCount">0</strong></div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span>Estimated Sharpe:</span><strong id="estSharpe">-</strong></div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span>Overfitting risk:</span><strong id="estOverfit">-</strong></div>
+            <div style="margin-top:8px">
+              <span class="badge badge-secondary" style="font-size:10px" id="complexityBadge">Simple</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ NL MODE ═══ -->
+    <div id="nlMode" style="display:none">
+      <div class="card nl-input-area" style="margin-bottom:16px">
+        <h3 class="card-title">Describe Your Trading Strategy</h3>
+        <textarea id="nlInput" class="form-input" rows="5" style="width:100%;font-family:inherit;font-size:14px;margin-bottom:12px" placeholder="Describe your strategy in natural language. Include: what to trade, when to enter/exit, how to size positions, and what risk controls to apply.
+
+Example: "Create a momentum rotation strategy for CSI 300 stocks. Rank by 20-day returns, buy top 10, rebalance weekly. Use equal weight position sizing. Set a 10% portfolio drawdown limit and 8% individual stop loss."></textarea>
+        <div class="nl-examples">
+          <span style="font-size:12px;color:hsl(var(--muted-foreground));align-self:center">Quick examples:</span>
+          <span class="nl-example" onclick="fillNL('trending')">Trend-following</span>
+          <span class="nl-example" onclick="fillNL('meanrev')">Mean reversion</span>
+          <span class="nl-example" onclick="fillNL('momentum')">Momentum rotation</span>
+          <span class="nl-example" onclick="fillNL('grid')">Grid trading</span>
+        </div>
+        <button class="btn btn-primary" style="margin-top:12px" onclick="parseNL()" id="nlParseBtn">
+          <span id="ico-sparkles"></span> Generate Strategy
+        </button>
+      </div>
+
+      <!-- NL Result -->
+      <div id="nlResult" style="display:none">
+        <div class="card" style="margin-bottom:16px;background:hsl(var(--primary)/.04);border:1px solid hsl(var(--primary)/.2)">
+          <h4 style="margin:0 0 12px"><span id="ico-sparkles" style="color:hsl(var(--primary))"></span> AI Parsed Strategy</h4>
+          <div class="stat-grid cols-3" style="margin-bottom:12px">
+            <div><div style="font-size:11px;color:hsl(var(--muted-foreground));text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Universe</div><div style="font-weight:600" id="nlUniverse">-</div></div>
+            <div><div style="font-size:11px;color:hsl(var(--muted-foreground));text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Signal / Entry</div><div style="font-weight:600" id="nlSignal">-</div></div>
+            <div><div style="font-size:11px;color:hsl(var(--muted-foreground));text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Exit / Rebalance</div><div style="font-weight:600" id="nlExit">-</div></div>
+          </div>
+          <div class="stat-grid cols-2" style="margin-bottom:12px">
+            <div><div style="font-size:11px;color:hsl(var(--muted-foreground));text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Position Sizing</div><div style="font-weight:600" id="nlPosition">-</div></div>
+            <div><div style="font-size:11px;color:hsl(var(--muted-foreground));text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Risk Controls</div><div style="font-weight:600" id="nlRisk">-</div></div>
+          </div>
+          <div style="background:hsl(var(--warning)/.1);padding:10px 14px;border-radius:6px;font-size:12px;margin-bottom:12px">
+            <strong>⚠️ Known Limitations:</strong> <span id="nlLimits">-</span>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-primary btn-sm" onclick="confirmNLStrategy()"><span id="ico-check"></span> Confirm & Save as Strategy</button>
+            <button class="btn btn-ghost btn-sm" onclick="refineNL()"><span id="ico-edit"></span> Refine Description</button>
+            <button class="btn btn-ghost btn-sm" onclick="switchMode('visual')"><span id="ico-layout"></span> Edit in Visual Builder</button>
+          </div>
+        </div>
+        <div class="code-preview" id="nlCodePreview" style="background:#1e1e2e;color:#cdd6f4;border-radius:8px;padding:16px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;line-height:1.6;overflow:auto;max-height:400px"></div>
+      </div>
+    </div>
+
+    <!-- ═══ Code Preview Modal ═══ -->
+    <div class="modal-overlay" id="codeModal" style="display:none">
+      <div class="modal" style="max-width:700px">
+        <div class="modal-header">
+          <h3 class="modal-title">Generated Strategy Code</h3>
+          <button class="btn btn-ghost btn-icon" onclick="closeModal('codeModal')">×</button>
+        </div>
+        <div class="modal-body code-modal-body">
+          <div style="background:#1e1e2e;color:#cdd6f4;border-radius:8px;padding:16px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;line-height:1.6;white-space:pre-wrap" id="codeContent">from vnpy_ctastrategy import CtaTemplate, BarData
+
+class CanvasStrategy(CtaTemplate):
+    """Auto-generated strategy from Visual Builder"""
+    author = "QuantMate Visual Builder"
+
+    # Universe: Market Cap Filter
+    min_market_cap = 5e9  # 50亿
+    max_market_cap = 2e11 # 2000亿
+
+    # Timing: MA Crossover
+    fast_period = 20
+    slow_period = 60
+
+    # Timing: Factor Scoring
+    factors = ['momentum_20d', 'volatility_20d']
+
+    # Position: Equal Weight
+    max_positions = 10
+
+    # Risk: ATR Trailing Stop
+    atr_period = 14
+    atr_multiplier = 2.0
+
+    def on_bar(self, bar: BarData):
+        # Universe filtering
+        if not self._check_market_cap(bar):
+            return
+
+        # Signal generation
+        signal = self._ma_crossover_signal(bar)
+        signal += self._factor_score_signal(bar)
+
+        # Execute
+        if signal > 0 and self.pos == 0:
+            self.buy(bar.close_price, self.fixed_size)
+        elif signal < 0 and self.pos > 0:
+            self.sell(bar.close_price, abs(self.pos))
+
+        # ATR trailing stop
+        self._atr_trailing_stop(bar)</div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost btn-sm" onclick="navigator.clipboard.writeText(document.getElementById('codeContent').textContent);showToast('Code copied!','success')"><span id="ico-copy"></span> Copy</button>
+          <button class="btn btn-ghost btn-sm" onclick="showToast('Lint: 0 errors, 0 warnings','success')"><span id="ico-check"></span> Lint Check</button>
+          <button class="btn btn-primary btn-sm" onclick="closeModal('codeModal')">Close</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="shared.js"></script>
+<script>
+/* ============================================================
+   Visual Strategy Builder — Drag & Drop + NL Generation
+   ============================================================ */
+
+let canvasBlocks = [];
+let selectedBlockId = null;
+let blockCounter = 0;
+
+// ── Component metadata ──
+const COMP_META = {
+  market_cap_filter: {name:'Market Cap Filter', cat:'universe', params:{min_cap:{type:'number',default:5e9,label:'Min Market Cap (¥)'},max_cap:{type:'number',default:2e11,label:'Max Market Cap (¥)'}}, desc:'Filters stocks by market capitalization range'},
+  pe_filter: {name:'PE Ratio Filter', cat:'universe', params:{max_pe:{type:'number',default:50,label:'Max PE Ratio'},min_pe:{type:'number',default:0,label:'Min PE Ratio'}}, desc:'Filters stocks by PE ratio range'},
+  volume_filter: {name:'Volume Filter', cat:'universe', params:{min_volume_ratio:{type:'number',default:1.0,label:'Min Volume Ratio (vs 20d avg)'}}, desc:'Filters by relative trading volume'},
+  industry_filter: {name:'Industry Filter', cat:'universe', params:{industries:{type:'select',default:'all',label:'Industries',options:['all','financial','tech','consumer','healthcare','energy']}}, desc:'Selects stocks from specific industries'},
+  index_constituent: {name:'Index Constituent', cat:'universe', params:{index:{type:'select',default:'000300.SH',label:'Index',options:['000300.SH (CSI 300)','000905.SH (CSI 500)','399001.SZ (SZ Comp)']}}, desc:'Limits to constituents of a specific index'},
+
+  ma_crossover: {name:'MA Crossover', cat:'timing', params:{fast:{type:'number',default:20,label:'Fast Period'},slow:{type:'number',default:60,label:'Slow Period'}}, desc:'Buy when fast MA crosses above slow MA'},
+  bollinger_breakout: {name:'Bollinger Breakout', cat:'timing', params:{period:{type:'number',default:20,label:'BB Period'},std:{type:'number',default:2.0,label:'Std Multiplier',step:0.5}}, desc:'Buy at lower band, sell at upper band'},
+  macd_signal: {name:'MACD Signal', cat:'timing', params:{fast:{type:'number',default:12},slow:{type:'number',default:26},signal:{type:'number',default:9}}, desc:'MACD histogram crossover signals'},
+  rsi_signal: {name:'RSI Signal', cat:'timing', params:{period:{type:'number',default:14},oversold:{type:'number',default:30},overbought:{type:'number',default:70}}, desc:'RSI oversold/overbought signals'},
+  factor_scoring: {name:'Factor Scoring', cat:'timing', params:{factors:{type:'text',default:'momentum_20d, volatility_20d',label:'Factor Names (comma-separated)'},rank_pct:{type:'number',default:0.2,label:'Top Rank %',step:0.05}}, desc:'Ranks stocks by multi-factor scores'},
+  volume_breakout: {name:'Volume Breakout', cat:'timing', params:{threshold:{type:'number',default:2.0,label:'Volume Multiple vs MA'}}, desc:'Signals on abnormal volume spikes'},
+
+  equal_weight: {name:'Equal Weight', cat:'position', params:{max_positions:{type:'number',default:10,label:'Max Positions'}}, desc:'Equal capital allocation across positions'},
+  kelly_sizing: {name:'Kelly Criterion', cat:'position', params:{fraction:{type:'number',default:0.5,label:'Kelly Fraction',step:0.1}}, desc:'Kelly formula-based position sizing'},
+  risk_parity: {name:'Risk Parity', cat:'position', params:{lookback:{type:'number',default:60,label:'Volatility Lookback'}}, desc:'Allocates inversely to volatility'},
+
+  fixed_stop_loss: {name:'Fixed Stop Loss', cat:'risk', params:{stop_pct:{type:'number',default:0.08,label:'Stop Loss %',step:0.01}}, desc:'Fixed percentage stop loss per position'},
+  atr_stop: {name:'ATR Trailing Stop', cat:'risk', params:{period:{type:'number',default:14,label:'ATR Period'},multiplier:{type:'number',default:2.0,label:'ATR Multiplier',step:0.5}}, desc:'Dynamic trailing stop based on ATR'},
+  drawdown_clear: {name:'Drawdown Clearout', cat:'risk', params:{max_dd_pct:{type:'number',default:0.15,label:'Max Portfolio Drawdown %',step:0.01}}, desc:'Clears all positions if portfolio drawdown exceeds limit'},
+};
+
+// ── Drag & Drop ──
+function dragStart(e) {
+  e.dataTransfer.setData('text/plain', e.target.dataset.comp);
+  e.dataTransfer.effectAllowed = 'copy';
+  e.target.style.opacity = '0.5';
+}
+function dragEnd(e) { e.target.style.opacity = '1'; }
+function dragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'copy';
+  document.getElementById('canvas').classList.add('drag-over');
+}
+function dragLeave(e) { document.getElementById('canvas').classList.remove('drag-over'); }
+
+function drop(e) {
+  e.preventDefault();
+  document.getElementById('canvas').classList.remove('drag-over');
+  const compKey = e.dataTransfer.getData('text/plain');
+  if (!compKey || !COMP_META[compKey]) return;
+  addBlock(compKey);
+}
+
+function addBlock(compKey) {
+  const meta = COMP_META[compKey];
+  const id = 'block-' + (++blockCounter);
+  const catClass = 'cat-' + meta.cat;
+  const block = {id, compKey, params:{}};
+  // Init default params
+  Object.entries(meta.params).forEach(([k,v]) => { block.params[k] = v.default; });
+  canvasBlocks.push(block);
+  renderCanvas();
+  selectBlock(id);
+  updateSummary();
+}
+
+function renderCanvas() {
+  const canvas = document.getElementById('canvas');
+  const empty = document.getElementById('canvasEmpty');
+  if (canvasBlocks.length === 0) {
+    empty.style.display = 'block';
+    // Keep only empty msg
+    canvas.querySelectorAll('.canvas-block,.canvas-arrow').forEach(e => e.remove());
+  } else {
+    empty.style.display = 'none';
+    let html = '';
+    canvasBlocks.forEach((block, i) => {
+      if (i > 0) html += '<div class="canvas-arrow">↓</div>';
+      const meta = COMP_META[block.compKey];
+      const selClass = block.id === selectedBlockId ? ' selected' : '';
+      html += `<div class="canvas-block cat-${meta.cat}${selClass}" id="${block.id}" onclick="selectBlock('${block.id}')">
+        <div class="block-header">
+          <span>${meta.name}</span>
+          <span style="margin-left:auto;font-size:12px;color:hsl(var(--muted-foreground));cursor:pointer" onclick="event.stopPropagation();removeBlock('${block.id}')">✕</span>
+        </div>
+        <div class="block-body">${meta.desc}</div>
+        <div class="block-footer">
+          ${Object.entries(block.params).map(([k,v]) => `<span class="block-tag">${k}: ${v}</span>`).join('')}
+        </div>
+      </div>`;
+    });
+    // Preserve empty div
+    canvas.querySelectorAll('.canvas-block,.canvas-arrow').forEach(e => e.remove());
+    if (empty) empty.style.display = 'none';
+    canvas.insertAdjacentHTML('beforeend', html);
+  }
+}
+
+function removeBlock(id) {
+  canvasBlocks = canvasBlocks.filter(b => b.id !== id);
+  if (selectedBlockId === id) { selectedBlockId = null; document.getElementById('propsContent').innerHTML = '<div style="color:hsl(var(--muted-foreground));font-size:13px;text-align:center;padding:20px">No block selected</div>'; }
+  renderCanvas();
+  updateSummary();
+}
+
+function selectBlock(id) {
+  selectedBlockId = id;
+  renderCanvas();
+  const block = canvasBlocks.find(b => b.id === id);
+  if (!block) return;
+  const meta = COMP_META[block.compKey];
+  let html = `<h5 style="margin:0 0 12px;font-size:14px">${meta.name}</h5>`;
+  Object.entries(meta.params).forEach(([key, config]) => {
+    const val = block.params[key];
+    html += `<div class="form-group" style="margin-bottom:10px"><label class="form-label" style="font-size:12px">${config.label || key}</label>`;
+    if (config.type === 'select') {
+      html += `<select class="form-select" style="width:100%" onchange="updateParam('${id}','${key}',this.value)">`;
+      config.options.forEach(o => { html += `<option value="${o}" ${val===o?'selected':''}>${o}</option>`; });
+      html += '</select>';
+    } else {
+      html += `<input class="form-input" style="width:100%" type="${config.type||'text'}" value="${val}" ${config.step?'step='+config.step:''} onchange="updateParam('${id}','${key}',this.value)">`;
+    }
+    html += '</div>';
+  });
+  html += `<button class="btn btn-ghost btn-sm text-destructive" style="margin-top:8px" onclick="removeBlock('${id}')">Remove Component</button>`;
+  document.getElementById('propsContent').innerHTML = html;
+}
+
+function updateParam(blockId, key, value) {
+  const block = canvasBlocks.find(b => b.id === blockId);
+  if (!block) return;
+  block.params[key] = (typeof block.params[key] === 'number') ? parseFloat(value) : value;
+  renderCanvas();
+  selectBlock(blockId);
+}
+
+// ── Summary ──
+function updateSummary() {
+  document.getElementById('compCount').textContent = canvasBlocks.length;
+  const complexity = canvasBlocks.length <= 3 ? 'Simple' : canvasBlocks.length <= 6 ? 'Moderate' : 'Complex';
+  document.getElementById('complexityBadge').textContent = complexity;
+  document.getElementById('estSharpe').textContent = canvasBlocks.length >= 3 ? '1.2-1.8' : '-';
+  document.getElementById('estOverfit').textContent = canvasBlocks.length <= 5 ? 'Low' : canvasBlocks.length <= 8 ? 'Medium' : 'High';
+}
+
+// ── Mode Switch ──
+function switchMode(mode) {
+  document.getElementById('visualMode').style.display = mode === 'visual' ? 'grid' : 'none';
+  document.getElementById('nlMode').style.display = mode === 'nl' ? 'block' : 'none';
+  document.getElementById('tabVisual').classList.toggle('active', mode === 'visual');
+  document.getElementById('tabNL').classList.toggle('active', mode === 'nl');
+}
+
+// ── NL Examples ──
+const NL_EXAMPLES = {
+  'trending': 'Create a trend-following strategy for CSI 300 stocks. Use 20/60 MA crossover for entry, exit when price crosses below 60-day MA. Use equal weight with max 10 positions. Set 2x ATR trailing stop.',
+  'meanrev': 'Build a mean reversion strategy using Bollinger Bands (20,2). Buy when price touches lower band and RSI(14) < 35. Sell when price returns to middle band. Use 5% fixed stop loss.',
+  'momentum': 'Create a momentum rotation strategy. Every week, rank CSI 500 stocks by 20-day returns. Buy top 20% performers, equal weight. Rebalance weekly. Set 15% max drawdown limit.',
+  'grid': 'Build a grid trading strategy for volatile stocks. Create 10 grid levels spaced 2% apart between the 20-day low and high. Allocate 10% capital per grid level. No stop loss — grid is self-hedging.',
+};
+
+function fillNL(type) {
+  document.getElementById('nlInput').value = NL_EXAMPLES[type];
+}
+
+function parseNL() {
+  const input = document.getElementById('nlInput').value.trim();
+  if (!input) return;
+
+  document.getElementById('nlParseBtn').disabled = true;
+  document.getElementById('nlParseBtn').innerHTML = '⏳ Analyzing...';
+  document.getElementById('nlResult').style.display = 'none';
+
+  // Simulate AI parsing delay
+  setTimeout(() => {
+    // Mock parse results based on input
+    const isMomentum = input.includes('momentum');
+    const isTrend = input.includes('trend');
+    const isReversal = input.includes('reversion') || input.includes('Bollinger');
+
+    document.getElementById('nlUniverse').textContent = input.includes('CSI 300') ? 'CSI 300 (000300.SH)' : input.includes('CSI 500') ? 'CSI 500 (000905.SH)' : 'CSI 300 (000300.SH)';
+    document.getElementById('nlSignal').textContent = isMomentum ? '20-day return ranking, top 20%' : isTrend ? '20/60 MA Crossover' : 'Bollinger Band (20,2) + RSI < 35';
+    document.getElementById('nlExit').textContent = isMomentum ? 'Weekly rebalance' : isTrend ? 'Price crosses below 60 MA' : 'Price returns to middle band';
+    document.getElementById('nlPosition').textContent = 'Equal weight, max 10 positions';
+    document.getElementById('nlRisk').textContent = input.includes('ATR') ? '2x ATR trailing stop' : input.includes('5%') ? '5% fixed stop loss' : '15% max portfolio drawdown';
+    document.getElementById('nlLimits').textContent = 'Strategy does not account for trading costs and market impact. May underperform during sudden market regime changes. Not tested for liquidity constraints.';
+
+    document.getElementById('nlCodePreview').textContent = `from vnpy_ctastrategy import CtaTemplate, BarData
+import numpy as np
+
+class NLParsedStrategy(CtaTemplate):
+    """Auto-generated from NL: ${input.substring(0, 60)}..."""
+    author = "QuantMate NL Generator"
+
+    parameters = [
+        "momentum_period", "top_pct", "max_positions",
+        "atr_period", "atr_multiplier"
+    ]
+    momentum_period = 20
+    top_pct = 0.2
+    max_positions = 10
+    atr_period = 14
+    atr_multiplier = 2.0
+
+    def __init__(self, cta_engine, strategy_name, vt_symbol, setting):
+        super().__init__(cta_engine, strategy_name, vt_symbol, setting)
+
+    def on_bar(self, bar: BarData):
+        # Signal: momentum ranking (simplified to single-instrument)
+        momentum = (bar.close_price / self.am.close[-self.momentum_period]) - 1
+
+        # Entry
+        if momentum > 0 and self.pos == 0:
+            self.buy(bar.close_price, self.fixed_size)
+
+        # ATR trailing stop
+        if self.pos > 0:
+            atr = self.am.atr(self.atr_period)
+            stop_price = bar.close_price - self.atr_multiplier * atr
+            if bar.close_price < stop_price:
+                self.sell(bar.close_price, abs(self.pos))`;
+
+    document.getElementById('nlResult').style.display = 'block';
+    document.getElementById('nlParseBtn').disabled = false;
+    document.getElementById('nlParseBtn').innerHTML = '<span id="ico-sparkles"></span> Generate Strategy';
+    showToast('Strategy generated from natural language!', 'success');
+  }, 1500);
+}
+
+function confirmNLStrategy() { showToast('Strategy saved! Redirecting to backtest...', 'success'); }
+function refineNL() { document.getElementById('nlResult').style.display = 'none'; document.getElementById('nlInput').focus(); }
+
+// ── Modals ──
+function openCodePreview() {
+  document.getElementById('codeModal').style.display = 'flex';
+  // Update code with canvas params
+  let code = 'from vnpy_ctastrategy import CtaTemplate, BarData\n\nclass CanvasStrategy(CtaTemplate):\n    """Auto-generated from Visual Builder"""\n    author = "QuantMate"\n\n';
+  canvasBlocks.forEach(b => {
+    const meta = COMP_META[b.compKey];
+    Object.entries(b.params).forEach(([k,v]) => { code += `    ${k} = ${typeof v==='string'?`'${v}'`:v}\n`; });
+  });
+  code += '\n    def on_bar(self, bar: BarData):\n        pass  # Component logic integrated\n';
+  document.getElementById('codeContent').textContent = code;
+}
+function saveStrategy() { showToast('Strategy saved successfully!', 'success'); }
+function filterComponents(v) {
+  const items = document.querySelectorAll('.comp-item');
+  items.forEach(item => {
+    const meta = COMP_META[item.dataset.comp];
+    item.style.display = (!v || (meta && meta.name.toLowerCase().includes(v.toLowerCase()))) ? '' : 'none';
+  });
+}
+
+// ── Close modal on overlay click ──
+document.addEventListener('click', function(e) {
+  if (e.target.classList.contains('modal-overlay')) {
+    e.target.style.display = 'none';
+  }
+});
+</script>
+</body>
+</html>
